@@ -2,7 +2,7 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-var pixelRatio = 1;
+var pixelRatio = window.devicePixelRatio || 1;
 var qualityLevel = 2; // 0=low, 1=medium, 2=high
 var sfxVolume = 1.0;
 var showSettings = false;
