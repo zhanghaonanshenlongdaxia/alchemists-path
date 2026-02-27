@@ -931,7 +931,9 @@ canvas.addEventListener('touchstart',function(e){
     for(var i=0;i<e.changedTouches.length;i++){
         var t=e.changedTouches[i];
         if(carriedPotions.length>0){
-            var qbX=12,qbY=canvas.height-130,qbSlotW=48,qbSlotH=48,qbGap=6;
+            var qbSlotW=48,qbSlotH=48,qbGap=6;
+            var qbTotalW=carriedPotions.length*(qbSlotW+qbGap)-qbGap;
+            var qbX=Math.floor((canvas.width-qbTotalW)/2),qbY=canvas.height-(isMobile?55:60);
             var hitSlot=false;
             for(var pi=0;pi<carriedPotions.length;pi++){
                 var sx=qbX+pi*(qbSlotW+qbGap);
@@ -2230,8 +2232,9 @@ function drawExpeditionHUD(){
 
     // Potion quickbar (improved with glow and better visuals)
     if(carriedPotions.length>0){
-        var qbX=12,qbY=canvas.height-(isMobile?130:60);
         var qbSlotW=48,qbSlotH=48,qbGap=6;
+        var qbTotalW=carriedPotions.length*(qbSlotW+qbGap)-qbGap;
+        var qbX=Math.floor((W-qbTotalW)/2),qbY=canvas.height-(isMobile?55:60);
         for(var i=0;i<carriedPotions.length;i++){
             var p=carriedPotions[i];
             var sx2=qbX+i*(qbSlotW+qbGap),sy2=qbY;
@@ -3903,7 +3906,9 @@ canvas.addEventListener('click',function(e){
             }
         }
         if(carriedPotions.length>0){
-            var qbX=12,qbY=canvas.height-60,qbSlotW=48,qbSlotH=48,qbGap=6;
+            var qbSlotW=48,qbSlotH=48,qbGap=6;
+            var qbTotalW=carriedPotions.length*(qbSlotW+qbGap)-qbGap;
+            var qbX=Math.floor((canvas.width-qbTotalW)/2),qbY=canvas.height-(isMobile?55:60);
             for(var pi=0;pi<carriedPotions.length;pi++){
                 var sx=qbX+pi*(qbSlotW+qbGap);
                 if(cx>=sx&&cx<=sx+qbSlotW&&cy>=qbY&&cy<=qbY+qbSlotH){useCarriedPotion(pi);return;}
