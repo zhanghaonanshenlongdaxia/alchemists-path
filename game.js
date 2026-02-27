@@ -2,7 +2,37 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+var pixelRatio = 1;
+var qualityLevel = 2; // 0=low, 1=medium, 2=high
+var sfxVolume = 1.0;
+var showSettings = false;
+function applyQuality(){
+    if(qualityLevel===0) pixelRatio=1;
+    else if(qualityLevel===1) pixelRatio=Math.min(window.devicePixelRatio||1, 2);
+    else pixelRatio=window.devicePixelRatio||1;
+    resize();
+}
+function resize() {
+    var w=window.innerWidth, h=window.innerHeight;
+    canvas.width = w * pixelRatio;
+    canvas.height = h * pixelRatio;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+}
+// Override canvas width/height getters to return logical pixels for game code
+Object.defineProperty(canvas, '_pw', {get: function(){ return this.getAttribute('width')|0; }});
+Object.defineProperty(canvas, '_ph', {get: function(){ return this.getAttribute('height')|0; }});
+var _origWidthDesc = Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype, 'width');
+var _origHeightDesc = Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype, 'height');
+Object.defineProperty(canvas, 'width', {
+    get: function(){ return Math.round(this._pw / pixelRatio); },
+    set: function(v){ _origWidthDesc.set.call(this, v); }
+});
+Object.defineProperty(canvas, 'height', {
+    get: function(){ return Math.round(this._ph / pixelRatio); },
+    set: function(v){ _origHeightDesc.set.call(this, v); }
+});
 resize(); window.addEventListener('resize', resize);
 
 // ============ LANGUAGE SYSTEM ============
@@ -103,6 +133,10 @@ const LANG = {
         skScavenger: 'Scavenger', skScavengerD: '+30% gold from enemies',
         skDodge: 'Dodge', skDodgeD: '12% chance to dodge attacks',
         skSecondWind: 'Second Wind', skSecondWindD: 'Heal 30% HP once per floor',
+        // Settings
+        settingsTitle: 'SETTINGS', bgmVol: 'Music', sfxVol: 'Sound FX',
+        qualityLow: 'Low', qualityMed: 'Medium', qualityHigh: 'High', qualityLabel: 'Quality',
+        langLabel: 'Language', settingsClose: 'CLOSE',
     },
     zh: {
         title: '炼金之路',
@@ -173,6 +207,10 @@ const LANG = {
         skScavenger: '拾荒', skScavengerD: '敌人掉落金币+30%',
         skDodge: '闪避', skDodgeD: '12%几率闪避攻击',
         skSecondWind: '回春', skSecondWindD: '每层回复30%HP一次',
+        // Settings
+        settingsTitle: '设 置', bgmVol: '音乐', sfxVol: '音效',
+        qualityLow: '低', qualityMed: '中', qualityHigh: '高', qualityLabel: '画质',
+        langLabel: '语言', settingsClose: '关闭',
     }
 };
 function T(key) { return LANG[lang][key] || LANG.en[key] || key; }
@@ -828,6 +866,7 @@ canvas.addEventListener('touchstart',function(e){
     var t0=e.changedTouches[0];
     if(state==='menu'){handleMenuTouch(t0.clientX,t0.clientY);return;}
     if(state==='lab'){
+        if(showSettings){handleSettingsClick(t0.clientX,t0.clientY);return;}
         if(labTab){
             var W=canvas.width,H=canvas.height;
             var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
@@ -841,6 +880,7 @@ canvas.addEventListener('touchstart',function(e){
     }
     if(state==='gameover'){handleGameOverTouch(t0.clientX,t0.clientY);return;}
     if(state!=='expedition') return;
+    if(showSettings){handleSettingsClick(t0.clientX,t0.clientY);return;}
     // Handle popups first
     if(weaponPopup||merchantPopup){
         if(merchantPopup){
@@ -1996,6 +2036,7 @@ function renderExpedition(){
 
     // Minimap
     drawMinimap();
+    if(showSettings) drawSettings();
 }
 
 function drawMinimap(){
@@ -2192,6 +2233,8 @@ function drawExpeditionHUD(){
             ctx.fillText(recipeName(p).substring(0,6),sx2+qbSlotW/2,sy2-3);
         }
     }
+    // Settings gear in expedition
+    drawSettingsGear(W-38,15,26);
 }
 
 function useCarriedPotion(index){
@@ -2725,6 +2768,9 @@ function renderLab(){
     ctx.fillStyle='#4488ee';ctx.font='bold 9px monospace';ctx.textAlign='center';
     ctx.fillText(T('saveBtn'),svX+svW/2,svY+svH/2+3);
 
+    // Settings gear
+    drawSettingsGear(130,15,22);
+
     // Carried potions belt
     if(carriedPotions.length>0){
         var beltW=carriedPotions.length*50+80;
@@ -2777,6 +2823,7 @@ function renderLab(){
         ctx.fillText(labMessage,W/2,H*0.08+19);
         ctx.restore();
     }
+    if(showSettings) drawSettings();
 }
 
 // ============ EXTRACTION MINIGAME ============
@@ -3278,16 +3325,133 @@ function drawLabExpedition(cy){
     }
 }
 
+// ============ SETTINGS PANEL ============
+function drawSettingsGear(x, y, s){
+    ctx.save();ctx.fillStyle='rgba(10,10,20,0.6)';ctx.fillRect(x,y,s,s);
+    ctx.strokeStyle='#888';ctx.lineWidth=1;ctx.strokeRect(x,y,s,s);
+    ctx.fillStyle='#aaa';ctx.font='bold '+(s-6)+'px monospace';ctx.textAlign='center';
+    ctx.fillText('⚙',x+s/2,y+s/2+5);ctx.restore();
+}
+function drawSettings(){
+    var W=canvas.width,H=canvas.height;
+    ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
+    var pw=Math.min(W-40,360),ph=300,px=(W-pw)/2,py=(H-ph)/2;
+    ctx.fillStyle='rgba(14,14,26,0.97)';ctx.fillRect(px,py,pw,ph);
+    ctx.strokeStyle='#44dd88';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
+    ctx.fillStyle='#44dd88';ctx.fillRect(px,py,pw,3);
+    // Title
+    ctx.fillStyle='#44dd88';ctx.font='bold 18px monospace';ctx.textAlign='center';
+    ctx.fillText(T('settingsTitle'),W/2,py+30);
+    var cy=py+55, lh=42, sliderW=pw-120, sliderX=px+100;
+    // Language
+    ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='left';
+    ctx.fillText(T('langLabel'),px+20,cy+5);
+    var lbW=60,lbH=26,lbX=sliderX,lbY=cy-10;
+    ctx.fillStyle='#222';ctx.fillRect(lbX,lbY,lbW,lbH);ctx.strokeStyle='#44dd88';ctx.lineWidth=1;ctx.strokeRect(lbX,lbY,lbW,lbH);
+    ctx.fillStyle='#44dd88';ctx.font='bold 11px monospace';ctx.textAlign='center';
+    ctx.fillText(lang==='zh'?'中文':'EN',lbX+lbW/2,lbY+lbH/2+4);
+    cy+=lh;
+    // BGM Volume
+    ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='left';
+    ctx.fillText(T('bgmVol'),px+20,cy+5);
+    ctx.fillStyle='#333';ctx.fillRect(sliderX,cy-4,sliderW,10);
+    ctx.fillStyle='#44dd88';ctx.fillRect(sliderX,cy-4,sliderW*bgmVolume,10);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sliderX+sliderW*bgmVolume,cy+1,7,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#aaa';ctx.font='10px monospace';ctx.textAlign='right';
+    ctx.fillText(Math.round(bgmVolume*100)+'%',px+pw-15,cy+5);
+    cy+=lh;
+    // SFX Volume
+    ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='left';
+    ctx.fillText(T('sfxVol'),px+20,cy+5);
+    ctx.fillStyle='#333';ctx.fillRect(sliderX,cy-4,sliderW,10);
+    ctx.fillStyle='#4488ee';ctx.fillRect(sliderX,cy-4,sliderW*sfxVolume,10);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sliderX+sliderW*sfxVolume,cy+1,7,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#aaa';ctx.font='10px monospace';ctx.textAlign='right';
+    ctx.fillText(Math.round(sfxVolume*100)+'%',px+pw-15,cy+5);
+    cy+=lh;
+    // Quality
+    ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='left';
+    ctx.fillText(T('qualityLabel'),px+20,cy+5);
+    var qLabels=[T('qualityLow'),T('qualityMed'),T('qualityHigh')];
+    var qBtnW=Math.floor((sliderW-10)/3),qBtnH=26;
+    for(var i=0;i<3;i++){
+        var qx=sliderX+i*(qBtnW+5),qy=cy-10;
+        ctx.fillStyle=qualityLevel===i?'#44dd88':'#222';ctx.fillRect(qx,qy,qBtnW,qBtnH);
+        ctx.strokeStyle=qualityLevel===i?'#88ffbb':'#555';ctx.lineWidth=1;ctx.strokeRect(qx,qy,qBtnW,qBtnH);
+        ctx.fillStyle=qualityLevel===i?'#000':'#888';ctx.font='bold 11px monospace';ctx.textAlign='center';
+        ctx.fillText(qLabels[i],qx+qBtnW/2,qy+qBtnH/2+4);
+    }
+    cy+=lh+10;
+    // Close button
+    var cbW=120,cbH=34,cbX=W/2-cbW/2,cbY=cy;
+    ctx.fillStyle='#44dd88';ctx.fillRect(cbX,cbY,cbW,cbH);
+    ctx.fillStyle='#000';ctx.font='bold 14px monospace';ctx.textAlign='center';
+    ctx.fillText(T('settingsClose'),W/2,cbY+cbH/2+5);
+}
+function handleSettingsClick(cx,cy){
+    var W=canvas.width,H=canvas.height;
+    var pw=Math.min(W-40,360),ph=300,px=(W-pw)/2,py=(H-ph)/2;
+    var cyy=py+55, lh=42, sliderW=pw-120, sliderX=px+100;
+    // Language toggle
+    var lbW=60,lbH=26,lbX=sliderX,lbY=cyy-10;
+    if(cx>=lbX&&cx<=lbX+lbW&&cy>=lbY&&cy<=lbY+lbH){lang=lang==='en'?'zh':'en';playSound('click');return;}
+    cyy+=lh;
+    // BGM slider
+    if(cy>=cyy-12&&cy<=cyy+12&&cx>=sliderX&&cx<=sliderX+sliderW){
+        bgmVolume=Math.max(0,Math.min(1,(cx-sliderX)/sliderW));
+        if(bgmAudio) bgmAudio.volume=bgmVolume;
+        return;
+    }
+    cyy+=lh;
+    // SFX slider
+    if(cy>=cyy-12&&cy<=cyy+12&&cx>=sliderX&&cx<=sliderX+sliderW){
+        sfxVolume=Math.max(0,Math.min(1,(cx-sliderX)/sliderW));
+        return;
+    }
+    cyy+=lh;
+    // Quality buttons
+    var qBtnW=Math.floor((sliderW-10)/3),qBtnH=26;
+    for(var i=0;i<3;i++){
+        var qx=sliderX+i*(qBtnW+5),qy=cyy-10;
+        if(cx>=qx&&cx<=qx+qBtnW&&cy>=qy&&cy<=qy+qBtnH){
+            qualityLevel=i;applyQuality();playSound('click');return;
+        }
+    }
+    cyy+=lh+10;
+    // Close button
+    var cbW=120,cbH=34,cbX=W/2-cbW/2,cbY=cyy;
+    if(cx>=cbX&&cx<=cbX+cbW&&cy>=cbY&&cy<=cbY+cbH){showSettings=false;saveSettings();playSound('click');return;}
+    // Click outside panel to close
+    if(cx<px||cx>px+pw||cy<py||cy>py+ph){showSettings=false;saveSettings();playSound('click');return;}
+}
+function saveSettings(){
+    try{localStorage.setItem('alchemist_settings',JSON.stringify({lang:lang,bgmVolume:bgmVolume,sfxVolume:sfxVolume,qualityLevel:qualityLevel}));}catch(e){}
+}
+function loadSettings(){
+    try{
+        var raw=localStorage.getItem('alchemist_settings');
+        if(!raw) return;
+        var d=JSON.parse(raw);
+        if(d.lang) lang=d.lang;
+        if(d.bgmVolume!==undefined) bgmVolume=d.bgmVolume;
+        if(d.sfxVolume!==undefined) sfxVolume=d.sfxVolume;
+        if(d.qualityLevel!==undefined){ qualityLevel=d.qualityLevel; applyQuality(); }
+    }catch(e){}
+}
+
 // ============ CLICK / TOUCH HANDLERS ============
 function hitBox(cx,cy,box){ return cx>=box.x&&cx<=box.x+box.w&&cy>=box.y&&cy<=box.y+box.h; }
 
 function handleLabClick(cx,cy){
+    if(showSettings){handleSettingsClick(cx,cy);return;}
     var W=canvas.width,H=canvas.height;
     var lbW=50,lbH=26,lbX=15,lbY=15;
     if(cx>=lbX&&cx<=lbX+lbW&&cy>=lbY&&cy<=lbY+lbH){lang=lang==='en'?'zh':'en';playSound('click');return;}
     // Save button
     var svW=45,svH=22,svX=75,svY=15;
     if(cx>=svX&&cx<=svX+svW&&cy>=svY&&cy<=svY+svH){saveGame();playSound('click');return;}
+    // Settings gear
+    if(cx>=130&&cx<=152&&cy>=15&&cy<=37){showSettings=true;playSound('click');return;}
 
     if(labTab){
         var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
@@ -3531,8 +3695,12 @@ function handleLabTouch(cx,cy){handleLabClick(cx,cy);}
 
 function handleMenuTouch(cx,cy){
     if(!audioCtx) initAudio();
+    if(showSettings){handleSettingsClick(cx,cy);return;}
     playBGM('lab');
     var W=canvas.width;
+    // Settings gear
+    var gX=W-50-75,gY=15,gS=26;
+    if(cx>=gX&&cx<=gX+gS&&cy>=gY&&cy<=gY+gS){showSettings=true;playSound('click');return;}
     var lbW=50,lbH=26,lbX=W-lbW-15,lbY=15;
     if(cx>=lbX&&cx<=lbX+lbW&&cy>=lbY&&cy<=lbY+lbH){lang=lang==='en'?'zh':'en';playSound('click');return;}
     var bw=200,bh=44,bx=W/2-bw/2,by=canvas.height*0.88;
@@ -3557,7 +3725,11 @@ canvas.addEventListener('click',function(e){
     else if(state==='lab') handleLabClick(cx,cy);
     else if(state==='gameover') handleGameOverTouch(cx,cy);
     else if(state==='expedition'){
+        if(showSettings){handleSettingsClick(cx,cy);return;}
         if(weaponPopup||merchantPopup){handleExpeditionPopupClick(cx,cy);return;}
+        // Settings gear
+        var W=canvas.width;
+        if(cx>=W-38&&cx<=W-12&&cy>=15&&cy<=41){showSettings=true;playSound('click');return;}
         // Click on merchant to interact
         if(nearMerchantRef&&!weaponPopup&&!merchantPopup){
             var mx2=nearMerchantRef.x-camera.x,my2=nearMerchantRef.y-camera.y;
@@ -3646,7 +3818,10 @@ function drawMenu(){
     var lbW=50,lbH=26,lbX=W-lbW-15,lbY=15;
     ctx.fillStyle='#1a1a2e';ctx.fillRect(lbX,lbY,lbW,lbH);ctx.strokeStyle='#44dd88';ctx.lineWidth=1;ctx.strokeRect(lbX,lbY,lbW,lbH);
     ctx.fillStyle='#44dd88';ctx.font='bold 11px monospace';ctx.textAlign='center';ctx.fillText(T('langBtn'),lbX+lbW/2,lbY+lbH/2+4);
+    // Settings gear
+    drawSettingsGear(W-lbW-75,15,26);
     ctx.save();ctx.globalAlpha=0.02;ctx.fillStyle='#000';for(var sl=0;sl<H;sl+=3) ctx.fillRect(0,sl,W,1);ctx.restore();
+    if(showSettings) drawSettings();
 }
 
 function drawGameOver(){
@@ -3726,4 +3901,4 @@ function render(){
     else if(state==='gameover') drawGameOver();
 }
 function gameLoop(){update();render();requestAnimationFrame(gameLoop);}
-(async function(){await loadTilesheet();initSprites();initResearch();loadGame();refreshLabShop();gameLoop();})();
+(async function(){await loadTilesheet();initSprites();initResearch();loadSettings();loadGame();refreshLabShop();gameLoop();})();

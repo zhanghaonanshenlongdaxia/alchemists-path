@@ -85,39 +85,44 @@ function playSound(type) {
     } catch(e) {}
 }
 function synthNote(freq, dur, wave, vol) {
+    var sv = (typeof sfxVolume !== 'undefined') ? sfxVolume : 1;
     var t = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.type = wave; o.frequency.setValueAtTime(freq, t);
     o.frequency.exponentialRampToValueAtTime(freq * 0.3, t + dur);
-    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    g.gain.setValueAtTime(vol * sv, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t + dur);
 }
 function synthPickup() {
+    var sv = (typeof sfxVolume !== 'undefined') ? sfxVolume : 1;
     var t = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.type = 'sine'; o.frequency.setValueAtTime(500, t); o.frequency.exponentialRampToValueAtTime(1000, t+0.1);
-    g.gain.setValueAtTime(0.15, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.15);
+    g.gain.setValueAtTime(0.15 * sv, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.15);
     o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t+0.15);
 }
 function synthCraft() {
+    var sv = (typeof sfxVolume !== 'undefined') ? sfxVolume : 1;
     var t = audioCtx.currentTime;
     [400,600,800].forEach(function(f, i) {
         var o = audioCtx.createOscillator(), g = audioCtx.createGain();
         o.type = 'sine'; o.frequency.setValueAtTime(f, t + i*0.08);
-        g.gain.setValueAtTime(0.12, t + i*0.08); g.gain.exponentialRampToValueAtTime(0.001, t + i*0.08 + 0.15);
+        g.gain.setValueAtTime(0.12 * sv, t + i*0.08); g.gain.exponentialRampToValueAtTime(0.001, t + i*0.08 + 0.15);
         o.connect(g); g.connect(audioCtx.destination); o.start(t + i*0.08); o.stop(t + i*0.08 + 0.15);
     });
 }
 function synthDrink() {
+    var sv = (typeof sfxVolume !== 'undefined') ? sfxVolume : 1;
     var t = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.type = 'sine'; o.frequency.setValueAtTime(300, t); o.frequency.exponentialRampToValueAtTime(600, t+0.2);
-    g.gain.setValueAtTime(0.15, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.25);
+    g.gain.setValueAtTime(0.15 * sv, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.25);
     o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t+0.25);
 }
 function synthLevelUp() {
+    var sv = (typeof sfxVolume !== 'undefined') ? sfxVolume : 1;
     var t = audioCtx.currentTime;
     [500,700,900,1100].forEach(function(f, i) {
         var o = audioCtx.createOscillator(), g = audioCtx.createGain();
         o.type = 'sine'; o.frequency.setValueAtTime(f, t + i*0.1);
-        g.gain.setValueAtTime(0.12, t + i*0.1); g.gain.exponentialRampToValueAtTime(0.001, t + i*0.1 + 0.2);
+        g.gain.setValueAtTime(0.12 * sv, t + i*0.1); g.gain.exponentialRampToValueAtTime(0.001, t + i*0.1 + 0.2);
         o.connect(g); g.connect(audioCtx.destination); o.start(t + i*0.1); o.stop(t + i*0.1 + 0.2);
     });
 }
