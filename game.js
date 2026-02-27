@@ -466,6 +466,28 @@ let extractMini = null;
 let labShopStock = []; // lab merchant stock
 let transmuteTarget = null; // for transmute skill
 
+// ============ TUTORIAL SYSTEM ============
+var tutorialDone = false;
+var tutorialStep = 0; // 0=not started
+var tutorialPhase = ''; // 'lab' or 'expedition'
+var tutorialBlink = 0;
+var TUTORIAL_LAB = [
+    {key:'bench', en:'This is the Extraction Bench.\nPlace herbs here to extract essences.', zh:'这是提取台。\n把药材放在这里提取精华。'},
+    {key:'cauldron', en:'This is the Cauldron.\nCombine 2 essences to brew potions.', zh:'这是炼金锅。\n将2种精华组合酿造药剂。'},
+    {key:'shelf', en:'This is the Potion Shelf.\nEquip potions to your belt before expeditions.', zh:'这是药剂架。\n出发前把药剂装到腰带上。'},
+    {key:'rack', en:'This is the Weapon Rack.\nManage and enchant your weapons here.', zh:'这是武器架。\n在这里管理和附魔武器。'},
+    {key:'merch', en:'This is the Shop.\nBuy and sell items with gold.', zh:'这是商店。\n用金币买卖物品。'},
+    {key:'research', en:'This is the Research Desk.\nSpend gold to permanently upgrade stats.', zh:'这是研究台。\n花费金币永久升级属性。'},
+    {key:'door', en:'This is the Exit Door.\nChoose a biome and start an expedition!\nLet\'s go explore!', zh:'这是出口大门。\n选择区域开始探险！\n我们去探险吧！'},
+];
+var TUTORIAL_EXP = [
+    {en:'Welcome to the expedition!\n'+('ontouchstart' in window?'Use the LEFT joystick to move.':'Use WASD keys to move around.'), zh:'欢迎来到探险！\n'+('ontouchstart' in window?'用左侧摇杆移动角色。':'用WASD键移动角色。')},
+    {en:('ontouchstart' in window?'Use the RIGHT joystick to aim and attack.\nDrag it to change facing direction.':'Click to attack in the mouse direction.\nHold to keep attacking.'), zh:('ontouchstart' in window?'用右侧摇杆瞄准和攻击。\n拖动改变朝向。':'点击鼠标攻击。\n按住持续攻击。')},
+    {en:'Defeat enemies to earn gold and find herbs.\nCollect herbs to bring back to the lab.', zh:'击败敌人获得金币和药材。\n收集药材带回炼金室。'},
+    {en:'The minimap is in the top-right corner.\nFind the exit (green) to go to the next floor.\nDefeat the boss on the final floor!', zh:'小地图在右上角。\n找到出口（绿色）前往下一层。\n在最后一层击败Boss！'},
+    {en:'Good luck, Alchemist!\nBrew potions to grow stronger.', zh:'祝你好运，炼金术士！\n酿造药剂让自己变强。'},
+];
+
 // ============ HELPERS ============
 function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 function dist(a,b){ return Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2); }
@@ -813,6 +835,7 @@ function startExpedition(biomeIdx){
     player=null;
     setupFloor(biomeIdx, 0);
     state='expedition';
+    if(!tutorialDone&&tutorialPhase===''){tutorialPhase='expedition';tutorialStep=0;}
     // Play biome BGM
     playBGM(currentBiome.enemyType);
 }
@@ -867,6 +890,7 @@ canvas.addEventListener('touchstart',function(e){
     if(state==='menu'){handleMenuTouch(t0.clientX,t0.clientY);return;}
     if(state==='lab'){
         if(showSettings){handleSettingsClick(t0.clientX,t0.clientY);return;}
+        if(tutorialPhase==='lab'){handleTutorialClick(t0.clientX,t0.clientY);return;}
         if(labTab){
             var W=canvas.width,H=canvas.height;
             var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
@@ -881,6 +905,7 @@ canvas.addEventListener('touchstart',function(e){
     if(state==='gameover'){handleGameOverTouch(t0.clientX,t0.clientY);return;}
     if(state!=='expedition') return;
     if(showSettings){handleSettingsClick(t0.clientX,t0.clientY);return;}
+    if(tutorialPhase==='expedition'){handleTutorialClick(t0.clientX,t0.clientY);return;}
     // Handle popups first
     if(weaponPopup||merchantPopup){
         if(merchantPopup){
@@ -977,6 +1002,8 @@ canvas.addEventListener('touchend',function(e){
 
 // ============ EXPEDITION UPDATE ============
 function update(){
+    // Pause game during tutorial
+    if(tutorialPhase==='expedition') return;
     // Lab extraction minigame update
     if(state==='lab'&&extractMini&&extractMini.step===3){
         var em=extractMini;
@@ -2036,6 +2063,7 @@ function renderExpedition(){
 
     // Minimap
     drawMinimap();
+    if(tutorialPhase==='expedition') drawTutorialExp();
     if(showSettings) drawSettings();
 }
 
@@ -2824,6 +2852,7 @@ function renderLab(){
         ctx.restore();
     }
     if(showSettings) drawSettings();
+    if(tutorialPhase==='lab') drawTutorialLab();
 }
 
 // ============ EXTRACTION MINIGAME ============
@@ -3325,6 +3354,134 @@ function drawLabExpedition(cy){
     }
 }
 
+// ============ TUTORIAL OVERLAY ============
+function drawTutorialLab(){
+    if(tutorialDone || tutorialPhase!=='lab') return;
+    var step=TUTORIAL_LAB[tutorialStep];
+    if(!step) return;
+    var lay=labFurniture;
+    var target=lay[step.key];
+    if(!target) return;
+    var W=canvas.width,H=canvas.height;
+    tutorialBlink=(tutorialBlink+1)%60;
+    // Dim everything except target
+    ctx.save();
+    ctx.fillStyle='rgba(0,0,0,0.6)';
+    ctx.beginPath();
+    ctx.rect(0,0,W,H);
+    // Cut out the target area
+    var pad=8;
+    ctx.rect(target.x-pad,target.y-pad+target.h+pad*2, target.w+pad*2, -(target.h+pad*2));
+    ctx.fill('evenodd');
+    // Pulsing border around target
+    var alpha=0.5+Math.sin(tutorialBlink*0.1)*0.3;
+    ctx.strokeStyle='rgba(68,221,136,'+alpha+')';ctx.lineWidth=3;
+    ctx.strokeRect(target.x-pad,target.y-pad,target.w+pad*2,target.h+pad*2);
+    ctx.restore();
+    // Text bubble
+    var text=lang==='zh'?step.zh:step.en;
+    var lines=text.split('\n');
+    var bubW=Math.min(W-40,320),bubH=lines.length*22+50,bubX=(W-bubW)/2,bubY=Math.min(target.y-bubH-20, H-bubH-60);
+    if(bubY<10) bubY=target.y+target.h+20;
+    ctx.fillStyle='rgba(14,14,26,0.95)';ctx.fillRect(bubX,bubY,bubW,bubH);
+    ctx.strokeStyle='#44dd88';ctx.lineWidth=2;ctx.strokeRect(bubX,bubY,bubW,bubH);
+    ctx.fillStyle='#44dd88';ctx.font='bold 13px monospace';ctx.textAlign='center';
+    for(var i=0;i<lines.length;i++){
+        ctx.fillText(lines[i],W/2,bubY+25+i*22);
+    }
+    // Step indicator
+    ctx.fillStyle='#888';ctx.font='10px monospace';
+    ctx.fillText((tutorialStep+1)+'/'+TUTORIAL_LAB.length,W/2,bubY+bubH-12);
+    // Next button
+    var btnW=100,btnH=28,btnX=W/2-btnW/2,btnY=bubY+bubH-40;
+    ctx.fillStyle='#44dd88';ctx.fillRect(btnX,btnY,btnW,btnH);
+    ctx.fillStyle='#000';ctx.font='bold 12px monospace';
+    ctx.fillText(tutorialStep<TUTORIAL_LAB.length-1?(lang==='zh'?'下一步':'Next'):(lang==='zh'?'开始探险！':'Go!'),W/2,btnY+btnH/2+4);
+}
+function drawTutorialExp(){
+    if(tutorialDone || tutorialPhase!=='expedition') return;
+    var step=TUTORIAL_EXP[tutorialStep];
+    if(!step) return;
+    var W=canvas.width,H=canvas.height;
+    tutorialBlink=(tutorialBlink+1)%60;
+    var text=lang==='zh'?step.zh:step.en;
+    var lines=text.split('\n');
+    var bubW=Math.min(W-40,340),bubH=lines.length*22+50,bubX=(W-bubW)/2,bubY=H*0.15;
+    ctx.save();ctx.globalAlpha=0.5;ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.restore();
+    ctx.fillStyle='rgba(14,14,26,0.95)';ctx.fillRect(bubX,bubY,bubW,bubH);
+    ctx.strokeStyle='#4488ee';ctx.lineWidth=2;ctx.strokeRect(bubX,bubY,bubW,bubH);
+    ctx.fillStyle='#fff';ctx.font='bold 13px monospace';ctx.textAlign='center';
+    for(var i=0;i<lines.length;i++){
+        ctx.fillText(lines[i],W/2,bubY+25+i*22);
+    }
+    ctx.fillStyle='#888';ctx.font='10px monospace';
+    ctx.fillText((tutorialStep+1)+'/'+TUTORIAL_EXP.length,W/2,bubY+bubH-12);
+    var btnW=100,btnH=28,btnX=W/2-btnW/2,btnY=bubY+bubH-40;
+    ctx.fillStyle='#4488ee';ctx.fillRect(btnX,btnY,btnW,btnH);
+    ctx.fillStyle='#fff';ctx.font='bold 12px monospace';
+    ctx.fillText(tutorialStep<TUTORIAL_EXP.length-1?(lang==='zh'?'下一步':'Next'):(lang==='zh'?'出发！':'Go!'),W/2,btnY+btnH/2+4);
+}
+function handleTutorialClick(cx,cy){
+    var W=canvas.width,H=canvas.height;
+    // Find the next button and check click
+    var lines,bubH,bubY,bubW;
+    if(tutorialPhase==='lab'){
+        var step=TUTORIAL_LAB[tutorialStep];if(!step) return false;
+        var text=lang==='zh'?step.zh:step.en;
+        lines=text.split('\n');
+        bubW=Math.min(W-40,320);bubH=lines.length*22+50;
+        var lay=labFurniture;var target=lay[step.key];
+        bubY=target?Math.min(target.y-bubH-20,H-bubH-60):H/2-bubH/2;
+        if(bubY<10&&target) bubY=target.y+target.h+20;
+    } else {
+        var step=TUTORIAL_EXP[tutorialStep];if(!step) return false;
+        var text=lang==='zh'?step.zh:step.en;
+        lines=text.split('\n');
+        bubW=Math.min(W-40,340);bubH=lines.length*22+50;bubY=H*0.15;
+    }
+    var btnW=100,btnH=28,btnX=W/2-btnW/2,btnY=bubY+bubH-40;
+    if(cx>=btnX&&cx<=btnX+btnW&&cy>=btnY&&cy<=btnY+btnH){
+        playSound('click');
+        var maxSteps=tutorialPhase==='lab'?TUTORIAL_LAB.length:TUTORIAL_EXP.length;
+        tutorialStep++;
+        if(tutorialStep>=maxSteps){
+            if(tutorialPhase==='lab'){
+                // End lab tutorial, expedition tutorial starts when first expedition begins
+                tutorialPhase='';tutorialStep=0;
+                // Auto-open expedition panel
+                labTab='expedition';labScrollY=0;
+            } else {
+                tutorialPhase='';tutorialStep=0;tutorialDone=true;
+                saveTutorialState();
+            }
+        }
+        return true;
+    }
+    // Click anywhere else also advances (more forgiving)
+    playSound('click');
+    var maxSteps2=tutorialPhase==='lab'?TUTORIAL_LAB.length:TUTORIAL_EXP.length;
+    tutorialStep++;
+    if(tutorialStep>=maxSteps2){
+        if(tutorialPhase==='lab'){
+            tutorialPhase='';tutorialStep=0;
+            labTab='expedition';labScrollY=0;
+        } else {
+            tutorialPhase='';tutorialStep=0;tutorialDone=true;
+            saveTutorialState();
+        }
+    }
+    return true;
+}
+function saveTutorialState(){
+    try{localStorage.setItem('alchemist_tutorial','done');}catch(e){}
+}
+function loadTutorialState(){
+    try{
+        var v=localStorage.getItem('alchemist_tutorial');
+        if(v==='done') tutorialDone=true;
+    }catch(e){}
+}
+
 // ============ SETTINGS PANEL ============
 function drawSettingsGear(x, y, s){
     ctx.save();ctx.fillStyle='rgba(10,10,20,0.6)';ctx.fillRect(x,y,s,s);
@@ -3444,6 +3601,7 @@ function hitBox(cx,cy,box){ return cx>=box.x&&cx<=box.x+box.w&&cy>=box.y&&cy<=bo
 
 function handleLabClick(cx,cy){
     if(showSettings){handleSettingsClick(cx,cy);return;}
+    if(tutorialPhase==='lab'){handleTutorialClick(cx,cy);return;}
     var W=canvas.width,H=canvas.height;
     var lbW=50,lbH=26,lbX=15,lbY=15;
     if(cx>=lbX&&cx<=lbX+lbW&&cy>=lbY&&cy<=lbY+lbH){lang=lang==='en'?'zh':'en';playSound('click');return;}
@@ -3704,7 +3862,10 @@ function handleMenuTouch(cx,cy){
     var lbW=50,lbH=26,lbX=W-lbW-15,lbY=15;
     if(cx>=lbX&&cx<=lbX+lbW&&cy>=lbY&&cy<=lbY+lbH){lang=lang==='en'?'zh':'en';playSound('click');return;}
     var bw=200,bh=44,bx=W/2-bw/2,by=canvas.height*0.88;
-    if(cx>=bx&&cx<=bx+bw&&cy>=by&&cy<=by+bh){state='lab';playSound('click');playBGM('lab');}
+    if(cx>=bx&&cx<=bx+bw&&cy>=by&&cy<=by+bh){
+        state='lab';playSound('click');playBGM('lab');
+        if(!tutorialDone&&tutorialPhase===''){tutorialPhase='lab';tutorialStep=0;}
+    }
 }
 
 function handleGameOverTouch(cx,cy){
@@ -3726,6 +3887,7 @@ canvas.addEventListener('click',function(e){
     else if(state==='gameover') handleGameOverTouch(cx,cy);
     else if(state==='expedition'){
         if(showSettings){handleSettingsClick(cx,cy);return;}
+        if(tutorialPhase==='expedition'){handleTutorialClick(cx,cy);return;}
         if(weaponPopup||merchantPopup){handleExpeditionPopupClick(cx,cy);return;}
         // Settings gear
         var W=canvas.width;
@@ -3901,4 +4063,4 @@ function render(){
     else if(state==='gameover') drawGameOver();
 }
 function gameLoop(){update();render();requestAnimationFrame(gameLoop);}
-(async function(){await loadTilesheet();initSprites();initResearch();loadSettings();loadGame();refreshLabShop();gameLoop();})();
+(async function(){await loadTilesheet();initSprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
