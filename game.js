@@ -114,7 +114,7 @@ const LANG = {
         collectible: 'Relic', collectibles: 'Relics', newRelic: 'New Relic Found!',
         relicCase: 'Relic Case', relicsFound: 'Relics Found',
         minimap: 'Map',
-        saved: 'Saved!', loaded: 'Loaded!', saveBtn: 'Save', loadBtn: 'Load',
+        saved: 'Saved!', loaded: 'Loaded!', saveBtn: 'Save', loadBtn: 'Load', loadSave: 'Load Save',
         // Skill tree
         tabSkills: 'Skills', skillTree: 'Skill Tree', skillDesc: 'Unlock permanent abilities',
         skillLocked: 'Locked', skillUnlocked: 'Unlocked', skillReq: 'Requires',
@@ -191,7 +191,7 @@ const LANG = {
         collectible: '遗物', collectibles: '遗物', newRelic: '发现新遗物！',
         relicCase: '遗物柜', relicsFound: '已发现遗物',
         minimap: '地图',
-        saved: '已保存！', loaded: '已加载！', saveBtn: '保存', loadBtn: '加载',
+        saved: '已保存！', loaded: '已加载！', saveBtn: '保存', loadBtn: '加载', loadSave: '读取存档',
         // Skill tree
         tabSkills: '技能', skillTree: '技能树', skillDesc: '解锁永久能力',
         skillLocked: '未解锁', skillUnlocked: '已解锁', skillReq: '需要',
@@ -3495,7 +3495,7 @@ function drawSettingsGear(x, y, s){
 function drawSettings(){
     var W=canvas.width,H=canvas.height;
     ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
-    var pw=Math.min(W-40,360),ph=300,px=(W-pw)/2,py=(H-ph)/2;
+    var pw=Math.min(W-40,360),ph=380,px=(W-pw)/2,py=(H-ph)/2;
     ctx.fillStyle='rgba(14,14,26,0.97)';ctx.fillRect(px,py,pw,ph);
     ctx.strokeStyle='#44dd88';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
     ctx.fillStyle='#44dd88';ctx.fillRect(px,py,pw,3);
@@ -3542,6 +3542,16 @@ function drawSettings(){
         ctx.fillText(qLabels[i],qx+qBtnW/2,qy+qBtnH/2+4);
     }
     cy+=lh+10;
+    // Save & Load buttons
+    var sbW=Math.floor((pw-50)/2),sbH=28;
+    var saveX=px+15,loadX=px+25+sbW,sbY=cy;
+    ctx.fillStyle='#44dd88';ctx.fillRect(saveX,sbY,sbW,sbH);
+    ctx.fillStyle='#000';ctx.font='bold 11px monospace';ctx.textAlign='center';
+    ctx.fillText(T('saveBtn'),saveX+sbW/2,sbY+sbH/2+4);
+    ctx.fillStyle='#4488ee';ctx.fillRect(loadX,sbY,sbW,sbH);
+    ctx.fillStyle='#fff';ctx.font='bold 11px monospace';
+    ctx.fillText(T('loadSave'),loadX+sbW/2,sbY+sbH/2+4);
+    cy+=lh;
     // Close button
     var cbW=120,cbH=34,cbX=W/2-cbW/2,cbY=cy;
     ctx.fillStyle='#44dd88';ctx.fillRect(cbX,cbY,cbW,cbH);
@@ -3550,7 +3560,7 @@ function drawSettings(){
 }
 function handleSettingsClick(cx,cy){
     var W=canvas.width,H=canvas.height;
-    var pw=Math.min(W-40,360),ph=300,px=(W-pw)/2,py=(H-ph)/2;
+    var pw=Math.min(W-40,360),ph=380,px=(W-pw)/2,py=(H-ph)/2;
     var cyy=py+55, lh=42, sliderW=pw-120, sliderX=px+100;
     // Language toggle
     var lbW=60,lbH=26,lbX=sliderX,lbY=cyy-10;
@@ -3578,6 +3588,12 @@ function handleSettingsClick(cx,cy){
         }
     }
     cyy+=lh+10;
+    // Save & Load buttons
+    var sbW2=Math.floor((pw-50)/2),sbH2=28;
+    var saveX2=px+15,loadX2=px+25+sbW2,sbY2=cyy;
+    if(cx>=saveX2&&cx<=saveX2+sbW2&&cy>=sbY2&&cy<=sbY2+sbH2){saveGame();playSound('click');return;}
+    if(cx>=loadX2&&cx<=loadX2+sbW2&&cy>=sbY2&&cy<=sbY2+sbH2){loadGame();playSound('click');return;}
+    cyy+=lh;
     // Close button
     var cbW=120,cbH=34,cbX=W/2-cbW/2,cbY=cyy;
     if(cx>=cbX&&cx<=cbX+cbW&&cy>=cbY&&cy<=cbY+cbH){showSettings=false;saveSettings();playSound('click');return;}
@@ -3865,6 +3881,15 @@ function handleMenuTouch(cx,cy){
     var lbW=50,lbH=26,lbX=W-lbW-15,lbY=15;
     if(cx>=lbX&&cx<=lbX+lbW&&cy>=lbY&&cy<=lbY+lbH){lang=lang==='en'?'zh':'en';playSound('click');return;}
     var bw=200,bh=44,bx=W/2-bw/2,by=canvas.height*0.88;
+    // Load save button
+    var hasSave=!!localStorage.getItem('alchemist_save');
+    if(hasSave){
+        var lsW=140,lsH=32,lsX=W/2-lsW/2,lsY=by-42;
+        if(cx>=lsX&&cx<=lsX+lsW&&cy>=lsY&&cy<=lsY+lsH){
+            loadGame();state='lab';playSound('click');playBGM('lab');
+            tutorialDone=true;return;
+        }
+    }
     if(cx>=bx&&cx<=bx+bw&&cy>=by&&cy<=by+bh){
         state='lab';playSound('click');playBGM('lab');
         if(!tutorialDone&&tutorialPhase===''){tutorialPhase='lab';tutorialStep=0;}
@@ -3982,6 +4007,15 @@ function drawMenu(){
     ctx.shadowColor='#44dd88';ctx.shadowBlur=15;ctx.fillStyle='#44dd88';ctx.fillRect(bx,by,bw,bh);ctx.shadowBlur=0;
     ctx.strokeStyle='#88ffbb';ctx.lineWidth=1;ctx.strokeRect(bx,by,bw,bh);
     ctx.fillStyle='#000';ctx.font='bold 16px monospace';ctx.fillText(T('enterLab'),W/2,by+bh/2+1);
+    // Load save button
+    var hasSave=!!localStorage.getItem('alchemist_save');
+    if(hasSave){
+        var lsW=140,lsH=32,lsX=W/2-lsW/2,lsY=by-42;
+        ctx.fillStyle='rgba(68,136,238,0.8)';ctx.fillRect(lsX,lsY,lsW,lsH);
+        ctx.strokeStyle='#6699ee';ctx.lineWidth=1;ctx.strokeRect(lsX,lsY,lsW,lsH);
+        ctx.fillStyle='#fff';ctx.font='bold 12px monospace';ctx.textAlign='center';
+        ctx.fillText(T('loadSave'),W/2,lsY+lsH/2+4);
+    }
     var lbW=50,lbH=26,lbX=W-lbW-15,lbY=15;
     ctx.fillStyle='#1a1a2e';ctx.fillRect(lbX,lbY,lbW,lbH);ctx.strokeStyle='#44dd88';ctx.lineWidth=1;ctx.strokeRect(lbX,lbY,lbW,lbH);
     ctx.fillStyle='#44dd88';ctx.font='bold 11px monospace';ctx.textAlign='center';ctx.fillText(T('langBtn'),lbX+lbW/2,lbY+lbH/2+4);
