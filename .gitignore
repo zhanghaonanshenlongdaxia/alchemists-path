@@ -1,0 +1,32 @@
+# Node / npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Capacitor / Android (generated + local machine config)
+android/**/build/
+android/.gradle/
+android/**/.gradle/
+android/local.properties
+android/**/local.properties
+android/**/captures/
+android/**/.externalNativeBuild/
+android/**/.cxx/
+
+# Signing keys / keystores (never commit)
+*.jks
+android/**/release-key.jks
+
+# Toolchains / SDKs (too large; install locally)
+tools/android-sdk/
+tools/jdk17/
+**/tools/android-sdk/
+**/tools/jdk17/
+
+# IDE / OS
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
+
