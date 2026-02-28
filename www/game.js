@@ -354,6 +354,7 @@ let bossDefeated = false;
 let weaponPopup = null; // {weapon, x, y} — found weapon popup
 let merchantPopup = null; // active merchant interaction
 let buffPopup = null; // selected buff for detail view
+let buffTooltipIndex = null; // index of buff to show tooltip for
 let shopStock = []; // merchant stock, refreshed each expedition
 let nearMerchantRef = null; // merchant NPC player is near
 let bossRef = null; // reference to boss enemy for special AI
@@ -2462,8 +2463,8 @@ function drawExpeditionHUD(){
     }
     
     // Draw buff detail tooltip if one is selected
-    if(buffPopup&&window.renderedBuffs){
-        var rb=window.renderedBuffs.find(function(b){return b.index===buffPopup;});
+    if(buffTooltipIndex!==null&&window.renderedBuffs){
+        var rb=window.renderedBuffs.find(function(b){return b.index===buffTooltipIndex;});
         if(rb){
             var tooltipW=180,tooltipH=80;
             var tx=rb.x+rb.w+8,ty=rb.y-10;
@@ -4181,6 +4182,7 @@ function handleSettingsClick(cx,cy){
         weaponPopup=null;
         merchantPopup=null;
         buffPopup=null;
+        buffTooltipIndex=null;
         playSound('click');
         playBGM('menu');
         return;
@@ -4561,14 +4563,14 @@ canvas.addEventListener('click',function(e){
                 var rb=window.renderedBuffs[bi];
                 if(cx>=rb.x&&cx<=rb.x+rb.w&&cy>=rb.y&&cy<=rb.y+rb.h){
                     // Toggle buff tooltip
-                    if(buffPopup===rb.index) buffPopup=null;
-                    else buffPopup=rb.index;
+                    if(buffTooltipIndex===rb.index) buffTooltipIndex=null;
+                    else buffTooltipIndex=rb.index;
                     playSound('click');return;
                 }
             }
         }
         // Close buff tooltip if clicking elsewhere
-        if(buffPopup!==null){buffPopup=null;}
+        if(buffTooltipIndex!==null){buffTooltipIndex=null;}
         // Click on merchant to interact
         if(nearMerchantRef&&!weaponPopup&&!merchantPopup){
             var mx2=nearMerchantRef.x-camera.x,my2=nearMerchantRef.y-camera.y;
