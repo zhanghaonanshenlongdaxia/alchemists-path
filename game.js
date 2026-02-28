@@ -224,7 +224,7 @@ const TILE = 32;
 const MAP_W = 36, MAP_H = 28;
 const PLAYER_SPEED = 2.5;
 const ENEMY_SPEED = 1.0;
-const MAX_FLOORS = 3;
+const MAX_FLOORS = 6;
 
 // ============ WEAPON DATA ============
 const WEAPON_NAMES_ZH = {
@@ -795,8 +795,9 @@ function setupFloor(biomeIdx, floor){
         });
     }
 
-    // Spawn merchant on floor 0 or 1 (not boss floor)
-    if(rooms.length>3){
+    // Spawn merchant every 2 floors (floor 1, 3, 5), not on boss floor
+    var shouldSpawnMerchant = (currentFloor % 2 === 1) && (currentFloor < MAX_FLOORS - 1);
+    if(shouldSpawnMerchant && rooms.length>3){
         var mr = rooms[Math.min(2, rooms.length-2)];
         var mp = findOpenTile(mr);
         merchants.push({x:mp.x, y:mp.y, interacted:false});
@@ -2584,55 +2585,57 @@ function drawMerchantPopup(){
         ctx.fillText(item.price+'G '+T('buy'),btnX+btnW2/2,btnY+btnH2/2+4);
     }
 
-    // Sell section — sell herbs, potions, weapons for gold
-    var sellY=iy+shopStock.length*(itemH+4)+10;
-    ctx.fillStyle='#888';ctx.font='11px monospace';ctx.textAlign='center';
-    ctx.fillText('— '+T('sell')+' —',W/2,sellY);
-    sellY+=18;
-    
-    // Sell herbs
-    var herbKeys=Object.keys(inventory.herbs).filter(function(k){return inventory.herbs[k]>0;});
-    for(var i=0;i<Math.min(herbKeys.length,3);i++){
-        var k=herbKeys[i];
-        var sy2=sellY+i*32;
-        ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
-        ctx.fillStyle='#44dd88';ctx.font='11px monospace';ctx.textAlign='left';
-        ctx.fillText(herbName(k)+' x'+inventory.herbs[k],px+20,sy2+18);
-        var sellPrice=3;
-        var sbX=px+pw-80,sbW=60,sbH=22;
-        ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
-        ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
-        ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
-    }
-    sellY+=Math.min(herbKeys.length,3)*32+8;
-    
-    // Sell potions
-    for(var i=0;i<Math.min(inventory.potions.length,3);i++){
-        var pot=inventory.potions[i];
-        var sy2=sellY+i*32;
-        ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
-        ctx.fillStyle=pot.color||'#88aaff';ctx.font='11px monospace';ctx.textAlign='left';
-        ctx.fillText(recipeName(pot),px+20,sy2+18);
-        var sellPrice=5+pot.tier*3;
-        var sbX=px+pw-80,sbW=60,sbH=22;
-        ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
-        ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
-        ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
-    }
-    sellY+=Math.min(inventory.potions.length,3)*32+8;
-    
-    // Sell weapons
-    for(var i=0;i<Math.min(inventory.weapons.length,3);i++){
-        var wep=inventory.weapons[i];
-        var sy2=sellY+i*32;
-        ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
-        ctx.fillStyle=wep.color||'#aabbcc';ctx.font='11px monospace';ctx.textAlign='left';
-        ctx.fillText(weaponName(wep)+' (T'+wep.tier+')',px+20,sy2+18);
-        var sellPrice=8+wep.tier*8;
-        var sbX=px+pw-80,sbW=60,sbH=22;
-        ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
-        ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
-        ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
+    // Sell section — only in lab, not in expedition
+    if(state!=='expedition'){
+        var sellY=iy+shopStock.length*(itemH+4)+10;
+        ctx.fillStyle='#888';ctx.font='11px monospace';ctx.textAlign='center';
+        ctx.fillText('— '+T('sell')+' —',W/2,sellY);
+        sellY+=18;
+        
+        // Sell herbs
+        var herbKeys=Object.keys(inventory.herbs).filter(function(k){return inventory.herbs[k]>0;});
+        for(var i=0;i<Math.min(herbKeys.length,3);i++){
+            var k=herbKeys[i];
+            var sy2=sellY+i*32;
+            ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
+            ctx.fillStyle='#44dd88';ctx.font='11px monospace';ctx.textAlign='left';
+            ctx.fillText(herbName(k)+' x'+inventory.herbs[k],px+20,sy2+18);
+            var sellPrice=3;
+            var sbX=px+pw-80,sbW=60,sbH=22;
+            ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
+            ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
+            ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
+        }
+        sellY+=Math.min(herbKeys.length,3)*32+8;
+        
+        // Sell potions
+        for(var i=0;i<Math.min(inventory.potions.length,3);i++){
+            var pot=inventory.potions[i];
+            var sy2=sellY+i*32;
+            ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
+            ctx.fillStyle=pot.color||'#88aaff';ctx.font='11px monospace';ctx.textAlign='left';
+            ctx.fillText(recipeName(pot),px+20,sy2+18);
+            var sellPrice=5+pot.tier*3;
+            var sbX=px+pw-80,sbW=60,sbH=22;
+            ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
+            ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
+            ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
+        }
+        sellY+=Math.min(inventory.potions.length,3)*32+8;
+        
+        // Sell weapons
+        for(var i=0;i<Math.min(inventory.weapons.length,3);i++){
+            var wep=inventory.weapons[i];
+            var sy2=sellY+i*32;
+            ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
+            ctx.fillStyle=wep.color||'#aabbcc';ctx.font='11px monospace';ctx.textAlign='left';
+            ctx.fillText(weaponName(wep)+' (T'+wep.tier+')',px+20,sy2+18);
+            var sellPrice=8+wep.tier*8;
+            var sbX=px+pw-80,sbW=60,sbH=22;
+            ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
+            ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
+            ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
+        }
     }
 
     ctx.restore();
