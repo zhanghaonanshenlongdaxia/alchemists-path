@@ -2428,13 +2428,16 @@ function drawExpeditionHUD(){
         }
     }
     
-    // Draw all buffs on left side
+    // Draw all buffs on left side (store for click detection)
+    window.renderedBuffs = []; // Store buff positions for click detection
     if(allBuffs.length>0){
         var buffIconSize=32,buffGap=4;
         var buffX=145,buffStartY=72;
         for(var bi=0;bi<allBuffs.length;bi++){
             var buff=allBuffs[bi];
             var biy=buffStartY+bi*(buffIconSize+buffGap);
+            // Store for click detection
+            window.renderedBuffs.push({x:buffX, y:biy, w:buffIconSize, h:buffIconSize, buff:buff, index:bi});
             // Icon background with glow
             ctx.save();
             ctx.shadowColor=buff.color;ctx.shadowBlur=6;
@@ -2455,6 +2458,78 @@ function drawExpeditionHUD(){
                 ctx.fillText('T'+buff.tier,buffX+buffIconSize/2,biy+29);
             }
             ctx.restore();
+        }
+    }
+    
+    // Draw buff detail tooltip if one is selected
+    if(buffPopup&&window.renderedBuffs){
+        var rb=window.renderedBuffs.find(function(b){return b.index===buffPopup;});
+        if(rb){
+            var tooltipW=180,tooltipH=80;
+            var tx=rb.x+rb.w+8,ty=rb.y-10;
+            // Adjust if off-screen
+            if(tx+tooltipW>canvas.width) tx=rb.x-tooltipW-8;
+            if(ty+tooltipH>canvas.height) ty=canvas.height-tooltipH-10;
+            if(ty<10) ty=10;
+            // Background
+            ctx.fillStyle='rgba(10,10,20,0.95)';
+            ctx.fillRect(tx,ty,tooltipW,tooltipH);
+            ctx.strokeStyle=rb.buff.color;ctx.lineWidth=2;
+            ctx.strokeRect(tx,ty,tooltipW,tooltipH);
+            // Arrow pointer
+            ctx.fillStyle='rgba(10,10,20,0.95)';
+            ctx.beginPath();
+            if(tx>rb.x){ // Arrow on left
+                ctx.moveTo(tx,ty+tooltipH/2-6);
+                ctx.lineTo(tx-6,ty+tooltipH/2);
+                ctx.lineTo(tx,ty+tooltipH/2+6);
+            } else { // Arrow on right
+                ctx.moveTo(tx+tooltipW,ty+tooltipH/2-6);
+                ctx.lineTo(tx+tooltipW+6,ty+tooltipH/2);
+                ctx.lineTo(tx+tooltipW,ty+tooltipH/2+6);
+            }
+            ctx.fill();
+            // Content
+            ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.textAlign='left';
+            var cy=ty+18;
+            if(rb.buff.type==='potion'){
+                // Potion buff details
+                var effectName='';
+                if(rb.buff.symbol==='⚔') effectName=lang==='zh'?'攻击':'Attack';
+                else if(rb.buff.symbol==='🛡') effectName=lang==='zh'?'防御':'Defense';
+                else if(rb.buff.symbol==='⚡') effectName=lang==='zh'?'速度':'Speed';
+                else if(rb.buff.symbol==='❤') effectName=lang==='zh'?'回血':'Regen';
+                else if(rb.buff.symbol==='♥') effectName=lang==='zh'?'最大生命':'Max HP';
+                ctx.fillText(effectName+' T'+rb.buff.tier,tx+10,cy);cy+=16;
+                ctx.fillStyle='#aaa';ctx.font='10px monospace';
+                var bonus='';
+                var actualBuff=activeBuffs.find(function(ab){return ab.tier===rb.buff.tier;});
+                if(actualBuff){
+                    if(actualBuff.effect==='attack') bonus='+'+actualBuff.value+' '+T('atk');
+                    else if(actualBuff.effect==='defense') bonus='+'+actualBuff.value+' '+T('def');
+                    else if(actualBuff.effect==='speed') bonus='+'+actualBuff.value+'% '+T('spd');
+                    else if(actualBuff.effect==='regen') bonus='+'+actualBuff.value+' HP/5s';
+                    else if(actualBuff.effect==='maxhp') bonus='+'+actualBuff.value+' Max HP';
+                }
+                ctx.fillText(bonus,tx+10,cy);cy+=14;
+                ctx.fillText(T('duration')+': '+rb.buff.timer+'s',tx+10,cy);
+            } else if(rb.buff.type==='relic'){
+                // Relic buff details
+                ctx.fillText(rb.buff.name,tx+10,cy);cy+=16;
+                ctx.fillStyle='#aaa';ctx.font='10px monospace';
+                var coll=COLLECTIBLES.find(function(c){return(lang==='zh'?c.nameZh:c.name)===rb.buff.name;});
+                if(coll){
+                    if(coll.effect.attackBonus) ctx.fillText('+'+coll.effect.attackBonus+' '+T('atk'),tx+10,cy),cy+=12;
+                    if(coll.effect.defenseBonus) ctx.fillText('+'+coll.effect.defenseBonus+' '+T('def'),tx+10,cy),cy+=12;
+                    if(coll.effect.maxHpBonus) ctx.fillText('+'+coll.effect.maxHpBonus+' Max HP',tx+10,cy),cy+=12;
+                    if(coll.effect.speedBonus) ctx.fillText('+'+coll.effect.speedBonus+'% '+T('spd'),tx+10,cy),cy+=12;
+                    if(coll.effect.goldBonus) ctx.fillText('+'+coll.effect.goldBonus+'% Gold',tx+10,cy),cy+=12;
+                    if(coll.effect.dodgeChance) ctx.fillText((coll.effect.dodgeChance*100).toFixed(0)+'% Dodge',tx+10,cy),cy+=12;
+                    if(coll.effect.critChance) ctx.fillText((coll.effect.critChance*100).toFixed(0)+'% Crit',tx+10,cy),cy+=12;
+                    if(coll.effect.lifeSteal) ctx.fillText('+'+coll.effect.lifeSteal+' HP/kill',tx+10,cy),cy+=12;
+                    if(coll.effect.regenBonus) ctx.fillText('+'+coll.effect.regenBonus+' HP/5s',tx+10,cy),cy+=12;
+                }
+            }
         }
     }
     // Settings gear in expedition
@@ -4440,19 +4515,20 @@ canvas.addEventListener('click',function(e){
         // Settings gear
         var W=canvas.width;
         if(cx>=W-38&&cx<=W-12&&cy>=15&&cy<=41){showSettings=true;playSound('click');return;}
-        // Click on buff icons
-        if(activeBuffs.length>0){
-            var buffIconSize=36,buffGap=4;
-            var buffStartX=W/2-activeBuffs.length*(buffIconSize+buffGap)/2;
-            var buffY=8;
-            for(var bi=0;bi<activeBuffs.length;bi++){
-                var bix=buffStartX+bi*(buffIconSize+buffGap);
-                if(cx>=bix&&cx<=bix+buffIconSize&&cy>=buffY&&cy<=buffY+buffIconSize){
-                    buffPopup=activeBuffs[bi];
+        // Click on buff icons (left side)
+        if(window.renderedBuffs&&window.renderedBuffs.length>0){
+            for(var bi=0;bi<window.renderedBuffs.length;bi++){
+                var rb=window.renderedBuffs[bi];
+                if(cx>=rb.x&&cx<=rb.x+rb.w&&cy>=rb.y&&cy<=rb.y+rb.h){
+                    // Toggle buff tooltip
+                    if(buffPopup===rb.index) buffPopup=null;
+                    else buffPopup=rb.index;
                     playSound('click');return;
                 }
             }
         }
+        // Close buff tooltip if clicking elsewhere
+        if(buffPopup!==null){buffPopup=null;}
         // Click on merchant to interact
         if(nearMerchantRef&&!weaponPopup&&!merchantPopup){
             var mx2=nearMerchantRef.x-camera.x,my2=nearMerchantRef.y-camera.y;
