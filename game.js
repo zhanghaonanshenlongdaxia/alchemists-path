@@ -384,18 +384,30 @@ function getResearchBonus(stat){
 
 // ============ COLLECTIBLES (relics) ============
 const COLLECTIBLES = [
-    { id:'ancient_coin',   name:'Ancient Coin',   nameZh:'远古金币',   color:'#ffd700', desc:'A coin from a forgotten age', descZh:'来自遗忘时代的金币' },
-    { id:'crystal_skull',  name:'Crystal Skull',  nameZh:'水晶头骨',   color:'#88ccff', desc:'Glows faintly in the dark', descZh:'在黑暗中微微发光' },
-    { id:'dragon_scale',   name:'Dragon Scale',   nameZh:'龙鳞',       color:'#ff6622', desc:'Warm to the touch', descZh:'触感温热' },
-    { id:'shadow_gem',     name:'Shadow Gem',     nameZh:'暗影宝石',   color:'#6644aa', desc:'Absorbs light around it', descZh:'吸收周围的光线' },
-    { id:'phoenix_feather',name:'Phoenix Feather', nameZh:'凤凰羽',    color:'#ffaa00', desc:'Never stops smoldering', descZh:'永远在燃烧' },
-    { id:'frost_heart',    name:'Frost Heart',    nameZh:'霜之心',     color:'#44ddff', desc:'Cold as the void', descZh:'冰冷如虚空' },
-    { id:'earth_rune',     name:'Earth Rune',     nameZh:'大地符文',   color:'#ddaa22', desc:'Hums with deep energy', descZh:'嗡嗡作响的深层能量' },
-    { id:'void_shard',     name:'Void Shard',     nameZh:'虚空碎片',   color:'#aa44dd', desc:'Seems to bend space', descZh:'似乎在扭曲空间' },
-    { id:'star_fragment',  name:'Star Fragment',  nameZh:'星辰碎片',   color:'#ddddff', desc:'Fallen from the sky', descZh:'从天而降' },
-    { id:'blood_ruby',     name:'Blood Ruby',     nameZh:'血红宝石',   color:'#ee4444', desc:'Pulses like a heartbeat', descZh:'像心跳一样脉动' },
-    { id:'moss_agate',     name:'Moss Agate',     nameZh:'苔藓玛瑙',   color:'#44dd88', desc:'Living stone', descZh:'活着的石头' },
-    { id:'thunder_pearl',  name:'Thunder Pearl',  nameZh:'雷霆珍珠',   color:'#ffdd44', desc:'Crackles with static', descZh:'噼啪作响的静电' },
+    { id:'ancient_coin',   name:'Ancient Coin',   nameZh:'远古金币',   color:'#ffd700', desc:'A coin from a forgotten age', descZh:'来自遗忘时代的金币', 
+      skill:'passive', skillName:'Golden Fortune', skillNameZh:'黄金财运', skillDesc:'+15% gold from all sources', skillDescZh:'所有来源的金币+15%', effect:{goldBonus:0.15} },
+    { id:'crystal_skull',  name:'Crystal Skull',  nameZh:'水晶头骨',   color:'#88ccff', desc:'Glows faintly in the dark', descZh:'在黑暗中微微发光',
+      skill:'passive', skillName:'Mind\'s Eye', skillNameZh:'心灵之眼', skillDesc:'Reveals enemy HP bars', skillDescZh:'显示敌人血量条', effect:{showEnemyHP:true} },
+    { id:'dragon_scale',   name:'Dragon Scale',   nameZh:'龙鳞',       color:'#ff6622', desc:'Warm to the touch', descZh:'触感温热',
+      skill:'passive', skillName:'Dragon Hide', skillNameZh:'龙之甲', skillDesc:'+3 Defense', skillDescZh:'防御+3', effect:{defenseBonus:3} },
+    { id:'shadow_gem',     name:'Shadow Gem',     nameZh:'暗影宝石',   color:'#6644aa', desc:'Absorbs light around it', descZh:'吸收周围的光线',
+      skill:'passive', skillName:'Shadow Step', skillNameZh:'暗影步', skillDesc:'+20% movement speed', skillDescZh:'移动速度+20%', effect:{speedBonus:0.5} },
+    { id:'phoenix_feather',name:'Phoenix Feather', nameZh:'凤凰羽',    color:'#ffaa00', desc:'Never stops smoldering', descZh:'永远在燃烧',
+      skill:'passive', skillName:'Rebirth', skillNameZh:'重生', skillDesc:'Revive once per expedition with 50% HP', skillDescZh:'每次探险复活一次，恢复50%血量', effect:{autoRevive:true} },
+    { id:'frost_heart',    name:'Frost Heart',    nameZh:'霜之心',     color:'#44ddff', desc:'Cold as the void', descZh:'冰冷如虚空',
+      skill:'passive', skillName:'Frost Aura', skillNameZh:'霜冻光环', skillDesc:'Slow nearby enemies by 30%', skillDescZh:'减缓附近敌人30%速度', effect:{enemySlow:0.3} },
+    { id:'earth_rune',     name:'Earth Rune',     nameZh:'大地符文',   color:'#ddaa22', desc:'Hums with deep energy', descZh:'嗡嗡作响的深层能量',
+      skill:'passive', skillName:'Stone Skin', skillNameZh:'石肤', skillDesc:'+5 Max HP', skillDescZh:'最大生命+5', effect:{maxHpBonus:5} },
+    { id:'void_shard',     name:'Void Shard',     nameZh:'虚空碎片',   color:'#aa44dd', desc:'Seems to bend space', descZh:'似乎在扭曲空间',
+      skill:'passive', skillName:'Void Walk', skillNameZh:'虚空行走', skillDesc:'15% chance to dodge attacks', skillDescZh:'15%几率闪避攻击', effect:{dodgeChance:0.15} },
+    { id:'star_fragment',  name:'Star Fragment',  nameZh:'星辰碎片',   color:'#ddddff', desc:'Fallen from the sky', descZh:'从天而降',
+      skill:'passive', skillName:'Star Light', skillNameZh:'星光', skillDesc:'+25% potion effectiveness', skillDescZh:'药剂效果+25%', effect:{potionBonus:0.25} },
+    { id:'blood_ruby',     name:'Blood Ruby',     nameZh:'血红宝石',   color:'#ee4444', desc:'Pulses like a heartbeat', descZh:'像心跳一样脉动',
+      skill:'passive', skillName:'Blood Thirst', skillNameZh:'嗜血', skillDesc:'Heal 1 HP per kill', skillDescZh:'每次击杀回复1生命', effect:{lifeSteal:1} },
+    { id:'moss_agate',     name:'Moss Agate',     nameZh:'苔藓玛瑙',   color:'#44dd88', desc:'Living stone', descZh:'活着的石头',
+      skill:'passive', skillName:'Nature\'s Blessing', skillNameZh:'自然祝福', skillDesc:'+1 HP regen per 5s', skillDescZh:'每5秒回复1生命', effect:{regenBonus:1} },
+    { id:'thunder_pearl',  name:'Thunder Pearl',  nameZh:'雷霆珍珠',   color:'#ffdd44', desc:'Crackles with static', descZh:'噼啪作响的静电',
+      skill:'passive', skillName:'Lightning Strike', skillNameZh:'雷击', skillDesc:'10% chance to deal double damage', skillDescZh:'10%几率造成双倍伤害', effect:{critChance:0.1} },
 ];
 let foundCollectibles = []; // array of collectible ids
 function collectibleName(c){ return lang==='zh'?c.nameZh:c.name; }
@@ -434,6 +446,8 @@ function hasSkill(id){ return !!unlockedSkills[id]; }
 function applyDamageToPlayer(dmg){
     // Skill: dodge (12% chance)
     if(hasSkill('dodge')&&Math.random()<0.12){spawnFloat(player.x,player.y-20,lang==='zh'?'闪避！':'DODGE!','#4488ee');return false;}
+    // Relic: Void Shard (15% dodge)
+    if(foundCollectibles.indexOf('void_shard')>=0&&Math.random()<0.15){spawnFloat(player.x,player.y-20,lang==='zh'?'虚空闪避！':'VOID DODGE!','#aa44dd');return false;}
     // Skill: thickSkin (-1 damage, min 1)
     if(hasSkill('thickSkin')) dmg=Math.max(1,dmg-1);
     playerStats.hp-=dmg;
@@ -523,6 +537,17 @@ function applyBuffs(){
     playerStats.atk=2+getResearchBonus('atk'); playerStats.def=0+getResearchBonus('def'); playerStats.speed=0+getResearchBonus('speed');
     playerStats.regen=0; playerStats.poison=0; playerStats.stealth=0;
     playerStats.revive=false; playerStats.maxHp=8+getResearchBonus('maxHp');
+    // Apply relic effects
+    for(var cid of foundCollectibles){
+        var coll=COLLECTIBLES.find(function(c){return c.id===cid;});
+        if(coll&&coll.effect){
+            if(coll.effect.defenseBonus) playerStats.def+=coll.effect.defenseBonus;
+            if(coll.effect.speedBonus) playerStats.speed+=coll.effect.speedBonus;
+            if(coll.effect.maxHpBonus) playerStats.maxHp+=coll.effect.maxHpBonus;
+            if(coll.effect.regenBonus) playerStats.regen+=coll.effect.regenBonus;
+            if(coll.effect.autoRevive) playerStats.revive=true;
+        }
+    }
     var best={};
     for(var b of activeBuffs){ if(!best[b.effect]||b.tier>best[b.effect].tier) best[b.effect]=b; }
     for(var eff in best){
@@ -1095,6 +1120,8 @@ function update(){
                     if(playerStats.poison>0) dmg+=1;
                     // Skill: powerStrike (10% crit)
                     if(hasSkill('powerStrike')&&Math.random()<0.1){dmg=Math.floor(dmg*1.8);spawnFloat(e.x,e.y-20,'CRIT!','#ffdd00');}
+                    // Relic: Thunder Pearl (10% crit double damage)
+                    if(foundCollectibles.indexOf('thunder_pearl')>=0&&Math.random()<0.1){dmg*=2;spawnFloat(e.x,e.y-20,'⚡CRIT!','#ffdd44');}
                     // Skill: berserker (+20% ATK when HP<30%)
                     if(hasSkill('berserker')&&playerStats.hp<playerStats.maxHp*0.3) dmg=Math.floor(dmg*1.2);
                     // Skill: execute (+50% DMG to enemies <25% HP)
@@ -1117,11 +1144,15 @@ function update(){
                         var goldDrop = e.isBoss?randInt(15,30+luckBonus*3):(e.isElite?randInt(5,12+luckBonus*2):randInt(1,4+luckBonus));
                         // Skill: scavenger (+30% gold)
                         if(hasSkill('scavenger')) goldDrop=Math.floor(goldDrop*1.3);
+                        // Relic: Ancient Coin (+15% gold)
+                        if(foundCollectibles.indexOf('ancient_coin')>=0) goldDrop=Math.floor(goldDrop*1.15);
                         gold+=goldDrop;
                         spawnFloat(e.x,e.y-10,'+'+goldDrop+' G','#ffd700');
                         totalScore+=e.isBoss?50:(e.isElite?25:10);
                         // Skill: lifeSteal (heal 1 HP per 5 kills)
                         if(hasSkill('lifeSteal')){killCounter++;if(killCounter>=5){killCounter=0;if(playerStats.hp<playerStats.maxHp){playerStats.hp=Math.min(playerStats.maxHp,playerStats.hp+1);spawnFloat(player.x,player.y-20,'+1 HP','#ee4444');}}}
+                        // Relic: Blood Ruby (heal 1 HP per kill)
+                        if(foundCollectibles.indexOf('blood_ruby')>=0&&playerStats.hp<playerStats.maxHp){playerStats.hp=Math.min(playerStats.maxHp,playerStats.hp+1);spawnFloat(player.x,player.y-20,'+1 HP','#ee4444');}
                         // Weapon drop chance (luck increases chance)
                         if(e.isBoss||e.isElite||(Math.random()<0.1+luckBonus*0.04)){
                             var pool=getWeaponDropPool(currentFloor,e.isBoss);
@@ -2493,7 +2524,7 @@ function drawWeaponPopup(){
 function drawMerchantPopup(){
     var W=canvas.width,H=canvas.height;
     ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
-    var pw=Math.min(W-40,420),ph=Math.min(H-60,400),px=(W-pw)/2,py=(H-ph)/2;
+    var pw=Math.min(W-40,420),ph=Math.min(H-60,500),px=(W-pw)/2,py=(H-ph)/2;
     ctx.fillStyle='rgba(14,14,26,0.95)';ctx.fillRect(px,py,pw,ph);
     ctx.strokeStyle='#ffcc44';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
 
@@ -3539,26 +3570,36 @@ function drawLabRelics(cy){
     var W=canvas.width;
     ctx.fillStyle='#aaa';ctx.font='12px monospace';ctx.textAlign='center';
     ctx.fillText(T('relicsFound')+': '+foundCollectibles.length+'/'+COLLECTIBLES.length,W/2,cy);cy+=25;
-    var startX=W/2-160, cols=3, cellW=100, cellH=70;
+    var startX=W/2-180, cols=3, cellW=110, cellH=90;
     for(var i=0;i<COLLECTIBLES.length;i++){
         var c=COLLECTIBLES[i];
         var found=foundCollectibles.indexOf(c.id)>=0;
         var col=i%cols, row=Math.floor(i/cols);
         var cx2=startX+col*(cellW+8), cy2=cy+row*(cellH+8);
         ctx.fillStyle=found?'#111120':'#0a0a12';ctx.fillRect(cx2,cy2,cellW,cellH);
-        ctx.strokeStyle=found?c.color:'#222';ctx.lineWidth=1;ctx.strokeRect(cx2,cy2,cellW,cellH);
+        ctx.strokeStyle=found?c.color:'#222';ctx.lineWidth=2;ctx.strokeRect(cx2,cy2,cellW,cellH);
         if(found){
             // Diamond icon
             ctx.fillStyle=c.color;
-            ctx.beginPath();ctx.moveTo(cx2+cellW/2,cy2+10);ctx.lineTo(cx2+cellW/2+10,cy2+25);
-            ctx.lineTo(cx2+cellW/2,cy2+40);ctx.lineTo(cx2+cellW/2-10,cy2+25);ctx.closePath();ctx.fill();
-            ctx.fillStyle='#ddd';ctx.font='9px monospace';ctx.textAlign='center';
-            ctx.fillText(collectibleName(c),cx2+cellW/2,cy2+55);
+            ctx.beginPath();ctx.moveTo(cx2+cellW/2,cy2+8);ctx.lineTo(cx2+cellW/2+8,cy2+20);
+            ctx.lineTo(cx2+cellW/2,cy2+32);ctx.lineTo(cx2+cellW/2-8,cy2+20);ctx.closePath();ctx.fill();
+            ctx.fillStyle='#ddd';ctx.font='bold 9px monospace';ctx.textAlign='center';
+            ctx.fillText(collectibleName(c),cx2+cellW/2,cy2+44);
+            // Skill info
+            if(c.skillName){
+                ctx.fillStyle=c.color;ctx.font='bold 8px monospace';
+                ctx.fillText(lang==='zh'?c.skillNameZh:c.skillName,cx2+cellW/2,cy2+56);
+                ctx.fillStyle='#888';ctx.font='7px monospace';
+                var skillD=lang==='zh'?c.skillDescZh:c.skillDesc;
+                if(skillD.length>20) skillD=skillD.substring(0,18)+'...';
+                ctx.fillText(skillD,cx2+cellW/2,cy2+66);
+                ctx.fillText((lang==='zh'?'被动':'Passive'),cx2+cellW/2,cy2+78);
+            }
         } else {
             ctx.fillStyle='#333';ctx.font='bold 16px monospace';ctx.textAlign='center';
-            ctx.fillText('?',cx2+cellW/2,cy2+30);
+            ctx.fillText('?',cx2+cellW/2,cy2+35);
             ctx.fillStyle='#333';ctx.font='9px monospace';
-            ctx.fillText('???',cx2+cellW/2,cy2+55);
+            ctx.fillText('???',cx2+cellW/2,cy2+60);
         }
     }
 }
@@ -4160,23 +4201,27 @@ function handleMenuTouch(cx,cy){
     if(!audioCtx) initAudio();
     if(showSettings){handleSettingsClick(cx,cy);return;}
     playBGM('lab');
-    var W=canvas.width;
+    var W=canvas.width,H=canvas.height;
     // Settings gear
     var gX=W-50,gY=15,gS=26;
     if(cx>=gX&&cx<=gX+gS&&cy>=gY&&cy<=gY+gS){showSettings=true;playSound('click');return;}
-    var bw=200,bh=44,bx=W/2-bw/2,by=canvas.height*0.88;
-    // Load save button
+    // New layout: buttons on left
+    var btnW=180,btnH=42,btnX=40,btnGap=12;
     var hasSave=!!localStorage.getItem('alchemist_save');
+    var startY=H*0.75;
+    // New Game button
+    if(cx>=btnX&&cx<=btnX+btnW&&cy>=startY&&cy<=startY+btnH){
+        state='lab';playSound('click');playBGM('lab');
+        if(!tutorialDone&&tutorialPhase===''){tutorialPhase='lab';tutorialStep=0;}
+        return;
+    }
+    // Continue button
     if(hasSave){
-        var lsW=140,lsH=32,lsX=W/2-lsW/2,lsY=by-42;
-        if(cx>=lsX&&cx<=lsX+lsW&&cy>=lsY&&cy<=lsY+lsH){
+        var continueY=startY+btnH+btnGap;
+        if(cx>=btnX&&cx<=btnX+btnW&&cy>=continueY&&cy<=continueY+btnH){
             loadGame();state='lab';playSound('click');playBGM('lab');
             tutorialDone=true;return;
         }
-    }
-    if(cx>=bx&&cx<=bx+bw&&cy>=by&&cy<=by+bh){
-        state='lab';playSound('click');playBGM('lab');
-        if(!tutorialDone&&tutorialPhase===''){tutorialPhase='lab';tutorialStep=0;}
     }
 }
 
@@ -4300,18 +4345,22 @@ function drawMenu(){
     if(SPR.ready){var orbitR=Math.min(100,W*0.12);var herbKeys=Object.keys(SPR.herbs);for(var i=0;i<herbKeys.length;i++){var angle=t*0.5+(i/herbKeys.length)*Math.PI*2;var ox=W/2+Math.cos(angle)*orbitR;var oy=H*0.4+Math.sin(angle)*orbitR*0.4;ctx.save();ctx.globalAlpha=0.5+Math.sin(angle)*0.2;ctx.drawImage(SPR.herbs[herbKeys[i]],ox-10,oy-10,20,20);ctx.restore();}}
     ctx.textAlign='center';ctx.fillStyle='#555';ctx.font=Math.min(11,W*0.015)+'px monospace';
     ctx.fillText(isMobile?T('controlsMobile'):T('controls'),W/2,H*0.82);
-    var bw=200,bh=44,bx=W/2-bw/2,by=H*0.88;
-    ctx.shadowColor='#44dd88';ctx.shadowBlur=15;ctx.fillStyle='#44dd88';ctx.fillRect(bx,by,bw,bh);ctx.shadowBlur=0;
-    ctx.strokeStyle='#88ffbb';ctx.lineWidth=1;ctx.strokeRect(bx,by,bw,bh);
-    ctx.fillStyle='#000';ctx.font='bold 16px monospace';ctx.fillText(T('enterLab'),W/2,by+bh/2+1);
-    // Load save button
+    // New layout: buttons on the left side
+    var btnW=180,btnH=42,btnX=40,btnGap=12;
     var hasSave=!!localStorage.getItem('alchemist_save');
+    var startY=H*0.75;
+    // New Game button
+    ctx.shadowColor='#44dd88';ctx.shadowBlur=15;ctx.fillStyle='#44dd88';ctx.fillRect(btnX,startY,btnW,btnH);ctx.shadowBlur=0;
+    ctx.strokeStyle='#88ffbb';ctx.lineWidth=2;ctx.strokeRect(btnX,startY,btnW,btnH);
+    ctx.fillStyle='#000';ctx.font='bold 14px monospace';ctx.textAlign='center';
+    ctx.fillText(lang==='zh'?'新游戏':'New Game',btnX+btnW/2,startY+btnH/2+1);
+    // Continue button (if save exists)
     if(hasSave){
-        var lsW=140,lsH=32,lsX=W/2-lsW/2,lsY=by-42;
-        ctx.fillStyle='rgba(68,136,238,0.8)';ctx.fillRect(lsX,lsY,lsW,lsH);
-        ctx.strokeStyle='#6699ee';ctx.lineWidth=1;ctx.strokeRect(lsX,lsY,lsW,lsH);
-        ctx.fillStyle='#fff';ctx.font='bold 12px monospace';ctx.textAlign='center';
-        ctx.fillText(T('loadSave'),W/2,lsY+lsH/2+4);
+        var continueY=startY+btnH+btnGap;
+        ctx.fillStyle='#4488ee';ctx.fillRect(btnX,continueY,btnW,btnH);
+        ctx.strokeStyle='#6699ff';ctx.lineWidth=2;ctx.strokeRect(btnX,continueY,btnW,btnH);
+        ctx.fillStyle='#fff';ctx.font='bold 14px monospace';
+        ctx.fillText(lang==='zh'?'继续游戏':'Continue',btnX+btnW/2,continueY+btnH/2+1);
     }
     // Settings gear
     drawSettingsGear(W-50,15,26);
