@@ -348,6 +348,7 @@ let stairsZone = null; // stairs to next floor
 let bossDefeated = false;
 let weaponPopup = null; // {weapon, x, y} — found weapon popup
 let merchantPopup = null; // active merchant interaction
+let buffPopup = null; // selected buff for detail view
 let shopStock = []; // merchant stock, refreshed each expedition
 let nearMerchantRef = null; // merchant NPC player is near
 let bossRef = null; // reference to boss enemy for special AI
@@ -918,7 +919,12 @@ canvas.addEventListener('touchstart',function(e){
     if(showSettings){handleSettingsClick(t0.clientX,t0.clientY);return;}
     if(tutorialPhase==='expedition'){handleTutorialClick(t0.clientX,t0.clientY);return;}
     // Handle popups first
-    if(weaponPopup||merchantPopup){
+    if(weaponPopup||merchantPopup||buffPopup){
+        if(buffPopup){
+            var W=canvas.width,H=canvas.height;
+            var pw3=280,ph3=200,px3=(W-pw3)/2,py3=(H-ph3)/2;
+            if(cx<px3||cx>px3+pw3||cy<py3||cy>py3+ph3){buffPopup=null;playSound('click');return;}
+        }
         if(merchantPopup){
             var W=canvas.width,H=canvas.height;
             var pw2=Math.min(W-40,420),ph2=Math.min(H-60,400),px2=(W-pw2)/2,py2=(H-ph2)/2;
@@ -1030,7 +1036,7 @@ function update(){
         if(em.temp>=95||em.temp<=5) em.quality-=0.3;
     }
     if(state!=='expedition') return;
-    if(weaponPopup||merchantPopup) return; // pause while popup open
+    if(weaponPopup||merchantPopup||buffPopup) return; // pause while popup open
     frameCount++;
     if(currentFloor<MAX_FLOORS-1) missionTimer--; // no timer on boss floor
     if(missionTimer<=0){endExpedition();return;}
@@ -2177,6 +2183,7 @@ function renderExpedition(){
     // Popups (drawn on top of everything)
     if(weaponPopup) drawWeaponPopup();
     if(merchantPopup) drawMerchantPopup();
+    if(buffPopup) drawBuffPopup();
 
     // Minimap
     drawMinimap();
@@ -2334,15 +2341,44 @@ function drawExpeditionHUD(){
     }
 
     // Active buffs (top-right)
-    var bx=W-15;
-    ctx.font='10px monospace';ctx.textAlign='right';
-    var by=20;
-    for(var b of activeBuffs){
-        ctx.fillStyle='#aaa';
-        for(var ri=0;ri<RECIPES.length;ri++){
-            if(RECIPES[ri].effect===b.effect&&RECIPES[ri].tier===b.tier){ctx.fillStyle=RECIPES[ri].color;break;}
+    // Active buffs as icons at top
+    if(activeBuffs.length>0){
+        var buffIconSize=36,buffGap=4;
+        var buffStartX=W/2-activeBuffs.length*(buffIconSize+buffGap)/2;
+        var buffY=8;
+        for(var bi=0;bi<activeBuffs.length;bi++){
+            var b=activeBuffs[bi];
+            var bix=buffStartX+bi*(buffIconSize+buffGap);
+            // Find buff color
+            var buffColor='#88aaff';
+            for(var ri=0;ri<RECIPES.length;ri++){
+                if(RECIPES[ri].effect===b.effect&&RECIPES[ri].tier===b.tier){buffColor=RECIPES[ri].color;break;}
+            }
+            // Icon background with glow
+            ctx.save();
+            ctx.shadowColor=buffColor;ctx.shadowBlur=8;
+            ctx.fillStyle='rgba(20,20,30,0.9)';
+            ctx.fillRect(bix,buffY,buffIconSize,buffIconSize);
+            ctx.shadowBlur=0;
+            ctx.strokeStyle=buffColor;ctx.lineWidth=2;
+            ctx.strokeRect(bix,buffY,buffIconSize,buffIconSize);
+            // Tier indicator
+            ctx.fillStyle=buffColor;ctx.font='bold 10px monospace';ctx.textAlign='center';
+            ctx.fillText('T'+b.tier,bix+buffIconSize/2,buffY+12);
+            // Effect icon/symbol
+            ctx.font='bold 16px monospace';
+            var symbol='?';
+            if(b.effect==='attack') symbol='⚔';
+            else if(b.effect==='defense') symbol='🛡';
+            else if(b.effect==='speed') symbol='⚡';
+            else if(b.effect==='regen') symbol='❤';
+            else if(b.effect==='poison') symbol='☠';
+            else if(b.effect==='stealth') symbol='👁';
+            else if(b.effect==='revive') symbol='⭐';
+            else if(b.effect==='maxhp') symbol='♥';
+            ctx.fillText(symbol,bix+buffIconSize/2,buffY+28);
+            ctx.restore();
         }
-        ctx.fillText(b.name,bx,by);by+=14;
     }
 
     // Potion quickbar (improved with glow and better visuals)
@@ -2566,8 +2602,72 @@ function drawMerchantPopup(){
     ctx.restore();
 }
 
+function drawBuffPopup(){
+    var W=canvas.width,H=canvas.height;
+    ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
+    var pw=280,ph=200,px=(W-pw)/2,py=(H-ph)/2;
+    // Background
+    ctx.fillStyle='#0f0f18';ctx.fillRect(px,py,pw,ph);
+    ctx.strokeStyle='#44dd88';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
+    // Title
+    ctx.fillStyle='#44dd88';ctx.font='bold 14px monospace';ctx.textAlign='center';
+    ctx.fillText(lang==='zh'?'增益详情':'Buff Details',W/2,py+25);
+    // Close button
+    var cbS=24,cbX=px+pw-cbS-8,cbY=py+8;
+    ctx.fillStyle='#aa4444';ctx.fillRect(cbX,cbY,cbS,cbS);
+    ctx.fillStyle='#fff';ctx.font='bold 14px monospace';ctx.textAlign='center';
+    ctx.fillText('×',cbX+cbS/2,cbY+cbS/2+5);
+    // Buff info
+    var b=buffPopup;
+    var buffColor='#88aaff';
+    for(var ri=0;ri<RECIPES.length;ri++){
+        if(RECIPES[ri].effect===b.effect&&RECIPES[ri].tier===b.tier){buffColor=RECIPES[ri].color;break;}
+    }
+    ctx.fillStyle=buffColor;ctx.font='bold 16px monospace';
+    ctx.fillText(b.name,W/2,py+60);
+    ctx.fillStyle='#aaa';ctx.font='12px monospace';
+    ctx.fillText('Tier '+b.tier,W/2,py+80);
+    // Effect description
+    ctx.fillStyle='#ddd';ctx.font='11px monospace';
+    var desc='';
+    if(b.effect==='attack') desc='ATK +'+b.value;
+    else if(b.effect==='defense') desc='DEF +'+b.value;
+    else if(b.effect==='maxhp') desc='Max HP +'+b.value;
+    else if(b.effect==='speed') desc='Speed +'+b.value;
+    else if(b.effect==='regen') desc='HP Regen +'+b.value+'/s';
+    else if(b.effect==='poison') desc='Poison Damage +'+b.value;
+    else if(b.effect==='stealth') desc='Stealth';
+    else if(b.effect==='revive') desc='Auto-Revive once';
+    ctx.fillText(desc,W/2,py+100);
+    // Remove button
+    var rmBtnW=120,rmBtnH=32,rmBtnX=(W-rmBtnW)/2,rmBtnY=py+ph-50;
+    ctx.fillStyle='#dd4444';ctx.fillRect(rmBtnX,rmBtnY,rmBtnW,rmBtnH);
+    ctx.fillStyle='#fff';ctx.font='bold 11px monospace';
+    ctx.fillText(lang==='zh'?'移除增益':'Remove Buff',rmBtnX+rmBtnW/2,rmBtnY+rmBtnH/2+4);
+}
+
 function handleExpeditionPopupClick(cx,cy){
     var W=canvas.width,H=canvas.height;
+    if(buffPopup){
+        var pw=280,ph=200,px=(W-pw)/2,py=(H-ph)/2;
+        // Close button
+        var cbS=24,cbX=px+pw-cbS-8,cbY=py+8;
+        if(cx>=cbX&&cx<=cbX+cbS&&cy>=cbY&&cy<=cbY+cbS){buffPopup=null;playSound('click');return;}
+        // Remove button
+        var rmBtnW=120,rmBtnH=32,rmBtnX=(W-rmBtnW)/2,rmBtnY=py+ph-50;
+        if(cx>=rmBtnX&&cx<=rmBtnX+rmBtnW&&cy>=rmBtnY&&cy<=rmBtnY+rmBtnH){
+            var idx=activeBuffs.indexOf(buffPopup);
+            if(idx>=0){
+                activeBuffs.splice(idx,1);
+                applyBuffs();
+                spawnFloat(player.x,player.y-20,lang==='zh'?'移除增益':'Buff Removed','#ffaa44');
+            }
+            buffPopup=null;playSound('click');return;
+        }
+        // Click outside
+        if(cx<px||cx>px+pw||cy<py||cy>py+ph){buffPopup=null;playSound('click');return;}
+        return;
+    }
     if(weaponPopup){
         var pw=300,ph=220,px=(W-pw)/2,py=(H-ph)/2;
         var btnW=110,btnH=34,gap=20;
@@ -4095,10 +4195,23 @@ canvas.addEventListener('click',function(e){
     else if(state==='expedition'){
         if(showSettings){handleSettingsClick(cx,cy);return;}
         if(tutorialPhase==='expedition'){handleTutorialClick(cx,cy);return;}
-        if(weaponPopup||merchantPopup){handleExpeditionPopupClick(cx,cy);return;}
+        if(weaponPopup||merchantPopup||buffPopup){handleExpeditionPopupClick(cx,cy);return;}
         // Settings gear
         var W=canvas.width;
         if(cx>=W-38&&cx<=W-12&&cy>=15&&cy<=41){showSettings=true;playSound('click');return;}
+        // Click on buff icons
+        if(activeBuffs.length>0){
+            var buffIconSize=36,buffGap=4;
+            var buffStartX=W/2-activeBuffs.length*(buffIconSize+buffGap)/2;
+            var buffY=8;
+            for(var bi=0;bi<activeBuffs.length;bi++){
+                var bix=buffStartX+bi*(buffIconSize+buffGap);
+                if(cx>=bix&&cx<=bix+buffIconSize&&cy>=buffY&&cy<=buffY+buffIconSize){
+                    buffPopup=activeBuffs[bi];
+                    playSound('click');return;
+                }
+            }
+        }
         // Click on merchant to interact
         if(nearMerchantRef&&!weaponPopup&&!merchantPopup){
             var mx2=nearMerchantRef.x-camera.x,my2=nearMerchantRef.y-camera.y;
