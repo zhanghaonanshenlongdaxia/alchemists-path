@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成 Alchemist's Path 应用图标</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        h1 { color: #64a0ff; }
+        .info { background: #16213e; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        button {
+            background: #64a0ff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover { background: #4a8fef; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        .preview { display: flex; flex-wrap: wrap; gap: 20px; margin: 20px 0; }
+        .preview-item { text-align: center; }
+        .preview-item canvas { border: 1px solid #444; border-radius: 8px; margin: 5px; }
+        .status { margin: 20px 0; padding: 10px; background: #0f3460; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <h1>🔮 Alchemist's Path 图标生成器</h1>
+    <div class="info">
+        <p>此工具将生成所有 Android 应用所需的图标尺寸：</p>
+        <ul>
+            <li>标准图标：mdpi (48px), hdpi (72px), xhdpi (96px), xxhdpi (144px), xxxhdpi (192px)</li>
+            <li>圆形图标：所有尺寸的圆形版本</li>
+            <li>自适应图标：前景和背景（432px）</li>
+        </ul>
+        <p><strong>使用方法：</strong>点击"生成所有图标"按钮，图标将自动下载。然后将它们复制到 <code>android/app/src/main/res/</code> 对应的目录中。</p>
+    </div>
+    
+    <button id="generateBtn" onclick="generateAllIcons()">生成所有图标</button>
+    <button onclick="previewIcons()">预览图标</button>
+    
+    <div id="status" class="status" style="display:none;"></div>
+    <div id="preview" class="preview"></div>
+
+    <script>
+        // 图标尺寸配置
+        const ICON_SIZES = {
+            'mdpi': 48,
+            'hdpi': 72,
+            'xhdpi': 96,
+            'xxhdpi': 144,
+            'xxxhdpi': 192,
+        };
+        const ADAPTIVE_FG_SIZE = 432;
+        const ADAPTIVE_BG_SIZE = 432;
+
+        function createIcon(size, isForeground = false) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, size, size);
+            const centerX = size / 2;
+            const centerY = size / 2;
+            
+            if (isForeground) {
+                // 前景：烧瓶
+                const flaskWidth = size * 0.4;
+                const flaskHeight = size * 0.6;
+                const flaskX = centerX - flaskWidth / 2;
+                const flaskY = centerY - flaskHeight / 2 + size * 0.05;
+                const flaskBottomRadius = flaskWidth / 2;
+                const flaskBottomY = flaskY + flaskHeight - flaskBottomRadius;
+                
+                // 烧瓶底部
+                ctx.fillStyle = 'rgba(100, 150, 255, 1)';
+                ctx.strokeStyle = 'rgba(60, 100, 200, 1)';
+                ctx.lineWidth = Math.max(2, size / 48);
+                ctx.beginPath();
+                ctx.ellipse(centerX, flaskBottomY, flaskBottomRadius, flaskBottomRadius, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                
+                // 瓶颈
+                const neckWidth = flaskWidth * 0.35;
+                const neckHeight = flaskHeight * 0.25;
+                ctx.fillRect(centerX - neckWidth/2, flaskY, neckWidth, neckHeight);
+                ctx.strokeRect(centerX - neckWidth/2, flaskY, neckWidth, neckHeight);
+                
+                // 瓶口
+                const mouthRadius = neckWidth * 0.4;
+                ctx.beginPath();
+                ctx.ellipse(centerX, flaskY - mouthRadius, mouthRadius, mouthRadius, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                
+                // 高光
+                ctx.fillStyle = 'rgba(150, 200, 255, 0.7)';
+                ctx.beginPath();
+                ctx.ellipse(centerX, flaskBottomY - flaskBottomRadius * 0.3, flaskBottomRadius * 0.25, flaskBottomRadius * 0.25, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 气泡
+                ctx.fillStyle = 'rgba(200, 230, 255, 0.8)';
+                const bubbleSize = Math.max(2, size / 32);
+                for (let i = 0; i < 3; i++) {
+                    const bx = flaskX + flaskWidth * (0.2 + i * 0.3);
+                    const by = flaskBottomY - flaskBottomRadius * (0.5 + i * 0.2);
+                    ctx.beginPath();
+                    ctx.ellipse(bx, by, bubbleSize, bubbleSize, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                // 星星符号
+                const starSize = size * 0.15;
+                ctx.fillStyle = 'rgba(255, 220, 100, 1)';
+                ctx.strokeStyle = 'rgba(255, 200, 50, 1)';
+                ctx.lineWidth = Math.max(1, size / 96);
+                ctx.beginPath();
+                for (let i = 0; i < 10; i++) {
+                    const angle = (i * Math.PI) / 5 - Math.PI / 2;
+                    const radius = (i % 2 === 0) ? starSize * 0.6 : starSize * 0.3;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY - size * 0.35 + radius * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            } else {
+                // 普通图标：带背景
+                const bgRadius = size * 0.48;
+                ctx.fillStyle = 'rgba(30, 40, 60, 1)';
+                ctx.strokeStyle = 'rgba(50, 70, 100, 1)';
+                ctx.lineWidth = Math.max(2, size / 48);
+                ctx.beginPath();
+                ctx.ellipse(centerX, centerY, bgRadius, bgRadius, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                
+                // 烧瓶（同上但稍小）
+                const flaskWidth = size * 0.35;
+                const flaskHeight = size * 0.5;
+                const flaskX = centerX - flaskWidth / 2;
+                const flaskY = centerY - flaskHeight / 2 + size * 0.05;
+                const flaskBottomRadius = flaskWidth / 2;
+                const flaskBottomY = flaskY + flaskHeight - flaskBottomRadius;
+                
+                ctx.fillStyle = 'rgba(100, 150, 255, 1)';
+                ctx.strokeStyle = 'rgba(60, 100, 200, 1)';
+                ctx.beginPath();
+                ctx.ellipse(centerX, flaskBottomY, flaskBottomRadius, flaskBottomRadius, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                
+                const neckWidth = flaskWidth * 0.35;
+                const neckHeight = flaskHeight * 0.25;
+                ctx.fillRect(centerX - neckWidth/2, flaskY, neckWidth, neckHeight);
+                ctx.strokeRect(centerX - neckWidth/2, flaskY, neckWidth, neckHeight);
+                
+                const mouthRadius = neckWidth * 0.4;
+                ctx.beginPath();
+                ctx.ellipse(centerX, flaskY - mouthRadius, mouthRadius, mouthRadius, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                
+                ctx.fillStyle = 'rgba(150, 200, 255, 0.7)';
+                ctx.beginPath();
+                ctx.ellipse(centerX, flaskBottomY - flaskBottomRadius * 0.3, flaskBottomRadius * 0.25, flaskBottomRadius * 0.25, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = 'rgba(200, 230, 255, 0.8)';
+                const bubbleSize = Math.max(2, size / 32);
+                for (let i = 0; i < 3; i++) {
+                    const bx = flaskX + flaskWidth * (0.2 + i * 0.3);
+                    const by = flaskBottomY - flaskBottomRadius * (0.5 + i * 0.2);
+                    ctx.beginPath();
+                    ctx.ellipse(bx, by, bubbleSize, bubbleSize, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                const starSize = size * 0.12;
+                ctx.fillStyle = 'rgba(255, 220, 100, 1)';
+                ctx.strokeStyle = 'rgba(255, 200, 50, 1)';
+                ctx.lineWidth = Math.max(1, size / 96);
+                ctx.beginPath();
+                for (let i = 0; i < 10; i++) {
+                    const angle = (i * Math.PI) / 5 - Math.PI / 2;
+                    const radius = (i % 2 === 0) ? starSize * 0.6 : starSize * 0.3;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY - size * 0.35 + radius * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+            
+            return canvas;
+        }
+
+        function createAdaptiveBackground(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, size, size);
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const radius = size * 0.5;
+            
+            // 渐变背景
+            for (let i = 0; i < radius; i++) {
+                const r = Math.floor(30 + (50 - 30) * (i / radius));
+                const g = Math.floor(40 + (60 - 40) * (i / radius));
+                const b = Math.floor(60 + (80 - 60) * (i / radius));
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                ctx.beginPath();
+                ctx.ellipse(centerX, centerY, radius - i, radius - i, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // 光晕
+            for (let i = 0; i < 3; i++) {
+                const glowRadius = radius * (0.3 + i * 0.2);
+                const alpha = (30 - i * 10) / 255;
+                ctx.fillStyle = `rgba(100, 150, 200, ${alpha})`;
+                ctx.beginPath();
+                ctx.ellipse(centerX, centerY, glowRadius, glowRadius, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            return canvas;
+        }
+
+        function downloadCanvas(canvas, filename) {
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        function createRoundIcon(canvas) {
+            const size = canvas.width;
+            const roundCanvas = document.createElement('canvas');
+            roundCanvas.width = size;
+            roundCanvas.height = size;
+            const ctx = roundCanvas.getContext('2d');
+            
+            // 创建圆形遮罩
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, size, size);
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.ellipse(size/2, size/2, size/2, size/2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 绘制原图标
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(canvas, 0, 0);
+            
+            // 应用遮罩
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.ellipse(size/2, size/2, size/2, size/2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            return roundCanvas;
+        }
+
+        function updateStatus(msg) {
+            const status = document.getElementById('status');
+            status.style.display = 'block';
+            status.textContent = msg;
+        }
+
+        function generateAllIcons() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            updateStatus('正在生成图标...');
+            
+            let count = 0;
+            const total = Object.keys(ICON_SIZES).length * 2 + 3; // 标准图标 + 圆形图标 + 自适应图标
+            
+            // 生成标准图标
+            for (const [density, size] of Object.entries(ICON_SIZES)) {
+                setTimeout(() => {
+                    const icon = createIcon(size, false);
+                    downloadCanvas(icon, `mipmap-${density}-ic_launcher.png`);
+                    count++;
+                    
+                    const roundIcon = createRoundIcon(icon);
+                    downloadCanvas(roundIcon, `mipmap-${density}-ic_launcher_round.png`);
+                    count++;
+                    
+                    if (count === total) {
+                        updateStatus('✅ 所有图标已生成！请将它们复制到 android/app/src/main/res/ 对应的目录中。');
+                        btn.disabled = false;
+                    }
+                }, count * 200);
+            }
+            
+            // 生成自适应图标
+            setTimeout(() => {
+                const fgIcon = createIcon(ADAPTIVE_FG_SIZE, true);
+                downloadCanvas(fgIcon, 'mipmap-xxxhdpi-ic_launcher_foreground.png');
+                count++;
+                
+                const bgIcon = createAdaptiveBackground(ADAPTIVE_BG_SIZE);
+                downloadCanvas(bgIcon, 'mipmap-xxxhdpi-ic_launcher_background.png');
+                count++;
+                
+                // 生成 XML 文件内容
+                const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_background"/>
+    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+</adaptive-icon>`;
+                const blob = new Blob([xmlContent], { type: 'text/xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ic_launcher.xml';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                count++;
+                
+                if (count === total) {
+                    updateStatus('✅ 所有图标已生成！请将它们复制到 android/app/src/main/res/ 对应的目录中。');
+                    btn.disabled = false;
+                }
+            }, Object.keys(ICON_SIZES).length * 2 * 200);
+        }
+
+        function previewIcons() {
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '<h3>图标预览：</h3>';
+            
+            // 预览标准图标
+            for (const [density, size] of Object.entries(ICON_SIZES)) {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                const icon = createIcon(size, false);
+                icon.style.width = '96px';
+                icon.style.height = '96px';
+                item.innerHTML = `<div>${density} (${size}px)</div>`;
+                item.appendChild(icon);
+                preview.appendChild(item);
+            }
+            
+            // 预览自适应图标
+            const fgItem = document.createElement('div');
+            fgItem.className = 'preview-item';
+            const fgIcon = createIcon(ADAPTIVE_FG_SIZE, true);
+            fgIcon.style.width = '192px';
+            fgIcon.style.height = '192px';
+            fgItem.innerHTML = '<div>前景 (432px)</div>';
+            fgItem.appendChild(fgIcon);
+            preview.appendChild(fgItem);
+            
+            const bgItem = document.createElement('div');
+            bgItem.className = 'preview-item';
+            const bgIcon = createAdaptiveBackground(ADAPTIVE_BG_SIZE);
+            bgIcon.style.width = '192px';
+            bgIcon.style.height = '192px';
+            bgItem.innerHTML = '<div>背景 (432px)</div>';
+            bgItem.appendChild(bgIcon);
+            preview.appendChild(bgItem);
+        }
+    </script>
+</body>
+</html>
