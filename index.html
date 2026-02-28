@@ -11,24 +11,85 @@
     <script src="sprites.js"></script>
     <script src="audio.js"></script>
     <script src="game.js"></script>
+    <div id="updateModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99999;justify-content:center;align-items:center;">
+        <div style="background:#1a1a2e;padding:30px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:320px;text-align:center;border:2px solid #44dd88;">
+            <div style="color:#44dd88;font-size:24px;margin-bottom:10px;">🔄</div>
+            <h3 style="color:#fff;margin:10px 0;font-family:monospace;">发现新版本</h3>
+            <p style="color:#aaa;font-size:14px;margin:15px 0;font-family:monospace;">检测到游戏更新，是否立即更新？</p>
+            <div id="updateProgress" style="display:none;margin:15px 0;">
+                <div style="background:#333;height:20px;border-radius:10px;overflow:hidden;margin:10px 0;">
+                    <div id="progressBar" style="background:linear-gradient(90deg,#44dd88,#4488ee);height:100%;width:0%;transition:width 0.3s;"></div>
+                </div>
+                <p id="progressText" style="color:#888;font-size:12px;font-family:monospace;">准备更新...</p>
+            </div>
+            <div id="updateButtons">
+                <button onclick="startUpdate()" style="background:#44dd88;color:#000;border:none;padding:12px 30px;border-radius:6px;font-size:16px;font-weight:bold;cursor:pointer;margin:5px;font-family:monospace;">立即更新</button>
+                <button onclick="closeUpdateModal()" style="background:#555;color:#fff;border:none;padding:12px 30px;border-radius:6px;font-size:16px;cursor:pointer;margin:5px;font-family:monospace;">稍后提醒</button>
+            </div>
+        </div>
+    </div>
     <script>
+    var pendingUpdate = null;
+    var updateModal = document.getElementById('updateModal');
+    var updateProgress = document.getElementById('updateProgress');
+    var updateButtons = document.getElementById('updateButtons');
+    var progressBar = document.getElementById('progressBar');
+    var progressText = document.getElementById('progressText');
+    
+    function showUpdateModal(){
+        updateModal.style.display = 'flex';
+    }
+    
+    function closeUpdateModal(){
+        updateModal.style.display = 'none';
+        // Remind again in 5 minutes if not updated
+        setTimeout(function(){ if(pendingUpdate) showUpdateModal(); }, 300000);
+    }
+    
+    function startUpdate(){
+        updateButtons.style.display = 'none';
+        updateProgress.style.display = 'block';
+        var progress = 0;
+        var interval = setInterval(function(){
+            progress += Math.random() * 15 + 5;
+            if(progress >= 100) progress = 100;
+            progressBar.style.width = progress + '%';
+            if(progress < 30) progressText.textContent = '正在下载更新...';
+            else if(progress < 70) progressText.textContent = '正在安装更新...';
+            else if(progress < 100) progressText.textContent = '即将完成...';
+            else {
+                progressText.textContent = '更新完成！正在重启...';
+                clearInterval(interval);
+                setTimeout(function(){
+                    if(pendingUpdate) pendingUpdate.postMessage({action:'skipWaiting'});
+                    window.location.reload();
+                }, 500);
+            }
+        }, 200);
+    }
+    
     if('serviceWorker' in navigator){
         navigator.serviceWorker.register('./sw.js').then(function(reg){
             // Check for updates every 30 seconds
             setInterval(function(){ reg.update(); }, 30000);
             reg.addEventListener('updatefound', function(){
                 var nw = reg.installing;
+                pendingUpdate = nw;
                 nw.addEventListener('statechange', function(){
-                    if(nw.state === 'activated'){
-                        // New SW activated, reload to get fresh content
-                        window.location.reload();
+                    if(nw.state === 'installed' && navigator.serviceWorker.controller){
+                        // New version available, show modal
+                        showUpdateModal();
                     }
                 });
             });
         });
-        // Also force reload when new SW takes control
+        // Handle controller change
+        var refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', function(){
-            window.location.reload();
+            if(!refreshing){
+                refreshing = true;
+                window.location.reload();
+            }
         });
     }
     </script>

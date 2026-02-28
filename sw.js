@@ -1,4 +1,4 @@
-var CACHE_NAME = 'alchemist-v5';
+var CACHE_NAME = 'alchemist-v6';
 var ASSETS = [
   './',
   './index.html',
@@ -14,13 +14,20 @@ var ASSETS = [
   './bgm_boss.mp3'
 ];
 
+// Listen for skipWaiting message from client
+self.addEventListener('message', function(e) {
+  if (e.data && e.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
       return cache.addAll(ASSETS);
     })
   );
-  self.skipWaiting();
+  // Don't auto-skip waiting, let user decide
 });
 
 self.addEventListener('activate', function(e) {
