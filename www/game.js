@@ -3648,6 +3648,8 @@ function drawLabShop(cy){
     var sellY=cy+labShopStock.length*(itemH+4)+10;
     ctx.fillStyle='#888';ctx.font='11px monospace';ctx.textAlign='center';
     ctx.fillText('— '+T('sell')+' —',W/2,sellY);sellY+=18;
+    
+    // Sell herbs
     var herbKeys=Object.keys(inventory.herbs).filter(function(k){return inventory.herbs[k]>0;});
     for(var i=0;i<Math.min(herbKeys.length,5);i++){
         var k=herbKeys[i],sy2=sellY+i*32;
@@ -3658,6 +3660,36 @@ function drawLabShop(cy){
         ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
         ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
         ctx.fillText('3G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
+    }
+    sellY+=Math.min(herbKeys.length,5)*32+8;
+    
+    // Sell potions
+    for(var i=0;i<Math.min(inventory.potions.length,5);i++){
+        var pot=inventory.potions[i];
+        var sy2=sellY+i*32;
+        ctx.fillStyle='#111118';ctx.fillRect(startX,sy2,320,28);
+        ctx.fillStyle=pot.color||'#88aaff';ctx.font='11px monospace';ctx.textAlign='left';
+        ctx.fillText(recipeName(pot),startX+14,sy2+18);
+        var sellPrice=5+pot.tier*3;
+        var sbX=startX+240,sbW=70,sbH=22;
+        ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
+        ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
+        ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
+    }
+    sellY+=Math.min(inventory.potions.length,5)*32+8;
+    
+    // Sell weapons
+    for(var i=0;i<Math.min(inventory.weapons.length,5);i++){
+        var wep=inventory.weapons[i];
+        var sy2=sellY+i*32;
+        ctx.fillStyle='#111118';ctx.fillRect(startX,sy2,320,28);
+        ctx.fillStyle=wep.color||'#aabbcc';ctx.font='11px monospace';ctx.textAlign='left';
+        ctx.fillText(weaponName(wep)+' (T'+wep.tier+')',startX+14,sy2+18);
+        var sellPrice=8+wep.tier*8;
+        var sbX=startX+240,sbW=70,sbH=22;
+        ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
+        ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
+        ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
     }
 }
 
@@ -4557,6 +4589,21 @@ function loadGame(){
         gold=data.gold||0; totalScore=data.totalScore||0; expeditionNum=data.expeditionNum||0;
         inventory=data.inventory||{herbs:{},essences:{},potions:[],weapons:[]};
         equippedWeapon=data.equippedWeapon||makeWeapon(WEAPONS[0]);
+        
+        // Fix missing type property in old saves
+        if(equippedWeapon&&!equippedWeapon.type){
+            var template=WEAPONS.find(function(w){return w.name===equippedWeapon.name;});
+            if(template) equippedWeapon.type=template.type;
+            else equippedWeapon.type='sword';
+        }
+        for(var i=0;i<inventory.weapons.length;i++){
+            if(!inventory.weapons[i].type){
+                var template=WEAPONS.find(function(w){return w.name===inventory.weapons[i].name;});
+                if(template) inventory.weapons[i].type=template.type;
+                else inventory.weapons[i].type='sword';
+            }
+        }
+        
         discoveredRecipes=data.discoveredRecipes||[];
         carriedPotions=data.carriedPotions||[];
         researchLevels=data.researchLevels||{};
