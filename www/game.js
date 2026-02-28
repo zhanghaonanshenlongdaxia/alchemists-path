@@ -2488,10 +2488,132 @@ function useCarriedPotion(index){
 }
 
 // ============ WEAPON POPUP ============
+function drawWeaponModel(x,y,weapon,scale){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.scale(scale,scale);
+    var wc=weapon.color;
+    var tier=weapon.tier;
+    
+    if(weapon.type==='sword'){
+        // Sword blade
+        ctx.fillStyle=wc;
+        ctx.beginPath();
+        ctx.moveTo(-3,-25);ctx.lineTo(0,-30);ctx.lineTo(3,-25);
+        ctx.lineTo(2,8);ctx.lineTo(-2,8);ctx.closePath();ctx.fill();
+        // Blade edge shine
+        ctx.fillStyle='rgba(255,255,255,0.4)';
+        ctx.fillRect(-1,-28,2,30);
+        // Guard
+        ctx.fillStyle=tier>=2?'#ffd700':'#888';
+        ctx.fillRect(-8,8,16,3);
+        // Handle
+        ctx.fillStyle='#5a4a3a';ctx.fillRect(-2,11,4,12);
+        // Pommel
+        ctx.fillStyle=tier>=3?'#ff4444':'#666';
+        ctx.beginPath();ctx.arc(0,24,3,0,Math.PI*2);ctx.fill();
+    } else if(weapon.type==='dagger'){
+        // Dagger blade (shorter, thinner)
+        ctx.fillStyle=wc;
+        ctx.beginPath();
+        ctx.moveTo(-2,-18);ctx.lineTo(0,-22);ctx.lineTo(2,-18);
+        ctx.lineTo(1.5,6);ctx.lineTo(-1.5,6);ctx.closePath();ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.5)';
+        ctx.fillRect(-0.5,-20,1,24);
+        // Guard (small)
+        ctx.fillStyle=tier>=2?'#ffd700':'#666';
+        ctx.fillRect(-5,6,10,2);
+        // Handle (wrapped)
+        ctx.fillStyle='#3a2a1a';ctx.fillRect(-1.5,8,3,10);
+        for(var i=0;i<4;i++){ctx.fillStyle='#665544';ctx.fillRect(-2,9+i*2.5,4,1);}
+    } else if(weapon.type==='axe'){
+        // Axe handle
+        ctx.fillStyle='#6a4a2a';ctx.fillRect(-2,-22,4,30);
+        // Axe head
+        ctx.fillStyle=wc;
+        ctx.beginPath();
+        ctx.moveTo(-2,-18);ctx.lineTo(-10,-12);ctx.lineTo(-8,-6);ctx.lineTo(-2,-8);ctx.closePath();ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(2,-18);ctx.lineTo(10,-12);ctx.lineTo(8,-6);ctx.lineTo(2,-8);ctx.closePath();ctx.fill();
+        // Blade edge
+        ctx.strokeStyle='rgba(255,255,255,0.6)';ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(-10,-12);ctx.lineTo(-8,-6);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(10,-12);ctx.lineTo(8,-6);ctx.stroke();
+        // Spike (high tier)
+        if(tier>=3){ctx.fillStyle='#888';ctx.fillRect(-1.5,-24,3,6);}
+    } else if(weapon.type==='staff'){
+        // Staff shaft
+        ctx.strokeStyle='#8a6a3a';ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(0,-24);ctx.lineTo(0,18);ctx.stroke();
+        // Ornamental bands
+        for(var i=0;i<3;i++){
+            ctx.fillStyle=tier>=2?'#cc9933':'#665533';
+            ctx.fillRect(-2.5,-18+i*12,5,2);
+        }
+        // Orb at top
+        var orbSize=tier>=3?8:(tier>=2?6:5);
+        ctx.fillStyle=wc;
+        ctx.beginPath();ctx.arc(0,-24,orbSize,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.3)';
+        ctx.beginPath();ctx.arc(-1,-26,3,0,Math.PI*2);ctx.fill();
+        // Magic glow
+        if(tier>=2){
+            ctx.save();ctx.globalAlpha=0.3;
+            var orbGlow=ctx.createRadialGradient(0,-24,2,0,-24,12);
+            orbGlow.addColorStop(0,wc);orbGlow.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle=orbGlow;ctx.fillRect(-12,-36,24,24);ctx.restore();
+        }
+    } else if(weapon.type==='spear'){
+        // Spear shaft
+        ctx.strokeStyle='#7a5a3a';ctx.lineWidth=2.5;
+        ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(0,20);ctx.stroke();
+        // Spear tip
+        ctx.fillStyle=wc;
+        ctx.beginPath();
+        ctx.moveTo(-3,-22);ctx.lineTo(0,-30);ctx.lineTo(3,-22);ctx.closePath();ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.4)';
+        ctx.beginPath();
+        ctx.moveTo(-1,-23);ctx.lineTo(0,-28);ctx.lineTo(1,-23);ctx.closePath();ctx.fill();
+        // Wings (high tier)
+        if(tier>=2){
+            ctx.fillStyle=tier>=3?'#ffd700':'#888';
+            ctx.beginPath();ctx.moveTo(-3,-22);ctx.lineTo(-5,-18);ctx.lineTo(-2,-20);ctx.closePath();ctx.fill();
+            ctx.beginPath();ctx.moveTo(3,-22);ctx.lineTo(5,-18);ctx.lineTo(2,-20);ctx.closePath();ctx.fill();
+        }
+    } else if(weapon.type==='claw'){
+        // Handle/knuckle
+        ctx.fillStyle='#4a3a2a';ctx.fillRect(-6,0,12,8);
+        // Three claws
+        for(var ci=0;ci<3;ci++){
+            var cx=(ci-1)*4;
+            ctx.fillStyle=wc;
+            ctx.beginPath();
+            ctx.moveTo(cx-1.5,0);ctx.lineTo(cx,-18);ctx.lineTo(cx+1.5,0);ctx.closePath();ctx.fill();
+            // Claw shine
+            ctx.fillStyle='rgba(255,255,255,0.3)';
+            ctx.fillRect(cx-0.5,-16,1,16);
+        }
+        // Gems (high tier)
+        if(tier>=3){
+            for(var gi=0;gi<3;gi++){
+                ctx.fillStyle='#ff4444';
+                ctx.beginPath();ctx.arc((gi-1)*4,4,2,0,Math.PI*2);ctx.fill();
+            }
+        }
+    } else {
+        // Default: simple sword
+        ctx.fillStyle=wc;
+        ctx.fillRect(-2,-24,4,28);
+        ctx.fillStyle='#666';ctx.fillRect(-6,4,12,2);
+        ctx.fillStyle='#444';ctx.fillRect(-1.5,6,3,10);
+    }
+    ctx.restore();
+}
+
 function drawWeaponPopup(){
     var W=canvas.width,H=canvas.height;
     ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
-    var pw=300,ph=220,px=(W-pw)/2,py=(H-ph)/2;
+    var pw=300,ph=260,px=(W-pw)/2,py=(H-ph)/2;
     ctx.fillStyle='rgba(14,14,26,0.95)';ctx.fillRect(px,py,pw,ph);
     ctx.strokeStyle='#ffd700';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
 
@@ -2499,20 +2621,23 @@ function drawWeaponPopup(){
     ctx.fillStyle='#ffd700';ctx.font='bold 16px monospace';ctx.textAlign='center';
     ctx.fillText(T('weaponFound'),W/2,py+28);
 
+    // Draw weapon model
+    drawWeaponModel(W/2,py+70,w,1.8);
+
     // New weapon
     ctx.fillStyle=w.color;ctx.font='bold 14px monospace';
-    ctx.fillText(weaponName(w),W/2,py+58);
+    ctx.fillText(weaponName(w),W/2,py+115);
     ctx.fillStyle='#aaa';ctx.font='11px monospace';
-    ctx.fillText(T('dmg')+':'+w.dmg+' '+T('spd')+':'+w.speed.toFixed(1)+' '+T('rng')+':'+w.range+' T'+w.tier,W/2,py+76);
+    ctx.fillText(T('dmg')+':'+w.dmg+' '+T('spd')+':'+w.speed.toFixed(1)+' '+T('rng')+':'+w.range+' T'+w.tier,W/2,py+133);
 
     // Current weapon
     if(equippedWeapon){
         ctx.fillStyle='#888';ctx.font='11px monospace';
-        ctx.fillText('— '+T('weapon')+' —',W/2,py+100);
+        ctx.fillText('— '+T('weapon')+' —',W/2,py+157);
         ctx.fillStyle=equippedWeapon.color;ctx.font='12px monospace';
-        ctx.fillText(weaponName(equippedWeapon),W/2,py+116);
+        ctx.fillText(weaponName(equippedWeapon),W/2,py+173);
         ctx.fillStyle='#777';ctx.font='10px monospace';
-        ctx.fillText(T('dmg')+':'+equippedWeapon.dmg+' '+T('spd')+':'+equippedWeapon.speed.toFixed(1)+' '+T('rng')+':'+equippedWeapon.range,W/2,py+132);
+        ctx.fillText(T('dmg')+':'+equippedWeapon.dmg+' '+T('spd')+':'+equippedWeapon.speed.toFixed(1)+' '+T('rng')+':'+equippedWeapon.range,W/2,py+189);
     }
 
     // Buttons
