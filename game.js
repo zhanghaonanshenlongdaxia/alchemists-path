@@ -409,7 +409,8 @@ const COLLECTIBLES = [
     { id:'thunder_pearl',  name:'Thunder Pearl',  nameZh:'雷霆珍珠',   color:'#ffdd44', desc:'Crackles with static', descZh:'噼啪作响的静电',
       skill:'passive', skillName:'Lightning Strike', skillNameZh:'雷击', skillDesc:'10% chance to deal double damage', skillDescZh:'10%几率造成双倍伤害', effect:{critChance:0.1} },
 ];
-let foundCollectibles = []; // array of collectible ids
+let foundCollectibles = []; // array of collectible ids (all-time)
+let expeditionFoundRelics = []; // relics found in current expedition only
 function collectibleName(c){ return lang==='zh'?c.nameZh:c.name; }
 function collectibleDesc(c){ return lang==='zh'?c.descZh:c.desc; }
 
@@ -858,6 +859,7 @@ function startExpedition(biomeIdx){
     merchantPopup = null;
     attackCooldown=0; regenTimer=0; screenShake=0; extracting=0;
     killCounter=0; // reset for lifeSteal tracking
+    expeditionFoundRelics = []; // reset expedition relics
     missionTimer = 90*60; // 90 seconds total
 
     // Generate shop stock for merchant
@@ -1396,10 +1398,11 @@ function update(){
         if(!cd.collected&&dist(player,cd)<22){
             cd.collected=true;
             if(foundCollectibles.indexOf(cd.collectibleId)<0) foundCollectibles.push(cd.collectibleId);
+            if(expeditionFoundRelics.indexOf(cd.collectibleId)<0) expeditionFoundRelics.push(cd.collectibleId);
             var coll=COLLECTIBLES.find(function(c){return c.id===cd.collectibleId;});
             spawnFloat(cd.x,cd.y-10,T('newRelic')+' '+collectibleName(coll),coll.color);
             spawnParticles(cd.x,cd.y,coll.color,10);
-            playSound('levelUp');
+            playSound('pickup');
             totalScore+=30;
         }
     }
@@ -2377,79 +2380,81 @@ function drawExpeditionHUD(){
         ctx.fillText(bossRef.hp+'/'+bossRef.maxHp,W/2,bhpY+bhpH+10);
     }
 
-    // Active buffs (top-right)
-    // Active buffs as icons at top
-    if(activeBuffs.length>0){
-        var buffIconSize=36,buffGap=4;
-        var buffStartX=W/2-activeBuffs.length*(buffIconSize+buffGap)/2;
-        var buffY=8;
-        for(var bi=0;bi<activeBuffs.length;bi++){
-            var b=activeBuffs[bi];
-            var bix=buffStartX+bi*(buffIconSize+buffGap);
-            // Find buff color
-            var buffColor='#88aaff';
-            for(var ri=0;ri<RECIPES.length;ri++){
-                if(RECIPES[ri].effect===b.effect&&RECIPES[ri].tier===b.tier){buffColor=RECIPES[ri].color;break;}
-            }
-            // Icon background with glow
-            ctx.save();
-            ctx.shadowColor=buffColor;ctx.shadowBlur=8;
-            ctx.fillStyle='rgba(20,20,30,0.9)';
-            ctx.fillRect(bix,buffY,buffIconSize,buffIconSize);
-            ctx.shadowBlur=0;
-            ctx.strokeStyle=buffColor;ctx.lineWidth=2;
-            ctx.strokeRect(bix,buffY,buffIconSize,buffIconSize);
-            // Tier indicator
-            ctx.fillStyle=buffColor;ctx.font='bold 10px monospace';ctx.textAlign='center';
-            ctx.fillText('T'+b.tier,bix+buffIconSize/2,buffY+12);
-            // Effect icon/symbol
-            ctx.font='bold 16px monospace';
-            var symbol='?';
-            if(b.effect==='attack') symbol='⚔';
-            else if(b.effect==='defense') symbol='🛡';
-            else if(b.effect==='speed') symbol='⚡';
-            else if(b.effect==='regen') symbol='❤';
-            else if(b.effect==='poison') symbol='☠';
-            else if(b.effect==='stealth') symbol='👁';
-            else if(b.effect==='revive') symbol='⭐';
-            else if(b.effect==='maxhp') symbol='♥';
-            ctx.fillText(symbol,bix+buffIconSize/2,buffY+28);
-            ctx.restore();
+    // All buffs displayed on left side (next to stats panel)
+    var allBuffs = [];
+    
+    // Add active potion buffs with timer
+    for(var bi=0;bi<activeBuffs.length;bi++){
+        var b=activeBuffs[bi];
+        var buffColor='#88aaff';
+        for(var ri=0;ri<RECIPES.length;ri++){
+            if(RECIPES[ri].effect===b.effect&&RECIPES[ri].tier===b.tier){buffColor=RECIPES[ri].color;break;}
+        }
+        var symbol='?';
+        if(b.effect==='attack') symbol='⚔';
+        else if(b.effect==='defense') symbol='🛡';
+        else if(b.effect==='speed') symbol='⚡';
+        else if(b.effect==='regen') symbol='❤';
+        else if(b.effect==='poison') symbol='☠';
+        else if(b.effect==='stealth') symbol='👁';
+        else if(b.effect==='revive') symbol='⭐';
+        else if(b.effect==='maxhp') symbol='♥';
+        allBuffs.push({
+            color:buffColor, symbol:symbol, tier:b.tier,
+            timer:b.duration?Math.ceil(b.duration/60):null, type:'potion'
+        });
+    }
+    
+    // Add expedition relics as buffs
+    var expeditionRelics = foundCollectibles.filter(function(cid){
+        return expeditionFoundRelics && expeditionFoundRelics.indexOf(cid)>=0;
+    });
+    for(var ei=0;ei<expeditionRelics.length;ei++){
+        var coll=COLLECTIBLES.find(function(c){return c.id===expeditionRelics[ei];});
+        if(coll){
+            var relicSymbol='💎';
+            if(coll.effect.defenseBonus) relicSymbol='🛡';
+            else if(coll.effect.speedBonus) relicSymbol='⚡';
+            else if(coll.effect.maxHpBonus) relicSymbol='♥';
+            else if(coll.effect.goldBonus) relicSymbol='💰';
+            else if(coll.effect.dodgeChance) relicSymbol='👻';
+            else if(coll.effect.critChance) relicSymbol='⚔';
+            else if(coll.effect.lifeSteal) relicSymbol='❤';
+            else if(coll.effect.regenBonus) relicSymbol='💚';
+            allBuffs.push({
+                color:coll.color, symbol:relicSymbol, tier:null,
+                timer:null, type:'relic', name:lang==='zh'?coll.nameZh:coll.name
+            });
         }
     }
-
-    // Potion quickbar (improved with glow and better visuals)
-    if(carriedPotions.length>0){
-        var qbSlotW=48,qbSlotH=48,qbGap=6;
-        var qbTotalW=carriedPotions.length*(qbSlotW+qbGap)-qbGap;
-        var qbX=Math.floor((W-qbTotalW)/2),qbY=canvas.height-(isMobile?55:60);
-        for(var i=0;i<carriedPotions.length;i++){
-            var p=carriedPotions[i];
-            var sx2=qbX+i*(qbSlotW+qbGap),sy2=qbY;
-            // Slot background with gradient
-            var slotG=ctx.createLinearGradient(sx2,sy2,sx2,sy2+qbSlotH);
-            slotG.addColorStop(0,'rgba(15,15,30,0.8)');slotG.addColorStop(1,'rgba(5,5,15,0.9)');
-            ctx.fillStyle=slotG;ctx.fillRect(sx2,sy2,qbSlotW,qbSlotH);
-            // Potion bottle (improved shape)
-            var bx2=sx2+14,by2=sy2+8;
-            ctx.fillStyle=p.color||'#44dd88';
-            // Bottle body
-            ctx.beginPath();ctx.moveTo(bx2+2,by2+8);ctx.lineTo(bx2,by2+12);ctx.lineTo(bx2,by2+26);
-            ctx.lineTo(bx2+20,by2+26);ctx.lineTo(bx2+20,by2+12);ctx.lineTo(bx2+18,by2+8);ctx.closePath();ctx.fill();
-            // Bottle neck
-            ctx.fillRect(bx2+6,by2,8,10);
-            // Cork
-            ctx.fillStyle='#8a6a3a';ctx.fillRect(bx2+5,by2-2,10,4);
-            // Liquid shine
-            ctx.fillStyle='rgba(255,255,255,0.2)';ctx.fillRect(bx2+2,by2+14,5,10);
-            // Border glow
-            ctx.strokeStyle=p.color||'#44dd88';ctx.lineWidth=1.5;ctx.strokeRect(sx2,sy2,qbSlotW,qbSlotH);
-            // Slot number
-            ctx.fillStyle='#aaa';ctx.font='9px monospace';ctx.textAlign='center';
-            ctx.fillText((i+1)+'',sx2+qbSlotW/2,sy2+qbSlotH+10);
-            // Potion name
-            ctx.fillStyle='#ccc';ctx.font='8px monospace';
-            ctx.fillText(recipeName(p).substring(0,6),sx2+qbSlotW/2,sy2-3);
+    
+    // Draw all buffs on left side
+    if(allBuffs.length>0){
+        var buffIconSize=32,buffGap=4;
+        var buffX=145,buffStartY=72;
+        for(var bi=0;bi<allBuffs.length;bi++){
+            var buff=allBuffs[bi];
+            var biy=buffStartY+bi*(buffIconSize+buffGap);
+            // Icon background with glow
+            ctx.save();
+            ctx.shadowColor=buff.color;ctx.shadowBlur=6;
+            ctx.fillStyle='rgba(20,20,30,0.85)';
+            ctx.fillRect(buffX,biy,buffIconSize,buffIconSize);
+            ctx.shadowBlur=0;
+            ctx.strokeStyle=buff.color;ctx.lineWidth=2;
+            ctx.strokeRect(buffX,biy,buffIconSize,buffIconSize);
+            // Symbol
+            ctx.fillStyle=buff.color;ctx.font='bold 16px monospace';ctx.textAlign='center';
+            ctx.fillText(buff.symbol,buffX+buffIconSize/2,biy+20);
+            // Timer or tier
+            if(buff.timer!==null){
+                ctx.fillStyle='#fff';ctx.font='bold 9px monospace';
+                ctx.fillText(buff.timer+'s',buffX+buffIconSize/2,biy+30);
+            } else if(buff.tier!==null){
+                ctx.fillStyle=buff.color;ctx.font='bold 8px monospace';
+                ctx.fillText('T'+buff.tier,buffX+buffIconSize/2,biy+29);
+            }
+            ctx.restore();
         }
     }
     // Settings gear in expedition
