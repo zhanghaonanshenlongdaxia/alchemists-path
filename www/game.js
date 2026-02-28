@@ -2838,7 +2838,7 @@ function handleExpeditionPopupClick(cx,cy){
         return;
     }
     if(weaponPopup){
-        var pw=300,ph=220,px=(W-pw)/2,py=(H-ph)/2;
+        var pw=300,ph=260,px=(W-pw)/2,py=(H-ph)/2;
         var btnW=110,btnH=34,gap=20;
         var b1x=W/2-btnW-gap/2,b2x=W/2+gap/2,bty=py+ph-50;
         if(cx>=b1x&&cx<=b1x+btnW&&cy>=bty&&cy<=bty+btnH){
@@ -4308,6 +4308,32 @@ function handleLabClick(cx,cy){
                 if(cx>=sbX&&cx<=sbX+sbW&&cy>=sy2+3&&cy<=sy2+3+sbH){
                     inventory.herbs[k]--;if(inventory.herbs[k]<=0) delete inventory.herbs[k];
                     gold+=3;labMessage=T('soldItem');labMessageTimer=60;playSound('pickup');return;
+                }
+            }
+            sellY+=Math.min(herbKeys.length,5)*32+8;
+            
+            // Sell potions
+            for(var i=0;i<Math.min(inventory.potions.length,5);i++){
+                var pot=inventory.potions[i];
+                var sy2=sellY+i*32;
+                var sellPrice=5+pot.tier*3;
+                var sbX=startX+240,sbW=70,sbH=22;
+                if(cx>=sbX&&cx<=sbX+sbW&&cy>=sy2+3&&cy<=sy2+3+sbH){
+                    inventory.potions.splice(i,1);
+                    gold+=sellPrice;labMessage=T('soldItem');labMessageTimer=60;playSound('pickup');return;
+                }
+            }
+            sellY+=Math.min(inventory.potions.length,5)*32+8;
+            
+            // Sell weapons
+            for(var i=0;i<Math.min(inventory.weapons.length,5);i++){
+                var wep=inventory.weapons[i];
+                var sy2=sellY+i*32;
+                var sellPrice=8+wep.tier*8;
+                var sbX=startX+240,sbW=70,sbH=22;
+                if(cx>=sbX&&cx<=sbX+sbW&&cy>=sy2+3&&cy<=sy2+3+sbH){
+                    inventory.weapons.splice(i,1);
+                    gold+=sellPrice;labMessage=T('soldItem');labMessageTimer=60;playSound('pickup');return;
                 }
             }
         } else if(labTab==='research'){
