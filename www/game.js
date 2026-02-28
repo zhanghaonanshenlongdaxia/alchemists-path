@@ -2569,117 +2569,192 @@ function drawWeaponModel(x,y,weapon,scale){
     ctx.translate(x,y);
     ctx.scale(scale,scale);
     var wc=weapon.color;
-    var tier=weapon.tier;
+    var wn=weapon.name;
     
-    if(weapon.type==='sword'){
-        // Sword blade
+    // Each weapon has unique appearance
+    if(wn==='Rusty Dagger'){
+        // Small rusty dagger
         ctx.fillStyle=wc;
-        ctx.beginPath();
-        ctx.moveTo(-3,-25);ctx.lineTo(0,-30);ctx.lineTo(3,-25);
-        ctx.lineTo(2,8);ctx.lineTo(-2,8);ctx.closePath();ctx.fill();
-        // Blade edge shine
-        ctx.fillStyle='rgba(255,255,255,0.4)';
-        ctx.fillRect(-1,-28,2,30);
-        // Guard
-        ctx.fillStyle=tier>=2?'#ffd700':'#888';
-        ctx.fillRect(-8,8,16,3);
-        // Handle
-        ctx.fillStyle='#5a4a3a';ctx.fillRect(-2,11,4,12);
-        // Pommel
-        ctx.fillStyle=tier>=3?'#ff4444':'#666';
-        ctx.beginPath();ctx.arc(0,24,3,0,Math.PI*2);ctx.fill();
-    } else if(weapon.type==='dagger'){
-        // Dagger blade (shorter, thinner)
+        ctx.beginPath();ctx.moveTo(-2,-16);ctx.lineTo(0,-20);ctx.lineTo(2,-16);ctx.lineTo(1.5,6);ctx.lineTo(-1.5,6);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#aa6633';ctx.fillRect(-4,6,8,2);ctx.fillRect(-1.5,8,3,8);
+        // Rust spots
+        for(var i=0;i<5;i++){ctx.fillStyle='#664422';ctx.fillRect(Math.random()*3-1.5,-14+i*3,1,1);}
+    } else if(wn==='Wooden Club'){
+        // Crude wooden club
+        ctx.fillStyle='#6a4a2a';ctx.fillRect(-3,-20,6,26);ctx.fillRect(-2,6,4,12);
+        ctx.fillStyle='#8b6a3a';ctx.fillRect(-4,-22,8,4);
+        // Wood grain
+        for(var i=0;i<8;i++){ctx.fillStyle='rgba(100,70,40,0.3)';ctx.fillRect(-2,-18+i*4,4,1);}
+    } else if(wn==='Old Sword'){
+        // Basic old iron sword
+        ctx.fillStyle=wc;ctx.fillRect(-2.5,-24,5,30);
+        ctx.fillStyle='rgba(255,255,255,0.2)';ctx.fillRect(-0.5,-22,1,26);
+        ctx.fillStyle='#777';ctx.fillRect(-7,6,14,3);
+        ctx.fillStyle='#4a3a2a';ctx.fillRect(-2,9,4,10);
+    } else if(wn==='Worn Axe'){
+        // Old worn battle axe
+        ctx.fillStyle='#7a5a3a';ctx.fillRect(-2,-20,4,28);
         ctx.fillStyle=wc;
-        ctx.beginPath();
-        ctx.moveTo(-2,-18);ctx.lineTo(0,-22);ctx.lineTo(2,-18);
-        ctx.lineTo(1.5,6);ctx.lineTo(-1.5,6);ctx.closePath();ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,0.5)';
-        ctx.fillRect(-0.5,-20,1,24);
-        // Guard (small)
-        ctx.fillStyle=tier>=2?'#ffd700':'#666';
-        ctx.fillRect(-5,6,10,2);
-        // Handle (wrapped)
-        ctx.fillStyle='#3a2a1a';ctx.fillRect(-1.5,8,3,10);
-        for(var i=0;i<4;i++){ctx.fillStyle='#665544';ctx.fillRect(-2,9+i*2.5,4,1);}
-    } else if(weapon.type==='axe'){
-        // Axe handle
-        ctx.fillStyle='#6a4a2a';ctx.fillRect(-2,-22,4,30);
-        // Axe head
+        ctx.beginPath();ctx.moveTo(-2,-16);ctx.lineTo(-9,-10);ctx.lineTo(-7,-5);ctx.lineTo(-2,-7);ctx.closePath();ctx.fill();
+        ctx.beginPath();ctx.moveTo(2,-16);ctx.lineTo(9,-10);ctx.lineTo(7,-5);ctx.lineTo(2,-7);ctx.closePath();ctx.fill();
+        // Chips/damage
+        ctx.fillStyle='#554433';ctx.fillRect(-8,-9,2,1);ctx.fillRect(6,-9,2,1);
+    } else if(wn==='Iron Sword'){
+        // Clean iron longsword
         ctx.fillStyle=wc;
-        ctx.beginPath();
-        ctx.moveTo(-2,-18);ctx.lineTo(-10,-12);ctx.lineTo(-8,-6);ctx.lineTo(-2,-8);ctx.closePath();ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(2,-18);ctx.lineTo(10,-12);ctx.lineTo(8,-6);ctx.lineTo(2,-8);ctx.closePath();ctx.fill();
-        // Blade edge
+        ctx.beginPath();ctx.moveTo(-3,-26);ctx.lineTo(0,-30);ctx.lineTo(3,-26);ctx.lineTo(2,8);ctx.lineTo(-2,8);ctx.closePath();ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillRect(-1,-28,2,32);
+        ctx.fillStyle='#999';ctx.fillRect(-8,8,16,3);
+        ctx.fillStyle='#3a2a1a';ctx.fillRect(-2,11,4,12);
+        ctx.fillStyle='#666';ctx.beginPath();ctx.arc(0,24,3,0,Math.PI*2);ctx.fill();
+    } else if(wn==='Steel Blade'){
+        // Refined steel blade
+        ctx.fillStyle=wc;
+        ctx.beginPath();ctx.moveTo(-3.5,-28);ctx.lineTo(0,-32);ctx.lineTo(3.5,-28);ctx.lineTo(2.5,10);ctx.lineTo(-2.5,10);ctx.closePath();ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillRect(-1,-30,2,36);
+        // Fuller groove
+        ctx.fillStyle='rgba(100,100,120,0.3)';ctx.fillRect(-0.5,-26,1,28);
+        ctx.fillStyle='#bbb';ctx.fillRect(-9,10,18,3);
+        ctx.fillStyle='#4a3a2a';ctx.fillRect(-2,13,4,10);
+        ctx.fillStyle='#888';ctx.beginPath();ctx.arc(0,24,3,0,Math.PI*2);ctx.fill();
+    } else if(wn==='Bronze Spear'){
+        // Bronze tipped spear
+        ctx.strokeStyle='#8a6a4a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(0,20);ctx.stroke();
+        ctx.fillStyle=wc;
+        ctx.beginPath();ctx.moveTo(-3,-20);ctx.lineTo(0,-28);ctx.lineTo(3,-20);ctx.closePath();ctx.fill();
+        ctx.fillStyle='rgba(255,200,150,0.4)';ctx.beginPath();ctx.moveTo(-1,-21);ctx.lineTo(0,-26);ctx.lineTo(1,-21);ctx.closePath();ctx.fill();
+        // Bronze bands
+        ctx.fillStyle='#b87333';ctx.fillRect(-2,-16,4,2);ctx.fillRect(-2,0,4,2);
+    } else if(wn==='War Axe'){
+        // Heavy war axe
+        ctx.fillStyle='#6a4a2a';ctx.fillRect(-2.5,-22,5,32);
+        ctx.fillStyle=wc;
+        ctx.beginPath();ctx.moveTo(-2,-18);ctx.lineTo(-11,-11);ctx.lineTo(-9,-5);ctx.lineTo(-2,-8);ctx.closePath();ctx.fill();
+        ctx.beginPath();ctx.moveTo(2,-18);ctx.lineTo(11,-11);ctx.lineTo(9,-5);ctx.lineTo(2,-8);ctx.closePath();ctx.fill();
+        // Edge shine
+        ctx.strokeStyle='rgba(255,255,255,0.6)';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(-11,-11);ctx.lineTo(-9,-5);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(11,-11);ctx.lineTo(9,-5);ctx.stroke();
+        // Spike
+        ctx.fillStyle='#999';ctx.fillRect(-1.5,-26,3,8);
+    } else if(wn==='Crystal Staff'){
+        // Magical crystal staff
+        ctx.strokeStyle='#9a7a5a';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,-22);ctx.lineTo(0,18);ctx.stroke();
+        // Crystal orb
+        var grad=ctx.createRadialGradient(0,-24,0,0,-24,9);
+        grad.addColorStop(0,'rgba(255,255,255,0.9)');grad.addColorStop(0.6,wc);grad.addColorStop(1,'rgba(100,180,255,0.3)');
+        ctx.fillStyle=grad;ctx.beginPath();ctx.arc(0,-24,9,0,Math.PI*2);ctx.fill();
+        // Crystal facets
         ctx.strokeStyle='rgba(255,255,255,0.6)';ctx.lineWidth=1;
-        ctx.beginPath();ctx.moveTo(-10,-12);ctx.lineTo(-8,-6);ctx.stroke();
-        ctx.beginPath();ctx.moveTo(10,-12);ctx.lineTo(8,-6);ctx.stroke();
-        // Spike (high tier)
-        if(tier>=3){ctx.fillStyle='#888';ctx.fillRect(-1.5,-24,3,6);}
-    } else if(weapon.type==='staff'){
-        // Staff shaft
-        ctx.strokeStyle='#8a6a3a';ctx.lineWidth=3;
-        ctx.beginPath();ctx.moveTo(0,-24);ctx.lineTo(0,18);ctx.stroke();
-        // Ornamental bands
-        for(var i=0;i<3;i++){
-            ctx.fillStyle=tier>=2?'#cc9933':'#665533';
-            ctx.fillRect(-2.5,-18+i*12,5,2);
-        }
-        // Orb at top
-        var orbSize=tier>=3?8:(tier>=2?6:5);
-        ctx.fillStyle=wc;
-        ctx.beginPath();ctx.arc(0,-24,orbSize,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,0.3)';
-        ctx.beginPath();ctx.arc(-1,-26,3,0,Math.PI*2);ctx.fill();
+        for(var i=0;i<6;i++){var a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(0,-24);ctx.lineTo(Math.cos(a)*7,-24+Math.sin(a)*7);ctx.stroke();}
         // Magic glow
-        if(tier>=2){
-            ctx.save();ctx.globalAlpha=0.3;
-            var orbGlow=ctx.createRadialGradient(0,-24,2,0,-24,12);
-            orbGlow.addColorStop(0,wc);orbGlow.addColorStop(1,'rgba(0,0,0,0)');
-            ctx.fillStyle=orbGlow;ctx.fillRect(-12,-36,24,24);ctx.restore();
-        }
-    } else if(weapon.type==='spear'){
-        // Spear shaft
-        ctx.strokeStyle='#7a5a3a';ctx.lineWidth=2.5;
-        ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(0,20);ctx.stroke();
-        // Spear tip
+        ctx.save();ctx.globalAlpha=0.4;
+        var glow=ctx.createRadialGradient(0,-24,2,0,-24,14);
+        glow.addColorStop(0,wc);glow.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=glow;ctx.fillRect(-14,-38,28,28);ctx.restore();
+    } else if(wn==='Shadow Knife'){
+        // Dark shadow dagger
         ctx.fillStyle=wc;
-        ctx.beginPath();
-        ctx.moveTo(-3,-22);ctx.lineTo(0,-30);ctx.lineTo(3,-22);ctx.closePath();ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,0.4)';
-        ctx.beginPath();
-        ctx.moveTo(-1,-23);ctx.lineTo(0,-28);ctx.lineTo(1,-23);ctx.closePath();ctx.fill();
-        // Wings (high tier)
-        if(tier>=2){
-            ctx.fillStyle=tier>=3?'#ffd700':'#888';
-            ctx.beginPath();ctx.moveTo(-3,-22);ctx.lineTo(-5,-18);ctx.lineTo(-2,-20);ctx.closePath();ctx.fill();
-            ctx.beginPath();ctx.moveTo(3,-22);ctx.lineTo(5,-18);ctx.lineTo(2,-20);ctx.closePath();ctx.fill();
+        ctx.beginPath();ctx.moveTo(-2,-18);ctx.lineTo(0,-22);ctx.lineTo(2,-18);ctx.lineTo(1.5,6);ctx.lineTo(-1.5,6);ctx.closePath();ctx.fill();
+        // Shadow effect
+        ctx.save();ctx.globalAlpha=0.3;
+        for(var i=0;i<3;i++){ctx.fillStyle='#000';ctx.fillRect(-2-i,-18+i,4,20);}
+        ctx.restore();
+        ctx.fillStyle='#4433aa';ctx.fillRect(-5,6,10,2);
+        ctx.fillStyle='#2a1a3a';ctx.fillRect(-1.5,8,3,9);
+        // Purple gem
+        ctx.fillStyle='#8844cc';ctx.beginPath();ctx.arc(0,14,2,0,Math.PI*2);ctx.fill();
+    } else if(wn==='Flame Sword'){
+        // Burning flame sword
+        ctx.fillStyle=wc;
+        ctx.beginPath();ctx.moveTo(-3.5,-28);ctx.lineTo(0,-32);ctx.lineTo(3.5,-28);ctx.lineTo(2.5,10);ctx.lineTo(-2.5,10);ctx.closePath();ctx.fill();
+        ctx.fillStyle='rgba(255,255,100,0.6)';ctx.fillRect(-1,-30,2,36);
+        // Flame pattern
+        for(var i=0;i<6;i++){
+            ctx.fillStyle=i%2===0?'#ff8822':'#ffdd44';
+            ctx.beginPath();ctx.arc(2-i*0.5,-26+i*5,2,0,Math.PI*2);ctx.fill();
         }
-    } else if(weapon.type==='claw'){
-        // Handle/knuckle
-        ctx.fillStyle='#4a3a2a';ctx.fillRect(-6,0,12,8);
-        // Three claws
+        ctx.fillStyle='#ffd700';ctx.fillRect(-9,10,18,3);
+        ctx.fillStyle='#6a3a1a';ctx.fillRect(-2,13,4,10);
+        ctx.fillStyle='#ff4400';ctx.beginPath();ctx.arc(0,24,3,0,Math.PI*2);ctx.fill();
+    } else if(wn==='Frost Mace'){
+        // Ice mace
+        ctx.fillStyle='#5a8aaa';ctx.fillRect(-2,-22,4,28);
+        // Ice crystal head
+        ctx.fillStyle=wc;
+        ctx.beginPath();ctx.moveTo(0,-26);ctx.lineTo(-5,-18);ctx.lineTo(-3,-16);ctx.lineTo(0,-20);ctx.lineTo(3,-16);ctx.lineTo(5,-18);ctx.closePath();ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.6)';
+        ctx.beginPath();ctx.moveTo(0,-24);ctx.lineTo(-3,-18);ctx.lineTo(0,-19);ctx.lineTo(3,-18);ctx.closePath();ctx.fill();
+        // Ice spikes
+        for(var i=0;i<4;i++){
+            var ang=i*Math.PI/2;ctx.fillStyle='#aaddff';
+            ctx.save();ctx.rotate(ang);ctx.fillRect(-1,-20,2,6);ctx.restore();
+        }
+    } else if(wn==='Venom Fang'){
+        // Poisonous fang dagger
+        ctx.fillStyle=wc;
+        ctx.beginPath();ctx.moveTo(-2,-19);ctx.lineTo(0,-23);ctx.lineTo(2,-19);
+        ctx.bezierCurveTo(2,-10,1.5,0,1.5,6);ctx.bezierCurveTo(1.5,6,-1.5,6,-1.5,6);
+        ctx.bezierCurveTo(-1.5,0,-2,-10,-2,-19);ctx.fill();
+        // Venom drips
+        for(var i=0;i<5;i++){
+            ctx.fillStyle='#66ff44';ctx.beginPath();ctx.arc(-1+i*0.5,-18+i*4,0.8,0,Math.PI*2);ctx.fill();
+        }
+        ctx.fillStyle='#8833cc';ctx.fillRect(-5,6,10,2);
+        ctx.fillStyle='#3a2a4a';ctx.fillRect(-1.5,8,3,8);
+    } else if(wn==='Thunder Spear'){
+        // Lightning spear
+        ctx.strokeStyle='#aa8844';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(0,20);ctx.stroke();
+        ctx.fillStyle=wc;
+        ctx.beginPath();ctx.moveTo(-3.5,-22);ctx.lineTo(0,-30);ctx.lineTo(3.5,-22);ctx.closePath();ctx.fill();
+        ctx.fillStyle='rgba(255,255,200,0.5)';ctx.beginPath();ctx.moveTo(-1.5,-23);ctx.lineTo(0,-28);ctx.lineTo(1.5,-23);ctx.closePath();ctx.fill();
+        // Lightning bolts
+        ctx.strokeStyle='#ffff88';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(-2,-18);ctx.lineTo(-4,-12);ctx.lineTo(-2,-6);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(2,-16);ctx.lineTo(4,-10);ctx.lineTo(2,-4);ctx.stroke();
+        // Golden wings
+        ctx.fillStyle='#ffd700';
+        ctx.beginPath();ctx.moveTo(-3.5,-22);ctx.lineTo(-6,-17);ctx.lineTo(-3,-19);ctx.closePath();ctx.fill();
+        ctx.beginPath();ctx.moveTo(3.5,-22);ctx.lineTo(6,-17);ctx.lineTo(3,-19);ctx.closePath();ctx.fill();
+    } else if(wn==='Dragon Claw'){
+        // Dragon claw gauntlet
+        ctx.fillStyle='#5a3a2a';ctx.fillRect(-7,0,14,9);
+        // Dragon scales
+        for(var i=0;i<3;i++){for(var j=0;j<2;j++){
+            ctx.fillStyle='#cc4422';ctx.beginPath();ctx.arc(-4+i*4,2+j*4,2,0,Math.PI*2);ctx.fill();
+        }}
+        // Three dragon claws (curved)
         for(var ci=0;ci<3;ci++){
-            var cx=(ci-1)*4;
+            var cx=(ci-1)*5;
             ctx.fillStyle=wc;
             ctx.beginPath();
-            ctx.moveTo(cx-1.5,0);ctx.lineTo(cx,-18);ctx.lineTo(cx+1.5,0);ctx.closePath();ctx.fill();
-            // Claw shine
-            ctx.fillStyle='rgba(255,255,255,0.3)';
-            ctx.fillRect(cx-0.5,-16,1,16);
+            ctx.moveTo(cx-1.5,0);
+            ctx.bezierCurveTo(cx-1,-8,cx-0.5,-16,cx,-20);
+            ctx.lineTo(cx+1.5,0);
+            ctx.bezierCurveTo(cx+0.5,-10,cx+0.8,-15,cx,-20);
+            ctx.closePath();ctx.fill();
+            // Fire glow
+            ctx.fillStyle='#ff6600';ctx.beginPath();ctx.arc(cx,-18,1.5,0,Math.PI*2);ctx.fill();
         }
-        // Gems (high tier)
-        if(tier>=3){
-            for(var gi=0;gi<3;gi++){
-                ctx.fillStyle='#ff4444';
-                ctx.beginPath();ctx.arc((gi-1)*4,4,2,0,Math.PI*2);ctx.fill();
-            }
-        }
-    } else {
-        // Default: simple sword
+    } else if(wn==='Arcane Blade'){
+        // Magical arcane sword
         ctx.fillStyle=wc;
-        ctx.fillRect(-2,-24,4,28);
+        ctx.beginPath();ctx.moveTo(-4,-30);ctx.lineTo(0,-34);ctx.lineTo(4,-30);ctx.lineTo(3,10);ctx.lineTo(-3,10);ctx.closePath();ctx.fill();
+        // Arcane runes
+        ctx.fillStyle='#ffaaff';ctx.font='bold 8px monospace';ctx.textAlign='center';
+        ctx.fillText('⚡',-1,-22);ctx.fillText('✦',1,-12);ctx.fillText('◈',0,-2);
+        ctx.fillStyle='rgba(255,200,255,0.5)';ctx.fillRect(-1.5,-32,3,38);
+        // Ornate guard
+        ctx.fillStyle='#ddaaff';
+        ctx.beginPath();ctx.moveTo(-10,10);ctx.lineTo(-8,8);ctx.lineTo(-4,9);ctx.lineTo(0,10);ctx.lineTo(4,9);ctx.lineTo(8,8);ctx.lineTo(10,10);
+        ctx.lineTo(8,12);ctx.lineTo(0,11);ctx.lineTo(-8,12);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#7a5aaa';ctx.fillRect(-2.5,12,5,10);
+        // Magic crystal pommel
+        ctx.fillStyle='#ff88ff';ctx.beginPath();ctx.arc(0,24,4,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.6)';ctx.beginPath();ctx.arc(-1,22,2,0,Math.PI*2);ctx.fill();
+    } else {
+        // Fallback: simple weapon
+        ctx.fillStyle=wc;ctx.fillRect(-2,-24,4,28);
         ctx.fillStyle='#666';ctx.fillRect(-6,4,12,2);
         ctx.fillStyle='#444';ctx.fillRect(-1.5,6,3,10);
     }
