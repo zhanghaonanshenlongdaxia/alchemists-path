@@ -4114,6 +4114,13 @@ function drawSettings(){
     ctx.fillStyle='#4488ee';ctx.fillRect(loadX,sbY,sbW,sbH);
     ctx.fillStyle='#fff';ctx.font='bold '+(compact?10:11)+'px monospace';
     ctx.fillText(T('loadSave'),loadX+sbW/2,sbY+sbH/2+4);
+    cy+=sbH+(compact?6:10);
+    // Return to Menu button
+    var menuBtnW=pw-24,menuBtnH=compact?24:28,menuBtnX=px+12,menuBtnY=cy;
+    ctx.fillStyle='#dd8844';ctx.fillRect(menuBtnX,menuBtnY,menuBtnW,menuBtnH);
+    ctx.strokeStyle='#ffaa66';ctx.lineWidth=1;ctx.strokeRect(menuBtnX,menuBtnY,menuBtnW,menuBtnH);
+    ctx.fillStyle='#000';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
+    ctx.fillText(lang==='zh'?'返回主菜单':'Return to Menu',menuBtnX+menuBtnW/2,menuBtnY+menuBtnH/2+4);
     cy+=lh;
     // Close button
     var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cy;
@@ -4160,6 +4167,24 @@ function handleSettingsClick(cx,cy){
     var saveX2=px+12,loadX2=px+20+sbW2,sbY2=cyy;
     if(cx>=saveX2&&cx<=saveX2+sbW2&&cy>=sbY2&&cy<=sbY2+sbH2){saveGame();playSound('click');return;}
     if(cx>=loadX2&&cx<=loadX2+sbW2&&cy>=sbY2&&cy<=sbY2+sbH2){loadGame();playSound('click');return;}
+    cyy+=sbH2+(compact?6:10);
+    // Return to Menu button
+    var menuBtnW2=pw-24,menuBtnH2=compact?24:28,menuBtnX2=px+12,menuBtnY2=cyy;
+    if(cx>=menuBtnX2&&cx<=menuBtnX2+menuBtnW2&&cy>=menuBtnY2&&cy<=menuBtnY2+menuBtnH2){
+        // Return to main menu
+        saveGame();
+        state='menu';
+        showSettings=false;
+        labTab=null;
+        activeBuffs=[];
+        carriedPotions=[];
+        weaponPopup=null;
+        merchantPopup=null;
+        buffPopup=null;
+        playSound('click');
+        playBGM('menu');
+        return;
+    }
     cyy+=lh;
     // Close button
     var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cyy;
@@ -4477,6 +4502,21 @@ function handleMenuTouch(cx,cy){
     var startY=H*0.45;
     // New Game button
     if(cx>=btnX&&cx<=btnX+btnW&&cy>=startY&&cy<=startY+btnH){
+        // Reset all game data for new game
+        gold=0; totalScore=0; expeditionNum=0;
+        inventory={herbs:{},essences:{},potions:[],weapons:[]};
+        equippedWeapon=makeWeapon(WEAPONS[0]);
+        discoveredRecipes=[];
+        carriedPotions=[];
+        researchLevels={};
+        foundCollectibles=[];
+        playerKeys=0;
+        unlockedSkills={};
+        tutorialDone=false;
+        tutorialPhase='';
+        tutorialStep=0;
+        initResearch();
+        refreshLabShop();
         state='lab';playSound('click');playBGM('lab');
         if(!tutorialDone&&tutorialPhase===''){tutorialPhase='lab';tutorialStep=0;}
         return;

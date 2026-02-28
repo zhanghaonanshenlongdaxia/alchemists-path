@@ -1,4 +1,4 @@
-var CACHE_NAME = 'alchemist-v15';
+var CACHE_NAME = 'alchemist-v16';
 var ASSETS = [
   './',
   './index.html',
