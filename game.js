@@ -44,7 +44,6 @@ const LANG = {
         enterLab: 'ENTER LAB',
         controls: 'WASD Move • Click Attack • Brew potions to grow stronger',
         controlsMobile: 'Tap to interact • Left stick to move • Right to attack',
-        labTitle: "ALCHEMIST'S LAB",
         tabExtract: 'Extract', tabBrew: 'Brew', tabPotions: 'Potions', tabExpedition: 'Expedition',
         selectHerb: 'Select a herb to extract essences',
         noHerbs: 'No herbs. Go on an expedition!',
@@ -58,8 +57,7 @@ const LANG = {
         discoveredRecipes: '— Discovered Recipes —',
         brewToDiscover: 'Brew to discover!',
         yourPotions: 'Your potions — use before expedition',
-        noPotions: 'No potions brewed yet.',
-        use: 'USE',
+        noPotions: 'No potions brewed yet.', 
         chooseBiome: 'Choose a biome to explore',
         activeBuffs: 'Active buffs: ',
         explore: 'EXPLORE',
@@ -70,28 +68,20 @@ const LANG = {
         score: 'Score',
         expComplete: 'Expedition complete! Check your herbs.',
         youFell: 'You fell... but your herbs are safe.',
-        extracted: 'Extracted: ',
         newRecipe: 'New recipe discovered: ',
         brewed: 'Brewed: ',
-        upgraded: 'Upgraded: ',
-        strongerBuff: 'Already have a stronger buff!',
-        used: 'Used: ',
-        targetDown: 'TARGET DOWN',
         revived: 'REVIVED!',
-        expedition: 'Expedition',
         atk: 'ATK', def: 'DEF', hp: 'HP',
         biomeForest: 'Forest', biomeCave: 'Cave', biomeSwamp: 'Swamp',
-        langBtn: '中文',
         tier: 'Tier',
-        settings: 'Settings',
         step1Chop: 'Step 1: CHOP', step1Desc: 'Click rapidly to chop the herb!',
         step2Grind: 'Step 2: GRIND', step2Desc: 'Click left and right to grind!',
         step3Distill: 'Step 3: DISTILL', step3Desc: 'Keep temperature in the green zone!',
         chopProgress: 'Chop', grindProgress: 'Grind', tempLabel: 'Temp', holdTime: 'Hold',
         bonusEssence: 'BONUS essence!', extractComplete: 'Extraction complete!',
-        extractFailed: 'Extraction failed... material lost.', extracting: 'Extracting...',
-        equip: 'EQUIP', unequip: 'DROP', carriedSlots: 'Expedition Belt',
-        slotEmpty: 'Empty', potionUsed: 'Used: ', beltFull: 'Belt is full! (max 3)',
+        extracting: 'Extracting...',
+        equip: 'EQUIP', carriedSlots: 'Expedition Belt',
+        slotEmpty: 'Empty', beltFull: 'Belt is full! (max 3)',
         quality: 'Quality', perfect: 'Perfect!', good: 'Good', poor: 'Poor',
         // New strings
         weapon: 'Weapon', weaponFound: 'Weapon Found!', weaponReplace: 'REPLACE', weaponKeep: 'KEEP',
@@ -106,18 +96,18 @@ const LANG = {
         enchantNone: 'No enchantment',
         dmg: 'DMG', spd: 'Speed', rng: 'Range',
         // Research & Collectibles
-        tabResearch: 'Research', research: 'Research', researchDesc: 'Spend gold to permanently upgrade',
+        tabResearch: 'Research', researchDesc: 'Spend gold to permanently upgrade',
         resHP: 'Max HP +1', resDEF: 'Base DEF +1', resATK: 'Base ATK +1', resSpeed: 'Move Speed +',
         resLuck: 'Luck +', resCarry: 'Belt +1 Slot',
-        lvl: 'Lv', maxLvl: 'MAX', upgradeCost: 'Cost',
-        key: 'Key', keys: 'Keys', lockedRoom: 'Locked!', needKey: 'Need a key',
-        collectible: 'Relic', collectibles: 'Relics', newRelic: 'New Relic Found!',
+        lvl: 'Lv', maxLvl: 'MAX',
+        key: 'Key', keys: 'Keys', needKey: 'Need a key',
+        newRelic: 'New Relic Found!',
         relicCase: 'Relic Case', relicsFound: 'Relics Found',
         minimap: 'Map',
-        saved: 'Saved!', loaded: 'Loaded!', saveBtn: 'Save', loadBtn: 'Load', loadSave: 'Load Save',
+        saved: 'Saved!', loaded: 'Loaded!', saveBtn: 'Save', loadSave: 'Load Save',
         // Skill tree
         tabSkills: 'Skills', skillTree: 'Skill Tree', skillDesc: 'Unlock permanent abilities',
-        skillLocked: 'Locked', skillUnlocked: 'Unlocked', skillReq: 'Requires',
+        skillUnlocked: 'Unlocked', skillReq: 'Requires',
         // Combat branch
         skCombat: 'Combat', skPowerStrike: 'Power Strike', skPowerStrikeD: 'Crit chance +10%',
         skLifeSteal: 'Life Steal', skLifeStealD: 'Heal 1 HP per 5 kills',
@@ -144,32 +134,30 @@ const LANG = {
         enterLab: '进入炼金室',
         controls: 'WASD移动 • 点击攻击 • 炼制药剂变强',
         controlsMobile: '点击交互 • 左摇杆移动 • 右侧攻击',
-        labTitle: '炼 金 室',
         tabExtract: '提取', tabBrew: '酿造', tabPotions: '药剂', tabExpedition: '探险',
         selectHerb: '选择药材提取精华', noHerbs: '没有药材，去探险吧！', extract: '提取',
         yourEssences: '— 你的精华 —', noneYet: '暂无',
         select2: '选择2种精华酿造药剂', selectMore: '再选一种精华...',
         noRecipe: '没有已知配方', brew: '酿造',
         discoveredRecipes: '— 已发现配方 —', brewToDiscover: '酿造来发现配方！',
-        yourPotions: '你的药剂 — 探险前使用', noPotions: '还没有药剂', use: '使用',
+        yourPotions: '你的药剂 — 探险前使用', noPotions: '还没有药剂',
         chooseBiome: '选择探险区域', activeBuffs: '当前增益：', explore: '出发',
         herbs: '药材：', exit: '出口', expFailed: '探险失败', backToLab: '返回炼金室',
         score: '分数', expComplete: '探险完成！查看你的药材。',
         youFell: '你倒下了...但药材还在。',
-        extracted: '提取了：', newRecipe: '发现新配方：', brewed: '酿造了：',
-        upgraded: '升级了：', strongerBuff: '已有更强的同类增益！', used: '使用了：',
-        targetDown: '目标消灭', revived: '复活！', expedition: '探险',
+        newRecipe: '发现新配方：', brewed: '酿造了：',
+        revived: '复活！',
         atk: '攻击', def: '防御', hp: '生命',
         biomeForest: '森林', biomeCave: '洞穴', biomeSwamp: '沼泽',
-        langBtn: 'EN', tier: '阶', settings: '设置',
+        tier: '阶',
         step1Chop: '第一步：切碎', step1Desc: '快速点击切碎药材！',
         step2Grind: '第二步：研磨', step2Desc: '左右交替点击研磨！',
         step3Distill: '第三步：蒸馏', step3Desc: '保持温度在绿色区间内！',
         chopProgress: '切碎', grindProgress: '研磨', tempLabel: '温度', holdTime: '保持',
         bonusEssence: '额外精华！', extractComplete: '提取完成！',
-        extractFailed: '提取失败…材料损失了。', extracting: '撤离中…',
-        equip: '装备', unequip: '卸下', carriedSlots: '探险腰带', slotEmpty: '空',
-        potionUsed: '使用了：', beltFull: '腰带已满！（最多3瓶）',
+        extracting: '撤离中…',
+        equip: '装备', carriedSlots: '探险腰带', slotEmpty: '空',
+        beltFull: '腰带已满！（最多3瓶）',
         quality: '品质', perfect: '完美！', good: '良好', poor: '较差',
         weapon: '武器', weaponFound: '发现武器！', weaponReplace: '替换', weaponKeep: '保留',
         enchant: '附魔', enchantWeapon: '武器附魔', selectPotion: '选择药剂附魔',
@@ -183,18 +171,18 @@ const LANG = {
         enchantNone: '无附魔',
         dmg: '伤害', spd: '速度', rng: '范围',
         // Research & Collectibles
-        tabResearch: '研究', research: '研究', researchDesc: '花费金币永久升级属性',
+        tabResearch: '研究', researchDesc: '花费金币永久升级属性',
         resHP: '生命上限+1', resDEF: '基础防御+1', resATK: '基础攻击+1', resSpeed: '移速+',
         resLuck: '幸运+', resCarry: '腰带+1格',
-        lvl: '级', maxLvl: '满级', upgradeCost: '费用',
-        key: '钥匙', keys: '钥匙', lockedRoom: '已锁！', needKey: '需要钥匙',
-        collectible: '遗物', collectibles: '遗物', newRelic: '发现新遗物！',
+        lvl: '级', maxLvl: '满级',
+        key: '钥匙', keys: '钥匙', needKey: '需要钥匙',
+        newRelic: '发现新遗物！',
         relicCase: '遗物柜', relicsFound: '已发现遗物',
         minimap: '地图',
-        saved: '已保存！', loaded: '已加载！', saveBtn: '保存', loadBtn: '加载', loadSave: '读取存档',
+        saved: '已保存！', loaded: '已加载！', saveBtn: '保存', loadSave: '读取存档',
         // Skill tree
         tabSkills: '技能', skillTree: '技能树', skillDesc: '解锁永久能力',
-        skillLocked: '未解锁', skillUnlocked: '已解锁', skillReq: '需要',
+        skillUnlocked: '已解锁', skillReq: '需要',
         skCombat: '战斗', skPowerStrike: '暴击强化', skPowerStrikeD: '暴击率+10%',
         skLifeSteal: '生命汲取', skLifeStealD: '每5次击杀回复1HP',
         skBerserker: '狂战', skBerserkerD: 'HP<30%时攻击+20%',
@@ -458,13 +446,12 @@ let explored = []; // 2D array same size as map
 
 // Lab UI state
 let labTab = null;
-let labScroll = 0, selectedHerb = null, selectedEssences = [];
+let selectedEssences = [];
 let labScrollY = 0, labScrollTouchId = -1, labScrollLastY = 0, labScrollMoved = false;
 let merchantScrollY = 0, merchantScrollTouchId = -1, merchantScrollLastY = 0, merchantScrollMoved = false;
 let labMessage = '', labMessageTimer = 0;
 let extractMini = null;
 let labShopStock = []; // lab merchant stock
-let transmuteTarget = null; // for transmute skill
 
 // ============ TUTORIAL SYSTEM ============
 var tutorialDone = false;
@@ -900,7 +887,7 @@ canvas.addEventListener('touchstart',function(e){
                 return;
             }
         }
-        handleLabTouch(t0.clientX,t0.clientY);return;
+        handleLabClick(t0.clientX,t0.clientY);return;
     }
     if(state==='gameover'){handleGameOverTouch(t0.clientX,t0.clientY);return;}
     if(state!=='expedition') return;
@@ -2781,26 +2768,19 @@ function renderLab(){
     var W=canvas.width,H=canvas.height;
     drawCaveScene();
 
-    // Language toggle
-    var lbW=50,lbH=26,lbX=15,lbY=15;
-    ctx.fillStyle='rgba(10,10,20,0.6)';ctx.fillRect(lbX,lbY,lbW,lbH);
-    ctx.strokeStyle='#44dd88';ctx.lineWidth=1;ctx.strokeRect(lbX,lbY,lbW,lbH);
-    ctx.fillStyle='#44dd88';ctx.font='bold 11px monospace';ctx.textAlign='center';
-    ctx.fillText(T('langBtn'),lbX+lbW/2,lbY+lbH/2+4);
-
     // Score + Gold + Keys
     ctx.fillStyle='rgba(200,200,200,0.4)';ctx.font='10px monospace';ctx.textAlign='right';
     ctx.fillText(T('score')+': '+totalScore+'  '+T('gold')+': '+gold+'  '+T('keys')+': '+playerKeys,W-15,25);
 
     // Save/Load buttons
-    var svW=45,svH=22,svX=75,svY=15;
+    var svW=45,svH=22,svX=15,svY=15;
     ctx.fillStyle='rgba(10,10,20,0.6)';ctx.fillRect(svX,svY,svW,svH);
     ctx.strokeStyle='#4488ee';ctx.lineWidth=1;ctx.strokeRect(svX,svY,svW,svH);
     ctx.fillStyle='#4488ee';ctx.font='bold 9px monospace';ctx.textAlign='center';
     ctx.fillText(T('saveBtn'),svX+svW/2,svY+svH/2+3);
 
     // Settings gear
-    drawSettingsGear(130,15,22);
+    drawSettingsGear(70,15,22);
 
     // Carried potions belt
     if(carriedPotions.length>0){
@@ -3071,7 +3051,7 @@ function drawLabBrew(cy){
             var tbx=tsx+i*(tBtnW+tGap);
             var totalOwned=0;for(var ok in inventory.essences) totalOwned+=inventory.essences[ok];
             var canTrans=totalOwned>=3;
-            ctx.fillStyle=transmuteTarget===ek?'#2a2a3e':'#111118';ctx.fillRect(tbx,ty,tBtnW,32);
+            ctx.fillStyle='#111118';ctx.fillRect(tbx,ty,tBtnW,32);
             ctx.strokeStyle=ess.color;ctx.lineWidth=1;ctx.strokeRect(tbx,ty,tBtnW,32);
             ctx.fillStyle=canTrans?ess.color:'#555';ctx.font='9px monospace';ctx.textAlign='center';
             ctx.fillText(essenceName(ek),tbx+tBtnW/2,ty+14);
@@ -3494,79 +3474,88 @@ function drawSettingsGear(x, y, s){
 }
 function drawSettings(){
     var W=canvas.width,H=canvas.height;
+    var compact=H<550;
+    var lh=compact?28:42, titleH=compact?22:30, padY=compact?12:20;
+    var ph=Math.min(H-padY*2,compact?280:380);
     ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
-    var pw=Math.min(W-40,360),ph=380,px=(W-pw)/2,py=(H-ph)/2;
+    var pw=Math.min(W-30,340),px=(W-pw)/2,py=(H-ph)/2;
     ctx.fillStyle='rgba(14,14,26,0.97)';ctx.fillRect(px,py,pw,ph);
     ctx.strokeStyle='#44dd88';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
     ctx.fillStyle='#44dd88';ctx.fillRect(px,py,pw,3);
     // Title
-    ctx.fillStyle='#44dd88';ctx.font='bold 18px monospace';ctx.textAlign='center';
-    ctx.fillText(T('settingsTitle'),W/2,py+30);
-    var cy=py+55, lh=42, sliderW=pw-120, sliderX=px+100;
+    ctx.fillStyle='#44dd88';ctx.font='bold '+(compact?14:18)+'px monospace';ctx.textAlign='center';
+    ctx.fillText(T('settingsTitle'),W/2,py+titleH);
+    var cy=py+titleH+20, sliderW=pw-100, sliderX=px+85;
     // Language
-    ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='left';
-    ctx.fillText(T('langLabel'),px+20,cy+5);
-    var lbW=60,lbH=26,lbX=sliderX,lbY=cy-10;
+    var fSz=compact?11:13, lbW=compact?50:60, lbH=compact?22:26;
+    ctx.fillStyle='#aaa';ctx.font=fSz+'px monospace';ctx.textAlign='left';
+    ctx.fillText(T('langLabel'),px+12,cy+(compact?3:5));
+    var lbX=sliderX,lbY=cy-(compact?8:10);
     ctx.fillStyle='#222';ctx.fillRect(lbX,lbY,lbW,lbH);ctx.strokeStyle='#44dd88';ctx.lineWidth=1;ctx.strokeRect(lbX,lbY,lbW,lbH);
-    ctx.fillStyle='#44dd88';ctx.font='bold 11px monospace';ctx.textAlign='center';
+    ctx.fillStyle='#44dd88';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
     ctx.fillText(lang==='zh'?'中文':'EN',lbX+lbW/2,lbY+lbH/2+4);
     cy+=lh;
     // BGM Volume
-    ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='left';
-    ctx.fillText(T('bgmVol'),px+20,cy+5);
-    ctx.fillStyle='#333';ctx.fillRect(sliderX,cy-4,sliderW,10);
-    ctx.fillStyle='#44dd88';ctx.fillRect(sliderX,cy-4,sliderW*bgmVolume,10);
-    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sliderX+sliderW*bgmVolume,cy+1,7,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#aaa';ctx.font='10px monospace';ctx.textAlign='right';
-    ctx.fillText(Math.round(bgmVolume*100)+'%',px+pw-15,cy+5);
+    ctx.fillStyle='#aaa';ctx.font=fSz+'px monospace';ctx.textAlign='left';
+    ctx.fillText(T('bgmVol'),px+12,cy+(compact?3:5));
+    var trackH=compact?8:10, thumbR=compact?5:7;
+    ctx.fillStyle='#333';ctx.fillRect(sliderX,cy-4,sliderW,trackH);
+    ctx.fillStyle='#44dd88';ctx.fillRect(sliderX,cy-4,sliderW*bgmVolume,trackH);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sliderX+sliderW*bgmVolume,cy+trackH/2-2,thumbR,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#aaa';ctx.font=(compact?9:10)+'px monospace';ctx.textAlign='right';
+    ctx.fillText(Math.round(bgmVolume*100)+'%',px+pw-10,cy+(compact?3:5));
     cy+=lh;
     // SFX Volume
-    ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='left';
-    ctx.fillText(T('sfxVol'),px+20,cy+5);
-    ctx.fillStyle='#333';ctx.fillRect(sliderX,cy-4,sliderW,10);
-    ctx.fillStyle='#4488ee';ctx.fillRect(sliderX,cy-4,sliderW*sfxVolume,10);
-    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sliderX+sliderW*sfxVolume,cy+1,7,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#aaa';ctx.font='10px monospace';ctx.textAlign='right';
-    ctx.fillText(Math.round(sfxVolume*100)+'%',px+pw-15,cy+5);
+    ctx.fillStyle='#aaa';ctx.font=fSz+'px monospace';ctx.textAlign='left';
+    ctx.fillText(T('sfxVol'),px+12,cy+(compact?3:5));
+    ctx.fillStyle='#333';ctx.fillRect(sliderX,cy-4,sliderW,trackH);
+    ctx.fillStyle='#4488ee';ctx.fillRect(sliderX,cy-4,sliderW*sfxVolume,trackH);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sliderX+sliderW*sfxVolume,cy+trackH/2-2,thumbR,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#aaa';ctx.font=(compact?9:10)+'px monospace';ctx.textAlign='right';
+    ctx.fillText(Math.round(sfxVolume*100)+'%',px+pw-10,cy+(compact?3:5));
     cy+=lh;
     // Quality
-    ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='left';
-    ctx.fillText(T('qualityLabel'),px+20,cy+5);
+    ctx.fillStyle='#aaa';ctx.font=fSz+'px monospace';ctx.textAlign='left';
+    ctx.fillText(T('qualityLabel'),px+12,cy+(compact?3:5));
     var qLabels=[T('qualityLow'),T('qualityMed'),T('qualityHigh')];
-    var qBtnW=Math.floor((sliderW-10)/3),qBtnH=26;
+    var qBtnW=Math.floor((sliderW-8)/3),qBtnH=compact?22:26;
     for(var i=0;i<3;i++){
-        var qx=sliderX+i*(qBtnW+5),qy=cy-10;
+        var qx=sliderX+i*(qBtnW+4),qy=cy-(compact?8:10);
         ctx.fillStyle=qualityLevel===i?'#44dd88':'#222';ctx.fillRect(qx,qy,qBtnW,qBtnH);
         ctx.strokeStyle=qualityLevel===i?'#88ffbb':'#555';ctx.lineWidth=1;ctx.strokeRect(qx,qy,qBtnW,qBtnH);
-        ctx.fillStyle=qualityLevel===i?'#000':'#888';ctx.font='bold 11px monospace';ctx.textAlign='center';
+        ctx.fillStyle=qualityLevel===i?'#000':'#888';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
         ctx.fillText(qLabels[i],qx+qBtnW/2,qy+qBtnH/2+4);
     }
-    cy+=lh+10;
+    cy+=lh+(compact?6:10);
     // Save & Load buttons
-    var sbW=Math.floor((pw-50)/2),sbH=28;
-    var saveX=px+15,loadX=px+25+sbW,sbY=cy;
+    var sbW=Math.floor((pw-40)/2),sbH=compact?24:28;
+    var saveX=px+12,loadX=px+20+sbW,sbY=cy;
     ctx.fillStyle='#44dd88';ctx.fillRect(saveX,sbY,sbW,sbH);
-    ctx.fillStyle='#000';ctx.font='bold 11px monospace';ctx.textAlign='center';
+    ctx.fillStyle='#000';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
     ctx.fillText(T('saveBtn'),saveX+sbW/2,sbY+sbH/2+4);
     ctx.fillStyle='#4488ee';ctx.fillRect(loadX,sbY,sbW,sbH);
-    ctx.fillStyle='#fff';ctx.font='bold 11px monospace';
+    ctx.fillStyle='#fff';ctx.font='bold '+(compact?10:11)+'px monospace';
     ctx.fillText(T('loadSave'),loadX+sbW/2,sbY+sbH/2+4);
     cy+=lh;
     // Close button
-    var cbW=120,cbH=34,cbX=W/2-cbW/2,cbY=cy;
+    var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cy;
     ctx.fillStyle='#44dd88';ctx.fillRect(cbX,cbY,cbW,cbH);
-    ctx.fillStyle='#000';ctx.font='bold 14px monospace';ctx.textAlign='center';
+    ctx.fillStyle='#000';ctx.font='bold '+(compact?12:14)+'px monospace';ctx.textAlign='center';
     ctx.fillText(T('settingsClose'),W/2,cbY+cbH/2+5);
 }
 function handleSettingsClick(cx,cy){
     var W=canvas.width,H=canvas.height;
-    var pw=Math.min(W-40,360),ph=380,px=(W-pw)/2,py=(H-ph)/2;
-    var cyy=py+55, lh=42, sliderW=pw-120, sliderX=px+100;
+    var compact=H<550;
+    var lh=compact?28:42, titleH=compact?22:30, padY=compact?12:20;
+    var ph=Math.min(H-padY*2,compact?280:380);
+    var pw=Math.min(W-30,340),px=(W-pw)/2,py=(H-ph)/2;
+    var cyy=py+titleH+20, sliderW=pw-100, sliderX=px+85;
     // Language toggle
-    var lbW=60,lbH=26,lbX=sliderX,lbY=cyy-10;
+    var lbW=compact?50:60,lbH=compact?22:26,lbX=sliderX,lbY=cyy-(compact?8:10);
     if(cx>=lbX&&cx<=lbX+lbW&&cy>=lbY&&cy<=lbY+lbH){lang=lang==='en'?'zh':'en';playSound('click');return;}
     cyy+=lh;
     // BGM slider
+    var trackH=compact?8:10;
     if(cy>=cyy-12&&cy<=cyy+12&&cx>=sliderX&&cx<=sliderX+sliderW){
         bgmVolume=Math.max(0,Math.min(1,(cx-sliderX)/sliderW));
         if(bgmAudio) bgmAudio.volume=bgmVolume;
@@ -3580,22 +3569,22 @@ function handleSettingsClick(cx,cy){
     }
     cyy+=lh;
     // Quality buttons
-    var qBtnW=Math.floor((sliderW-10)/3),qBtnH=26;
+    var qBtnW=Math.floor((sliderW-8)/3),qBtnH=compact?22:26;
     for(var i=0;i<3;i++){
-        var qx=sliderX+i*(qBtnW+5),qy=cyy-10;
+        var qx=sliderX+i*(qBtnW+4),qy=cyy-(compact?8:10);
         if(cx>=qx&&cx<=qx+qBtnW&&cy>=qy&&cy<=qy+qBtnH){
             qualityLevel=i;applyQuality();playSound('click');return;
         }
     }
-    cyy+=lh+10;
+    cyy+=lh+(compact?6:10);
     // Save & Load buttons
-    var sbW2=Math.floor((pw-50)/2),sbH2=28;
-    var saveX2=px+15,loadX2=px+25+sbW2,sbY2=cyy;
+    var sbW2=Math.floor((pw-40)/2),sbH2=compact?24:28;
+    var saveX2=px+12,loadX2=px+20+sbW2,sbY2=cyy;
     if(cx>=saveX2&&cx<=saveX2+sbW2&&cy>=sbY2&&cy<=sbY2+sbH2){saveGame();playSound('click');return;}
     if(cx>=loadX2&&cx<=loadX2+sbW2&&cy>=sbY2&&cy<=sbY2+sbH2){loadGame();playSound('click');return;}
     cyy+=lh;
     // Close button
-    var cbW=120,cbH=34,cbX=W/2-cbW/2,cbY=cyy;
+    var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cyy;
     if(cx>=cbX&&cx<=cbX+cbW&&cy>=cbY&&cy<=cbY+cbH){showSettings=false;saveSettings();playSound('click');return;}
     // Click outside panel to close
     if(cx<px||cx>px+pw||cy<py||cy>py+ph){showSettings=false;saveSettings();playSound('click');return;}
@@ -3622,13 +3611,11 @@ function handleLabClick(cx,cy){
     if(showSettings){handleSettingsClick(cx,cy);return;}
     if(tutorialPhase==='lab'){handleTutorialClick(cx,cy);return;}
     var W=canvas.width,H=canvas.height;
-    var lbW=50,lbH=26,lbX=15,lbY=15;
-    if(cx>=lbX&&cx<=lbX+lbW&&cy>=lbY&&cy<=lbY+lbH){lang=lang==='en'?'zh':'en';playSound('click');return;}
     // Save button
-    var svW=45,svH=22,svX=75,svY=15;
+    var svW=45,svH=22,svX=15,svY=15;
     if(cx>=svX&&cx<=svX+svW&&cy>=svY&&cy<=svY+svH){saveGame();playSound('click');return;}
     // Settings gear
-    if(cx>=130&&cx<=152&&cy>=15&&cy<=37){showSettings=true;playSound('click');return;}
+    if(cx>=70&&cx<=92&&cy>=15&&cy<=37){showSettings=true;playSound('click');return;}
 
     if(labTab){
         var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
@@ -3868,7 +3855,6 @@ function handleLabClick(cx,cy){
         if(lay.skillBook&&hitBox(cx,cy,lay.skillBook)){labTab='skills';labScrollY=0;playSound('click');return;}
     }
 }
-function handleLabTouch(cx,cy){handleLabClick(cx,cy);}
 
 function handleMenuTouch(cx,cy){
     if(!audioCtx) initAudio();
@@ -3876,10 +3862,8 @@ function handleMenuTouch(cx,cy){
     playBGM('lab');
     var W=canvas.width;
     // Settings gear
-    var gX=W-50-75,gY=15,gS=26;
+    var gX=W-50,gY=15,gS=26;
     if(cx>=gX&&cx<=gX+gS&&cy>=gY&&cy<=gY+gS){showSettings=true;playSound('click');return;}
-    var lbW=50,lbH=26,lbX=W-lbW-15,lbY=15;
-    if(cx>=lbX&&cx<=lbX+lbW&&cy>=lbY&&cy<=lbY+lbH){lang=lang==='en'?'zh':'en';playSound('click');return;}
     var bw=200,bh=44,bx=W/2-bw/2,by=canvas.height*0.88;
     // Load save button
     var hasSave=!!localStorage.getItem('alchemist_save');
@@ -4016,11 +4000,8 @@ function drawMenu(){
         ctx.fillStyle='#fff';ctx.font='bold 12px monospace';ctx.textAlign='center';
         ctx.fillText(T('loadSave'),W/2,lsY+lsH/2+4);
     }
-    var lbW=50,lbH=26,lbX=W-lbW-15,lbY=15;
-    ctx.fillStyle='#1a1a2e';ctx.fillRect(lbX,lbY,lbW,lbH);ctx.strokeStyle='#44dd88';ctx.lineWidth=1;ctx.strokeRect(lbX,lbY,lbW,lbH);
-    ctx.fillStyle='#44dd88';ctx.font='bold 11px monospace';ctx.textAlign='center';ctx.fillText(T('langBtn'),lbX+lbW/2,lbY+lbH/2+4);
     // Settings gear
-    drawSettingsGear(W-lbW-75,15,26);
+    drawSettingsGear(W-50,15,26);
     ctx.save();ctx.globalAlpha=0.02;ctx.fillStyle='#000';for(var sl=0;sl<H;sl+=3) ctx.fillRect(0,sl,W,1);ctx.restore();
     if(showSettings) drawSettings();
 }
