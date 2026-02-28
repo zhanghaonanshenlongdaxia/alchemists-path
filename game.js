@@ -2524,7 +2524,7 @@ function drawWeaponPopup(){
 function drawMerchantPopup(){
     var W=canvas.width,H=canvas.height;
     ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
-    var pw=Math.min(W-40,420),ph=Math.min(H-60,500),px=(W-pw)/2,py=(H-ph)/2;
+    var pw=Math.min(W-40,420),ph=Math.min(H-40,650),px=(W-pw)/2,py=(H-ph)/2;
     ctx.fillStyle='rgba(14,14,26,0.95)';ctx.fillRect(px,py,pw,ph);
     ctx.strokeStyle='#ffcc44';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
 
