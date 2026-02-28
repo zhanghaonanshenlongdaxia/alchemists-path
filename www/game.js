@@ -228,7 +228,8 @@ const MAX_FLOORS = 3;
 
 // ============ WEAPON DATA ============
 const WEAPON_NAMES_ZH = {
-    'Rusty Dagger':'生锈匕首','Iron Sword':'铁剑','Steel Blade':'钢刃','War Axe':'战斧',
+    'Rusty Dagger':'生锈匕首','Wooden Club':'木棍','Old Sword':'旧剑','Worn Axe':'破旧斧',
+    'Iron Sword':'铁剑','Steel Blade':'钢刃','Bronze Spear':'青铜矛','War Axe':'战斧',
     'Crystal Staff':'水晶法杖','Shadow Knife':'暗影短刀','Flame Sword':'烈焰剑',
     'Frost Mace':'霜冻锤','Venom Fang':'毒牙刃','Thunder Spear':'雷霆枪',
     'Dragon Claw':'龙爪','Arcane Blade':'奥术之刃'
@@ -237,8 +238,12 @@ function weaponName(w) { return lang==='zh' ? (WEAPON_NAMES_ZH[w.name]||w.name) 
 
 const WEAPONS = [
     { name:'Rusty Dagger', tier:0, dmg:1, speed:1.2, range:42, color:'#888888', type:'dagger' },
+    { name:'Wooden Club',  tier:0, dmg:1, speed:0.8, range:38, color:'#8b7355', type:'mace' },
+    { name:'Old Sword',    tier:0, dmg:1, speed:1.0, range:44, color:'#999999', type:'sword' },
+    { name:'Worn Axe',     tier:0, dmg:2, speed:0.7, range:40, color:'#aa8866', type:'axe' },
     { name:'Iron Sword',   tier:1, dmg:2, speed:1.0, range:50, color:'#aabbcc', type:'sword' },
     { name:'Steel Blade',  tier:1, dmg:3, speed:0.9, range:52, color:'#ccddee', type:'sword' },
+    { name:'Bronze Spear', tier:1, dmg:2, speed:0.9, range:58, color:'#cd7f32', type:'spear' },
     { name:'War Axe',      tier:2, dmg:5, speed:0.7, range:48, color:'#dd8844', type:'axe' },
     { name:'Crystal Staff', tier:2, dmg:4, speed:1.0, range:62, color:'#88ccff', type:'staff' },
     { name:'Shadow Knife', tier:1, dmg:2, speed:1.4, range:40, color:'#6644aa', type:'dagger' },
