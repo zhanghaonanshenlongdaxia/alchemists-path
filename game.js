@@ -236,22 +236,22 @@ const WEAPON_NAMES_ZH = {
 function weaponName(w) { return lang==='zh' ? (WEAPON_NAMES_ZH[w.name]||w.name) : w.name; }
 
 const WEAPONS = [
-    { name:'Rusty Dagger', tier:0, dmg:1, speed:1.2, range:42, color:'#888888' },
-    { name:'Iron Sword',   tier:1, dmg:2, speed:1.0, range:50, color:'#aabbcc' },
-    { name:'Steel Blade',  tier:1, dmg:3, speed:0.9, range:52, color:'#ccddee' },
-    { name:'War Axe',      tier:2, dmg:5, speed:0.7, range:48, color:'#dd8844' },
-    { name:'Crystal Staff', tier:2, dmg:4, speed:1.0, range:62, color:'#88ccff' },
-    { name:'Shadow Knife', tier:1, dmg:2, speed:1.4, range:40, color:'#6644aa' },
-    { name:'Flame Sword',  tier:3, dmg:7, speed:0.8, range:55, color:'#ff6622' },
-    { name:'Frost Mace',   tier:3, dmg:6, speed:0.7, range:50, color:'#44ddff' },
-    { name:'Venom Fang',   tier:2, dmg:4, speed:1.1, range:44, color:'#aa44dd' },
-    { name:'Thunder Spear',tier:3, dmg:8, speed:0.6, range:68, color:'#ffdd44' },
-    { name:'Dragon Claw',  tier:4, dmg:10, speed:0.9, range:58, color:'#ff4400' },
-    { name:'Arcane Blade', tier:4, dmg:12, speed:0.8, range:62, color:'#ddaaff' },
+    { name:'Rusty Dagger', tier:0, dmg:1, speed:1.2, range:42, color:'#888888', type:'dagger' },
+    { name:'Iron Sword',   tier:1, dmg:2, speed:1.0, range:50, color:'#aabbcc', type:'sword' },
+    { name:'Steel Blade',  tier:1, dmg:3, speed:0.9, range:52, color:'#ccddee', type:'sword' },
+    { name:'War Axe',      tier:2, dmg:5, speed:0.7, range:48, color:'#dd8844', type:'axe' },
+    { name:'Crystal Staff', tier:2, dmg:4, speed:1.0, range:62, color:'#88ccff', type:'staff' },
+    { name:'Shadow Knife', tier:1, dmg:2, speed:1.4, range:40, color:'#6644aa', type:'dagger' },
+    { name:'Flame Sword',  tier:3, dmg:7, speed:0.8, range:55, color:'#ff6622', type:'sword' },
+    { name:'Frost Mace',   tier:3, dmg:6, speed:0.7, range:50, color:'#44ddff', type:'mace' },
+    { name:'Venom Fang',   tier:2, dmg:4, speed:1.1, range:44, color:'#aa44dd', type:'dagger' },
+    { name:'Thunder Spear',tier:3, dmg:8, speed:0.6, range:68, color:'#ffdd44', type:'spear' },
+    { name:'Dragon Claw',  tier:4, dmg:10, speed:0.9, range:58, color:'#ff4400', type:'claw' },
+    { name:'Arcane Blade', tier:4, dmg:12, speed:0.8, range:62, color:'#ddaaff', type:'sword' },
 ];
 
 function makeWeapon(template) {
-    return { name:template.name, tier:template.tier, dmg:template.dmg, speed:template.speed, range:template.range, color:template.color, enchant:null };
+    return { name:template.name, tier:template.tier, dmg:template.dmg, speed:template.speed, range:template.range, color:template.color, type:template.type, enchant:null };
 }
 
 function getWeaponDropPool(floor, isBoss) {
@@ -302,7 +302,19 @@ const RECIPES = [
     { ingredients:['toxin','lux'],   name:'Shadow Elixir',   effect:'stealth',tier:1, value:1, color:'#6644aa', desc:'Stealth' },
     { ingredients:['aqua','terra'],  name:'Stone Shield',    effect:'defense',tier:2, value:4, color:'#8899aa', desc:'+4 DEF' },
     { ingredients:['vita','lux'],    name:'Greater Heal',    effect:'heal',   tier:2, value:5, color:'#ff88aa', desc:'+5 HP' },
-    { ingredients:['ignis','lux'],   name:'Phoenix Draught', effect:'revive', tier:2, value:1, color:'#ffaa00', desc:'Auto-Revive' }
+    { ingredients:['ignis','lux'],   name:'Phoenix Draught', effect:'revive', tier:2, value:1, color:'#ffaa00', desc:'Auto-Revive' },
+    // 3-ingredient advanced potions
+    { ingredients:['vita','herba','aqua'],  name:'Supreme Vitality', effect:'maxhp', tier:3, value:5, color:'#44ffaa', desc:'+5 Max HP' },
+    { ingredients:['ignis','terra','vita'], name:'Titan Strength',   effect:'attack',tier:3, value:6, color:'#ff3300', desc:'+6 ATK' },
+    { ingredients:['aqua','terra','lux'],   name:'Diamond Shield',   effect:'defense',tier:3, value:6, color:'#aaddff', desc:'+6 DEF' },
+    { ingredients:['vita','lux','herba'],   name:'Master Healing',   effect:'heal',  tier:3, value:8, color:'#ffaacc', desc:'+8 HP' },
+    { ingredients:['toxin','ignis','lux'],  name:'Deadly Venom',     effect:'poison',tier:2, value:2, color:'#dd44ff', desc:'Poison DMG' },
+    { ingredients:['aqua','lux','herba'],   name:'Rapid Regen',      effect:'regen', tier:2, value:2, color:'#88ffcc', desc:'Fast Regen' },
+    // 4-ingredient legendary potions
+    { ingredients:['vita','ignis','aqua','terra'], name:'Elemental Fury',  effect:'attack', tier:4, value:10, color:'#ff00ff', desc:'+10 ATK' },
+    { ingredients:['vita','herba','lux','aqua'],   name:'Divine Blessing', effect:'heal',   tier:4, value:15, color:'#ffffaa', desc:'+15 HP' },
+    { ingredients:['terra','aqua','lux','herba'],  name:'Fortress Wall',   effect:'defense',tier:4, value:10, color:'#6699ff', desc:'+10 DEF' },
+    { ingredients:['vita','ignis','lux','toxin'],  name:'Phoenix Rebirth', effect:'revive', tier:3, value:2, color:'#ffaa44', desc:'Revive+Heal' }
 ];
 
 // ============ GAME STATE ============
@@ -484,6 +496,21 @@ function addEssence(key,count){ inventory.essences[key]=(inventory.essences[key]
 function hasEssence(key){ return (inventory.essences[key]||0)>0; }
 function findRecipe(e1,e2){
     for(var i=0;i<RECIPES.length;i++){ var r=RECIPES[i].ingredients; if((r[0]===e1&&r[1]===e2)||(r[0]===e2&&r[1]===e1)) return i; }
+    return -1;
+}
+function findRecipeMulti(selected){
+    // Find recipe matching any number of ingredients (2-4)
+    for(var i=0;i<RECIPES.length;i++){
+        var r=RECIPES[i].ingredients;
+        if(r.length!==selected.length) continue;
+        var sortedR=r.slice().sort();
+        var sortedS=selected.slice().sort();
+        var match=true;
+        for(var j=0;j<sortedR.length;j++){
+            if(sortedR[j]!==sortedS[j]){match=false;break;}
+        }
+        if(match) return i;
+    }
     return -1;
 }
 function applyBuffs(){
@@ -804,19 +831,16 @@ function startExpedition(biomeIdx){
     // Generate shop stock for merchant
     generateShopStock(biomeIdx, 0);
 
-    // Process carried potions
+    // Process carried potions - activate buffs but keep all potions
     activeBuffs=[];
-    var kept=[];
     for(var i=0;i<carriedPotions.length;i++){
         var p=carriedPotions[i];
-        if(p.effect==='heal'||p.effect==='revive'){ kept.push(p); }
-        else {
+        if(p.effect!=='heal'&&p.effect!=='revive'){
             var existing=activeBuffs.findIndex(function(b){return b.effect===p.effect;});
             if(existing>=0){ if(p.tier>=activeBuffs[existing].tier) activeBuffs[existing]={effect:p.effect,tier:p.tier,value:p.value,name:p.name}; }
             else activeBuffs.push({effect:p.effect,tier:p.tier,value:p.value,name:p.name});
         }
     }
-    carriedPotions=kept;
     applyBuffs();
     playerStats.hp=playerStats.maxHp;
     player=null;
@@ -1406,6 +1430,7 @@ function update(){
 
 function endExpedition(){
     activeBuffs=[];
+    carriedPotions=[]; // Clear used potions after expedition
     state='lab'; labTab=null;
     labMessage=T('expComplete');
     labMessageTimer=180;
@@ -2001,17 +2026,120 @@ function renderExpedition(){
         ctx.save();ctx.translate(ppx,ppy);ctx.rotate(player.angle);
         var wc=equippedWeapon?equippedWeapon.color:'#fff';
         var wRange=equippedWeapon?equippedWeapon.range:30;
-        // Outer trail
-        ctx.globalAlpha=swingAlpha*0.3;
-        ctx.strokeStyle=wc;ctx.lineWidth=8;
-        ctx.beginPath();ctx.arc(0,0,wRange,-0.7,0.7);ctx.stroke();
-        // Inner arc
-        ctx.globalAlpha=swingAlpha;
-        ctx.strokeStyle=wc;ctx.lineWidth=3;
-        ctx.beginPath();ctx.arc(0,0,wRange,-0.5,0.5);ctx.stroke();
-        // Tip sparkle
-        ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.8;
-        ctx.beginPath();ctx.arc(wRange,0,2,0,Math.PI*2);ctx.fill();
+        var wType=equippedWeapon?equippedWeapon.type:'sword';
+        
+        // Weapon-specific rendering
+        if(wType==='sword'){
+            // Sword: Arc slash with blade trail
+            ctx.globalAlpha=swingAlpha*0.3;
+            ctx.strokeStyle=wc;ctx.lineWidth=8;
+            ctx.beginPath();ctx.arc(0,0,wRange,-0.7,0.7);ctx.stroke();
+            ctx.globalAlpha=swingAlpha;
+            ctx.strokeStyle=wc;ctx.lineWidth=3;
+            ctx.beginPath();ctx.arc(0,0,wRange,-0.5,0.5);ctx.stroke();
+            // Blade edge
+            ctx.globalAlpha=swingAlpha*0.9;
+            ctx.strokeStyle='#fff';ctx.lineWidth=1;
+            ctx.beginPath();ctx.moveTo(8,0);ctx.lineTo(wRange-5,0);ctx.stroke();
+            ctx.fillStyle='#fff';
+            ctx.beginPath();ctx.arc(wRange,0,2,0,Math.PI*2);ctx.fill();
+        } else if(wType==='dagger'){
+            // Dagger: Quick stab motion
+            ctx.globalAlpha=swingAlpha*0.5;
+            ctx.strokeStyle=wc;ctx.lineWidth=6;
+            ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(wRange*0.8,0);ctx.stroke();
+            ctx.globalAlpha=swingAlpha;
+            ctx.fillStyle=wc;
+            ctx.beginPath();ctx.moveTo(wRange*0.7,-3);ctx.lineTo(wRange,0);ctx.lineTo(wRange*0.7,3);ctx.fill();
+            // Twin gleam
+            for(var i=0;i<2;i++){
+                ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.6;
+                ctx.beginPath();ctx.arc(wRange*0.5+i*8,-2+i*4,1.5,0,Math.PI*2);ctx.fill();
+            }
+        } else if(wType==='axe'){
+            // Axe: Heavy swing with wide arc
+            ctx.globalAlpha=swingAlpha*0.4;
+            ctx.strokeStyle=wc;ctx.lineWidth=12;
+            ctx.beginPath();ctx.arc(0,0,wRange,-0.9,0.9);ctx.stroke();
+            ctx.globalAlpha=swingAlpha*0.8;
+            ctx.strokeStyle=wc;ctx.lineWidth=5;
+            ctx.beginPath();ctx.arc(0,0,wRange,-0.6,0.6);ctx.stroke();
+            // Axe head
+            ctx.globalAlpha=swingAlpha;
+            ctx.fillStyle=wc;
+            ctx.beginPath();ctx.moveTo(wRange-10,-8);ctx.lineTo(wRange,-3);ctx.lineTo(wRange,3);ctx.lineTo(wRange-10,8);ctx.fill();
+        } else if(wType==='staff'){
+            // Staff: Magic orb at tip
+            ctx.globalAlpha=swingAlpha*0.2;
+            ctx.strokeStyle=wc;ctx.lineWidth=4;
+            ctx.beginPath();ctx.arc(0,0,wRange,-0.5,0.5);ctx.stroke();
+            // Staff shaft
+            ctx.globalAlpha=swingAlpha*0.7;
+            ctx.strokeStyle='#8b7355';ctx.lineWidth=3;
+            ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(wRange*0.8,0);ctx.stroke();
+            // Magic orb
+            ctx.globalAlpha=swingAlpha;
+            var orbGlow=ctx.createRadialGradient(wRange,0,0,wRange,0,8);
+            orbGlow.addColorStop(0,wc);orbGlow.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle=orbGlow;ctx.fillRect(wRange-8,-8,16,16);
+            ctx.fillStyle=wc;
+            ctx.beginPath();ctx.arc(wRange,0,4,0,Math.PI*2);ctx.fill();
+            ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.8;
+            ctx.beginPath();ctx.arc(wRange,0,2,0,Math.PI*2);ctx.fill();
+        } else if(wType==='mace'){
+            // Mace: Crushing impact visual
+            ctx.globalAlpha=swingAlpha*0.5;
+            ctx.strokeStyle=wc;ctx.lineWidth=10;
+            ctx.beginPath();ctx.arc(0,0,wRange,-0.8,0.8);ctx.stroke();
+            ctx.globalAlpha=swingAlpha;
+            ctx.strokeStyle='#6b5b4a';ctx.lineWidth=4;
+            ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(wRange*0.75,0);ctx.stroke();
+            // Mace head
+            ctx.fillStyle=wc;
+            ctx.beginPath();ctx.arc(wRange,0,6,0,Math.PI*2);ctx.fill();
+            for(var s=0;s<4;s++){
+                var ang=s*Math.PI/2;
+                ctx.fillStyle=wc;ctx.globalAlpha=swingAlpha*0.7;
+                ctx.fillRect(wRange+Math.cos(ang)*6-1,-1+Math.sin(ang)*6,3,3);
+            }
+        } else if(wType==='spear'){
+            // Spear: Long thrust
+            ctx.globalAlpha=swingAlpha*0.4;
+            ctx.strokeStyle=wc;ctx.lineWidth=5;
+            ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(wRange*1.1,0);ctx.stroke();
+            ctx.globalAlpha=swingAlpha;
+            ctx.strokeStyle='#8b7355';ctx.lineWidth=3;
+            ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(wRange*0.9,0);ctx.stroke();
+            // Spear tip
+            ctx.fillStyle=wc;
+            ctx.beginPath();ctx.moveTo(wRange*0.85,-4);ctx.lineTo(wRange*1.05,0);ctx.lineTo(wRange*0.85,4);ctx.fill();
+            ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.9;
+            ctx.beginPath();ctx.arc(wRange*1.05,0,2,0,Math.PI*2);ctx.fill();
+        } else if(wType==='claw'){
+            // Claw: Triple slash marks
+            for(var cl=0;cl<3;cl++){
+                ctx.globalAlpha=swingAlpha*0.6;
+                ctx.strokeStyle=wc;ctx.lineWidth=3;
+                var clOff=(cl-1)*5;
+                ctx.beginPath();ctx.moveTo(wRange*0.3,clOff);ctx.lineTo(wRange,clOff);ctx.stroke();
+            }
+            ctx.globalAlpha=swingAlpha;
+            for(var cl=0;cl<3;cl++){
+                ctx.fillStyle=wc;
+                var clOff=(cl-1)*5;
+                ctx.beginPath();ctx.moveTo(wRange-8,clOff-2);ctx.lineTo(wRange,clOff);ctx.lineTo(wRange-8,clOff+2);ctx.fill();
+            }
+        } else {
+            // Default: simple arc
+            ctx.globalAlpha=swingAlpha*0.3;
+            ctx.strokeStyle=wc;ctx.lineWidth=8;
+            ctx.beginPath();ctx.arc(0,0,wRange,-0.7,0.7);ctx.stroke();
+            ctx.globalAlpha=swingAlpha;
+            ctx.strokeStyle=wc;ctx.lineWidth=3;
+            ctx.beginPath();ctx.arc(0,0,wRange,-0.5,0.5);ctx.stroke();
+            ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.8;
+            ctx.beginPath();ctx.arc(wRange,0,2,0,Math.PI*2);ctx.fill();
+        }
         ctx.restore();
     }
 
@@ -2384,19 +2512,51 @@ function drawMerchantPopup(){
         ctx.fillText(item.price+'G '+T('buy'),btnX+btnW2/2,btnY+btnH2/2+4);
     }
 
-    // Sell section — sell herbs for gold
+    // Sell section — sell herbs, potions, weapons for gold
     var sellY=iy+shopStock.length*(itemH+4)+10;
     ctx.fillStyle='#888';ctx.font='11px monospace';ctx.textAlign='center';
     ctx.fillText('— '+T('sell')+' —',W/2,sellY);
     sellY+=18;
+    
+    // Sell herbs
     var herbKeys=Object.keys(inventory.herbs).filter(function(k){return inventory.herbs[k]>0;});
-    for(var i=0;i<Math.min(herbKeys.length,4);i++){
+    for(var i=0;i<Math.min(herbKeys.length,3);i++){
         var k=herbKeys[i];
         var sy2=sellY+i*32;
         ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
         ctx.fillStyle='#44dd88';ctx.font='11px monospace';ctx.textAlign='left';
         ctx.fillText(herbName(k)+' x'+inventory.herbs[k],px+20,sy2+18);
         var sellPrice=3;
+        var sbX=px+pw-80,sbW=60,sbH=22;
+        ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
+        ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
+        ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
+    }
+    sellY+=Math.min(herbKeys.length,3)*32+8;
+    
+    // Sell potions
+    for(var i=0;i<Math.min(inventory.potions.length,3);i++){
+        var pot=inventory.potions[i];
+        var sy2=sellY+i*32;
+        ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
+        ctx.fillStyle=pot.color||'#88aaff';ctx.font='11px monospace';ctx.textAlign='left';
+        ctx.fillText(recipeName(pot),px+20,sy2+18);
+        var sellPrice=5+pot.tier*3;
+        var sbX=px+pw-80,sbW=60,sbH=22;
+        ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
+        ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
+        ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
+    }
+    sellY+=Math.min(inventory.potions.length,3)*32+8;
+    
+    // Sell weapons
+    for(var i=0;i<Math.min(inventory.weapons.length,3);i++){
+        var wep=inventory.weapons[i];
+        var sy2=sellY+i*32;
+        ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
+        ctx.fillStyle=wep.color||'#aabbcc';ctx.font='11px monospace';ctx.textAlign='left';
+        ctx.fillText(weaponName(wep)+' (T'+wep.tier+')',px+20,sy2+18);
+        var sellPrice=8+wep.tier*8;
         var sbX=px+pw-80,sbW=60,sbH=22;
         ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
         ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
@@ -2464,7 +2624,7 @@ function handleExpeditionPopupClick(cx,cy){
         // Sell herbs
         var sellY=iy+shopStock.length*(itemH+4)+28;
         var herbKeys=Object.keys(inventory.herbs).filter(function(k){return inventory.herbs[k]>0;});
-        for(var i=0;i<Math.min(herbKeys.length,4);i++){
+        for(var i=0;i<Math.min(herbKeys.length,3);i++){
             var k=herbKeys[i];
             var sy2=sellY+i*32;
             var sbX=px2+pw2-80,sbW=60,sbH=22;
@@ -2473,6 +2633,36 @@ function handleExpeditionPopupClick(cx,cy){
                 if(inventory.herbs[k]<=0) delete inventory.herbs[k];
                 gold+=3;
                 spawnFloat(player.x,player.y-20,T('soldItem')+' +3G','#ffd700');
+                playSound('pickup'); return;
+            }
+        }
+        sellY+=Math.min(herbKeys.length,3)*32+8;
+        
+        // Sell potions
+        for(var i=0;i<Math.min(inventory.potions.length,3);i++){
+            var pot=inventory.potions[i];
+            var sy2=sellY+i*32;
+            var sbX=px2+pw2-80,sbW=60,sbH=22;
+            if(cx>=sbX&&cx<=sbX+sbW&&cy>=sy2+3&&cy<=sy2+3+sbH){
+                var sellPrice=5+pot.tier*3;
+                inventory.potions.splice(i,1);
+                gold+=sellPrice;
+                spawnFloat(player.x,player.y-20,T('soldItem')+' +'+sellPrice+'G','#ffd700');
+                playSound('pickup'); return;
+            }
+        }
+        sellY+=Math.min(inventory.potions.length,3)*32+8;
+        
+        // Sell weapons
+        for(var i=0;i<Math.min(inventory.weapons.length,3);i++){
+            var wep=inventory.weapons[i];
+            var sy2=sellY+i*32;
+            var sbX=px2+pw2-80,sbW=60,sbH=22;
+            if(cx>=sbX&&cx<=sbX+sbW&&cy>=sy2+3&&cy<=sy2+3+sbH){
+                var sellPrice=8+wep.tier*8;
+                inventory.weapons.splice(i,1);
+                gold+=sellPrice;
+                spawnFloat(player.x,player.y-20,T('soldItem')+' +'+sellPrice+'G','#ffd700');
                 playSound('pickup'); return;
             }
         }
@@ -3020,16 +3210,18 @@ function drawLabExtract(cy){
 
 function drawLabBrew(cy){
     var W=canvas.width;
-    ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='center';ctx.fillText(T('select2'),W/2,cy);cy+=25;
+    var maxEss=4; // Maximum essences for advanced recipes
+    ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='center';
+    ctx.fillText('Select 2-4 essences to brew',W/2,cy);cy+=25;
     var essKeys=Object.keys(inventory.essences).filter(function(k){return inventory.essences[k]>0;});
     var btnW=80,btnH=50,gap=8;
     var totalW=essKeys.length*(btnW+gap);
     var sx=W/2-totalW/2;
-    for(var i=0;i<essKeys.length;i++){var ek=essKeys[i],ess=ESSENCES[ek];var bx=sx+i*(btnW+gap),by=cy;var sel=selectedEssences.indexOf(ek)>=0;ctx.fillStyle=sel?'#2a2a3e':'#111118';ctx.fillRect(bx,by,btnW,btnH);ctx.strokeStyle=sel?ess.color:'#333';ctx.lineWidth=sel?2:1;ctx.strokeRect(bx,by,btnW,btnH);ctx.fillStyle=ess.color;ctx.font='bold 11px monospace';ctx.textAlign='center';ctx.fillText(essenceName(ek),bx+btnW/2,by+20);ctx.fillStyle='#aaa';ctx.font='10px monospace';ctx.fillText('x'+inventory.essences[ek],bx+btnW/2,by+36);}
+    for(var i=0;i<essKeys.length;i++){var ek=essKeys[i],ess=ESSENCES[ek];var bx=sx+i*(btnW+gap),by=cy;var isSelected=selectedEssences.indexOf(ek)>=0;ctx.fillStyle=isSelected?'#2a2a3e':'#111118';ctx.fillRect(bx,by,btnW,btnH);ctx.strokeStyle=isSelected?'#44dd88':ess.color;ctx.lineWidth=isSelected?2:1;ctx.strokeRect(bx,by,btnW,btnH);ctx.fillStyle=ess.color;ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.fillText(essenceName(ek),bx+btnW/2,by+20);ctx.fillStyle='#aaa';ctx.font='11px monospace';ctx.fillText('x'+inventory.essences[ek],bx+btnW/2,by+36);}
     cy+=btnH+20;
-    if(selectedEssences.length===2){
-        var ri=findRecipe(selectedEssences[0],selectedEssences[1]);
-        if(ri>=0){var r=RECIPES[ri];ctx.fillStyle=r.color;ctx.font='bold 14px monospace';ctx.textAlign='center';ctx.fillText('= '+recipeName(r)+' =',W/2,cy);ctx.fillStyle='#aaa';ctx.font='12px monospace';ctx.fillText(recipeDesc(r),W/2,cy+18);var bbx=W/2-50,bby=cy+30,bbw=100,bbh=34;ctx.fillStyle=r.color;ctx.fillRect(bbx,bby,bbw,bbh);ctx.fillStyle='#000';ctx.font='bold 12px monospace';ctx.fillText(T('brew'),W/2,bby+bbh/2+4);}
+    if(selectedEssences.length>=2){
+        var ri=findRecipeMulti(selectedEssences);
+        if(ri>=0){var r=RECIPES[ri];ctx.fillStyle=r.color;ctx.font='bold 14px monospace';ctx.textAlign='center';ctx.fillText('= '+recipeName(r)+' =',W/2,cy);ctx.fillStyle='#aaa';ctx.font='12px monospace';ctx.fillText(recipeDesc(r),W/2,cy+18);ctx.fillStyle='#888';ctx.font='10px monospace';ctx.fillText('Tier '+r.tier+' | '+r.ingredients.length+' ingredients',W/2,cy+32);var bbx=W/2-50,bby=cy+42,bbw=100,bbh=34;ctx.fillStyle=r.color;ctx.fillRect(bbx,bby,bbw,bbh);ctx.fillStyle='#000';ctx.font='bold 12px monospace';ctx.fillText(T('brew'),W/2,bby+bbh/2+4);}
         else{ctx.fillStyle='#ff4444';ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText(T('noRecipe'),W/2,cy);}
     } else if(selectedEssences.length===1){ctx.fillStyle='#666';ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText(T('selectMore'),W/2,cy);}
     cy+=80;
@@ -3667,20 +3859,23 @@ function handleLabClick(cx,cy){
                 var bx=sx+i*(btnW+gap),by=contentY+25;
                 if(cx>=bx&&cx<=bx+btnW&&cy>=by&&cy<=by+btnH){
                     var ek=essKeys[i],idx=selectedEssences.indexOf(ek);
-                    if(idx>=0) selectedEssences.splice(idx,1); else if(selectedEssences.length<2) selectedEssences.push(ek);
+                    if(idx>=0) selectedEssences.splice(idx,1); else if(selectedEssences.length<4) selectedEssences.push(ek);
                     playSound('click');return;
                 }
             }
-            if(selectedEssences.length===2){
-                var ri=findRecipe(selectedEssences[0],selectedEssences[1]);
+            if(selectedEssences.length>=2){
+                var ri=findRecipeMulti(selectedEssences);
                 if(ri>=0){
-                    var bbx=W/2-50,bby=contentY+25+btnH+50,bbw=100,bbh=34;
+                    var bbx=W/2-50,bby=contentY+25+btnH+62,bbw=100,bbh=34;
                     if(cx>=bbx&&cx<=bbx+bbw&&cy>=bby&&cy<=bby+bbh){
                         // Skill: philoStone (15% chance no essence cost)
                         var freeBrewPS=hasSkill('philoStone')&&Math.random()<0.15;
                         if(!freeBrewPS){
-                            inventory.essences[selectedEssences[0]]--;if(inventory.essences[selectedEssences[0]]<=0) delete inventory.essences[selectedEssences[0]];
-                            inventory.essences[selectedEssences[1]]--;if(inventory.essences[selectedEssences[1]]<=0) delete inventory.essences[selectedEssences[1]];
+                            for(var ei=0;ei<selectedEssences.length;ei++){
+                                var ek=selectedEssences[ei];
+                                inventory.essences[ek]--;
+                                if(inventory.essences[ek]<=0) delete inventory.essences[ek];
+                            }
                         }
                         var r=RECIPES[ri];
                         inventory.potions.push({name:r.name,effect:r.effect,tier:r.tier,value:r.value,color:r.color,desc:r.desc});
