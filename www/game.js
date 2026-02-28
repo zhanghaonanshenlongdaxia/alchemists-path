@@ -4205,10 +4205,10 @@ function handleMenuTouch(cx,cy){
     // Settings gear
     var gX=W-50,gY=15,gS=26;
     if(cx>=gX&&cx<=gX+gS&&cy>=gY&&cy<=gY+gS){showSettings=true;playSound('click');return;}
-    // New layout: buttons on left
+    // New layout: buttons on left (middle)
     var btnW=180,btnH=42,btnX=40,btnGap=12;
     var hasSave=!!localStorage.getItem('alchemist_save');
-    var startY=H*0.75;
+    var startY=H*0.45;
     // New Game button
     if(cx>=btnX&&cx<=btnX+btnW&&cy>=startY&&cy<=startY+btnH){
         state='lab';playSound('click');playBGM('lab');
@@ -4345,10 +4345,10 @@ function drawMenu(){
     if(SPR.ready){var orbitR=Math.min(100,W*0.12);var herbKeys=Object.keys(SPR.herbs);for(var i=0;i<herbKeys.length;i++){var angle=t*0.5+(i/herbKeys.length)*Math.PI*2;var ox=W/2+Math.cos(angle)*orbitR;var oy=H*0.4+Math.sin(angle)*orbitR*0.4;ctx.save();ctx.globalAlpha=0.5+Math.sin(angle)*0.2;ctx.drawImage(SPR.herbs[herbKeys[i]],ox-10,oy-10,20,20);ctx.restore();}}
     ctx.textAlign='center';ctx.fillStyle='#555';ctx.font=Math.min(11,W*0.015)+'px monospace';
     ctx.fillText(isMobile?T('controlsMobile'):T('controls'),W/2,H*0.82);
-    // New layout: buttons on the left side
+    // New layout: buttons on the left side (middle)
     var btnW=180,btnH=42,btnX=40,btnGap=12;
     var hasSave=!!localStorage.getItem('alchemist_save');
-    var startY=H*0.75;
+    var startY=H*0.45;
     // New Game button
     ctx.shadowColor='#44dd88';ctx.shadowBlur=15;ctx.fillStyle='#44dd88';ctx.fillRect(btnX,startY,btnW,btnH);ctx.shadowBlur=0;
     ctx.strokeStyle='#88ffbb';ctx.lineWidth=2;ctx.strokeRect(btnX,startY,btnW,btnH);
