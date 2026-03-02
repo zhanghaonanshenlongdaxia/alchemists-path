@@ -372,6 +372,81 @@ let seenEnemies = {};
 let showBestiary = false;
 let bestiaryPage = 0;
 
+// ============ STATUS EFFECTS ============
+// Effect types: poison, paralyze, sleep, dizzy, freeze, burn
+const STATUS_DEFS = {
+    poison:   { name:'Poison',   nameZh:'中毒',  color:'#aa44dd', icon:'☠', duration:180, tickDmg:1,  tickRate:60, desc:'Deals damage over time',         descZh:'持续造成伤害' },
+    paralyze: { name:'Paralyze', nameZh:'麻痹',  color:'#ffee44', icon:'⚡', duration:120, speedMul:0, desc:'Cannot move for duration',       descZh:'无法移动' },
+    sleep:    { name:'Sleep',    nameZh:'睡眠',  color:'#8888ff', icon:'💤', duration:180, speedMul:0, noAlert:true, desc:'Falls asleep, wakes on hit',     descZh:'入睡，受击醒来' },
+    dizzy:    { name:'Dizzy',    nameZh:'眩晕',  color:'#ffaa44', icon:'🌀', duration:90,  speedMul:0.3, aimPenalty:true, desc:'Confused movement, reduced accuracy', descZh:'移动混乱，命中降低' },
+    freeze:   { name:'Freeze',   nameZh:'冰冻',  color:'#44ddff', icon:'❄', duration:150, speedMul:0, defBuff:2,  desc:'Frozen solid, extra defense',    descZh:'冻结，额外防御' },
+    burn:     { name:'Burn',     nameZh:'灼烧',  color:'#ff6622', icon:'🔥', duration:150, tickDmg:2,  tickRate:40, defPenalty:1, desc:'Burning, reduces defense',      descZh:'燃烧，降低防御' },
+};
+
+// Player debuff state
+let playerDebuffs = {}; // {type: {timer, tickTimer}}
+
+// Weapon on-hit effects mapping (added to WEAPONS at runtime)
+const WEAPON_EFFECTS = {
+    // Poison weapons (daggers, venomous)
+    'Hunting Knife':  ['poison'],
+    'Venom Fang':     ['poison'],
+    'Shadow Knife':   ['poison'],
+    'Venom Fang':     ['poison','dizzy'],
+
+    // Burn weapons (fire-themed)
+    'Flame Sword':    ['burn'],
+    'Wrath of Trog':  ['burn'],
+    'Scythe of Curses':['burn','poison'],
+
+    // Freeze / ice weapons
+    'Frost Mace':     ['freeze'],
+    'Crystal Staff':  ['freeze','dizzy'],
+
+    // Paralyze (lightning)
+    'Thunder Spear':  ['paralyze'],
+    'Lajatang':       ['paralyze'],
+    'Staff of Dispater':['paralyze','freeze'],
+
+    // Dizzy / stun (heavy blunt)
+    'Stone Hammer':   ['dizzy'],
+    'War Hammer':     ['dizzy'],
+    'Frost Mace':     ['freeze','dizzy'],
+    'Executioner Axe':['dizzy'],
+    'Great Sword':    ['dizzy'],
+
+    // Sleep (arcane blades)
+    'Arcane Blade':   ['sleep'],
+    'Katana':         ['dizzy'],
+    'Blessed Blade':  ['sleep'],
+
+    // Multi-effect legendaries/mythics
+    'Dragon Claw':    ['burn','paralyze'],
+    'Holy Scourge':   ['dizzy','paralyze'],
+    'Demon Whip':     ['burn','poison'],
+    'Sword of Cerebov':['burn','paralyze'],
+    'Staff of Dispater':['paralyze','freeze'],
+};
+
+// Enemy on-hit effects
+const ENEMY_TYPE_EFFECTS = {
+    bee:       ['poison'],
+    spider:    ['poison'],
+    centipede: ['poison'],
+    lizard:    ['poison'],
+    leech:     ['poison'],
+    bat:       ['dizzy'],
+    frog:      ['sleep'],
+    croc:      ['dizzy'],
+    bear:      ['dizzy'],
+    wolf:      ['paralyze'],
+    tarantella:['poison','sleep'],
+    anaconda:  ['paralyze','dizzy'],
+    grizzly:   ['dizzy','burn'],
+    kraken:    ['paralyze','freeze'],
+    dragon:    ['burn','poison'],
+};
+
 const HERBS = {
     greenLeaf:  { name:'Green Leaf',   yields:['vita','herba'],  biome:'Forest' },
     redBerry:   { name:'Red Berry',    yields:['vita','ignis'],  biome:'Forest' },
@@ -538,6 +613,85 @@ let unlockedSkills = {}; // {skillId: true}
 let killCounter = 0; // for lifeSteal tracking
 let secondWindUsed = false; // reset per floor
 function hasSkill(id){ return !!unlockedSkills[id]; }
+
+// ===== STATUS EFFECT FUNCTIONS =====
+function applyStatusToEnemy(e, type, sdef){
+    if(!e.statuses) e.statuses={};
+    if(e.statuses[type]&&e.statuses[type].timer>0) return; // already afflicted
+    e.statuses[type]={timer:sdef.duration, tickTimer:sdef.tickRate||60};
+    var icon=sdef.icon||'?';
+    var color=sdef.color||'#fff';
+    spawnFloat(e.x,e.y-16,icon,color);
+}
+
+function applyDebuffToPlayer(type){
+    var sdef=STATUS_DEFS[type];
+    if(!sdef) return;
+    if(playerDebuffs[type]&&playerDebuffs[type].timer>0) return; // already active
+    playerDebuffs[type]={timer:sdef.duration, tickTimer:sdef.tickRate||60};
+    spawnFloat(player.x,player.y-20,sdef.icon+(lang==='zh'?sdef.nameZh:sdef.name),sdef.color);
+}
+
+function updateStatusEffects(){
+    // Update player debuffs
+    var types=Object.keys(playerDebuffs);
+    for(var ti=0;ti<types.length;ti++){
+        var type=types[ti];
+        var db=playerDebuffs[type];
+        if(!db||db.timer<=0){delete playerDebuffs[type];continue;}
+        db.timer--;
+        var sdef=STATUS_DEFS[type];
+        if(sdef&&sdef.tickDmg){
+            db.tickTimer--;
+            if(db.tickTimer<=0){
+                db.tickTimer=sdef.tickRate||60;
+                if(!godMode){
+                    playerStats.hp=Math.max(0,playerStats.hp-sdef.tickDmg);
+                    spawnFloat(player.x,player.y-15,'-'+sdef.tickDmg,sdef.color);
+                    if(playerStats.hp<=0) gameOver();
+                }
+            }
+        }
+        if(db.timer<=0) delete playerDebuffs[type];
+    }
+    // Update enemy statuses
+    for(var ei=0;ei<enemies.length;ei++){
+        var e=enemies[ei];
+        if(!e.statuses) continue;
+        var stypes=Object.keys(e.statuses);
+        for(var si=0;si<stypes.length;si++){
+            var st=stypes[si];
+            var es=e.statuses[st];
+            if(!es||es.timer<=0){delete e.statuses[st];continue;}
+            es.timer--;
+            var esdef=STATUS_DEFS[st];
+            if(esdef&&esdef.tickDmg){
+                es.tickTimer--;
+                if(es.tickTimer<=0){
+                    es.tickTimer=esdef.tickRate||60;
+                    e.hp-=esdef.tickDmg;
+                    spawnFloat(e.x,e.y-10,'-'+esdef.tickDmg,esdef.color);
+                    if(e.hp<=0) e.dyingFromDot=true; // mark for removal
+                }
+            }
+            if(es.timer<=0) delete e.statuses[st];
+        }
+    }
+}
+
+// Check if player is paralyzed/frozen/sleeping (can't move)
+function playerCanMove(){
+    return !((playerDebuffs.paralyze&&playerDebuffs.paralyze.timer>0)||
+             (playerDebuffs.freeze&&playerDebuffs.freeze.timer>0)||
+             (playerDebuffs.sleep&&playerDebuffs.sleep.timer>0));
+}
+// Get player speed multiplier from debuffs
+function playerSpeedMul(){
+    var mul=1;
+    if(playerDebuffs.dizzy&&playerDebuffs.dizzy.timer>0) mul*=STATUS_DEFS.dizzy.speedMul;
+    return mul;
+}
+
 function applyDamageToPlayer(dmg){
     // God Mode: invincibility for testing
     if(godMode){spawnFloat(player.x,player.y-20,lang==='zh'?'无敌！':'GOD MODE!','#ffd700');return false;}
@@ -1181,16 +1335,34 @@ function update(){
     if(currentFloor<MAX_FLOORS-1&&!godMode) missionTimer--; // no timer on boss floor or in god mode
     if(missionTimer<=0&&!godMode){endExpedition();return;}
 
-    // Movement
+    // Update all status effects (player debuffs + enemy statuses)
+    updateStatusEffects();
+
+    // Handle DOT deaths on enemies
+    for(var dei=enemies.length-1;dei>=0;dei--){
+        if(enemies[dei].dyingFromDot){
+            var de=enemies[dei];
+            spawnParticles(de.x,de.y,'#aa44dd',6);
+            var luckBonus2=getResearchBonus('luck');
+            var gdrop=de.isBoss?randInt(15,30):(de.isElite?randInt(5,12):randInt(1,4));
+            gold+=gdrop; spawnFloat(de.x,de.y-10,'+'+gdrop+' G','#ffd700');
+            totalScore+=de.isBoss?50:(de.isElite?25:10);
+            enemies.splice(dei,1);
+        }
+    }
+
+    // Movement (blocked by paralyze/freeze/sleep)
     var mx=0,my=0;
-    if(keys['KeyW']||keys['ArrowUp']) my=-1;
-    if(keys['KeyS']||keys['ArrowDown']) my=1;
-    if(keys['KeyA']||keys['ArrowLeft']) mx=-1;
-    if(keys['KeyD']||keys['ArrowRight']) mx=1;
-    if(mobileStick.active){
-        var sdx=mobileStick.cx-mobileStick.sx,sdy=mobileStick.cy-mobileStick.sy;
-        var sd=Math.sqrt(sdx*sdx+sdy*sdy);
-        if(sd>10){mx=sdx/sd;my=sdy/sd;}
+    if(playerCanMove()){
+        if(keys['KeyW']||keys['ArrowUp']) my=-1;
+        if(keys['KeyS']||keys['ArrowDown']) my=1;
+        if(keys['KeyA']||keys['ArrowLeft']) mx=-1;
+        if(keys['KeyD']||keys['ArrowRight']) mx=1;
+        if(mobileStick.active){
+            var sdx=mobileStick.cx-mobileStick.sx,sdy=mobileStick.cy-mobileStick.sy;
+            var sd=Math.sqrt(sdx*sdx+sdy*sdy);
+            if(sd>10){mx=sdx/sd;my=sdy/sd;}
+        }
     }
     player.moving=(mx!==0||my!==0);
     if(player.moving){
@@ -1238,6 +1410,19 @@ function update(){
                     else if(ench.effect==='poison') dmg+=2;
                 }
                 e.hp-=dmg;
+                // Apply weapon on-hit status effect
+                if(equippedWeapon){
+                    var wfx=WEAPON_EFFECTS[equippedWeapon.name];
+                    if(wfx&&wfx.length>0){
+                        var fx=wfx[Math.floor(Math.random()*wfx.length)];
+                        var sdef=STATUS_DEFS[fx];
+                        // Chance to apply: 30% base, higher rarity = higher chance
+                        var fxChance=0.25+(equippedWeapon.rarity||0)*0.07;
+                        if(Math.random()<fxChance){
+                            applyStatusToEnemy(e,fx,sdef);
+                        }
+                    }
+                }
                 spawnParticles(e.x,e.y,'#ff0',4);
                 spawnFloat(e.x,e.y-10,'-'+dmg,'#ff4444');
                 playSound('enemyHit');
@@ -1402,6 +1587,20 @@ function update(){
         }
 
         // ===== NORMAL ENEMY AI =====
+        // Status effect: freeze/paralyze/sleep = can't move or attack
+        if(e.statuses){
+            var eCCed=(e.statuses.freeze&&e.statuses.freeze.timer>0)||
+                      (e.statuses.paralyze&&e.statuses.paralyze.timer>0)||
+                      (e.statuses.sleep&&e.statuses.sleep.timer>0);
+            if(eCCed){e.attackCD=Math.max(e.attackCD,10);continue;}
+            // Dizzy: move randomly
+            if(e.statuses.dizzy&&e.statuses.dizzy.timer>0){
+                e.angle+=0.15*((frameCount%2===0)?1:-1);
+                tryMove(e,Math.cos(e.angle)*ENEMY_SPEED*0.5,Math.sin(e.angle)*ENEMY_SPEED*0.5);
+                if(e.attackCD>0) e.attackCD--;
+                continue;
+            }
+        }
         var sightRange = e.isElite?180:150;
         var canSee=d<sightRange&&lineOfSight(e.x,e.y,player.x,player.y);
         if(playerStats.stealth>0&&!e.alert) canSee=canSee&&d<60;
@@ -1421,7 +1620,14 @@ function update(){
                 var actualDmg=applyDamageToPlayer(dmg);
                 if(actualDmg!==false){spawnFloat(player.x,player.y-10,'-'+actualDmg,'#ee4444');
                 spawnParticles(player.x,player.y,'#ee4444',4);
-                screenShake=4; playSound('hit');}
+                screenShake=4; playSound('hit');
+                // Apply enemy on-hit debuff to player
+                if(e.enemyTypeKey){
+                    var efx=ENEMY_TYPE_EFFECTS[e.enemyTypeKey];
+                    if(efx&&efx.length>0&&Math.random()<0.35){
+                        applyDebuffToPlayer(efx[Math.floor(Math.random()*efx.length)]);
+                    }
+                }}
                 e.attackCD=40;
                 if(playerStats.hp<=0){
                     if(playerStats.revive){
@@ -2187,6 +2393,30 @@ function renderExpedition(){
                 ctx.fillStyle=enrG;ctx.fillRect(e.x-50,e.y-50,100,100);ctx.restore();
             }
         }
+        // Draw status effect icons on enemy
+        if(e.statuses){
+            var skeys=Object.keys(e.statuses);
+            var sxOff=-(skeys.length-1)*9;
+            for(var si2=0;si2<skeys.length;si2++){
+                var stype=skeys[si2];
+                var sd2=STATUS_DEFS[stype];
+                if(!sd2) continue;
+                var es2=e.statuses[stype];
+                var sxp=e.x+sxOff+si2*18;
+                var syp=e.y-e.radius-18;
+                // Color overlay on enemy for freeze/burn
+                if(stype==='freeze'){ctx.save();ctx.globalAlpha=0.3;ctx.fillStyle='#44ddff';ctx.beginPath();ctx.arc(e.x,e.y,e.radius+2,0,Math.PI*2);ctx.fill();ctx.restore();}
+                if(stype==='burn'){ctx.save();ctx.globalAlpha=0.2+Math.sin(frameCount*0.2)*0.1;ctx.fillStyle='#ff6622';ctx.beginPath();ctx.arc(e.x,e.y,e.radius+3,0,Math.PI*2);ctx.fill();ctx.restore();}
+                // Icon
+                ctx.fillStyle=sd2.color;ctx.font='12px monospace';ctx.textAlign='center';
+                ctx.fillText(sd2.icon,sxp,syp);
+                // Timer bar
+                var sbar=e.isBoss?20:14;
+                var sratio=es2.timer/sd2.duration;
+                ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(sxp-sbar/2,syp+2,sbar,2);
+                ctx.fillStyle=sd2.color;ctx.fillRect(sxp-sbar/2,syp+2,sbar*sratio,2);
+            }
+        }
     }
 
     // Player (improved with dynamic light and shadow)
@@ -2194,6 +2424,11 @@ function renderExpedition(){
     // Ground shadow
     ctx.save();ctx.globalAlpha=0.3;ctx.fillStyle='#000';
     ctx.beginPath();ctx.ellipse(ppx,ppy+10,10,4,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    // Player debuff visual overlay
+    if(playerDebuffs.freeze&&playerDebuffs.freeze.timer>0){ctx.save();ctx.globalAlpha=0.35;ctx.fillStyle='#44ddff';ctx.beginPath();ctx.arc(ppx,ppy,20,0,Math.PI*2);ctx.fill();ctx.restore();}
+    if(playerDebuffs.burn&&playerDebuffs.burn.timer>0){ctx.save();ctx.globalAlpha=0.25+Math.sin(frameCount*0.2)*0.1;ctx.fillStyle='#ff6622';ctx.beginPath();ctx.arc(ppx,ppy,22,0,Math.PI*2);ctx.fill();ctx.restore();}
+    if(playerDebuffs.poison&&playerDebuffs.poison.timer>0){ctx.save();ctx.globalAlpha=0.2+Math.sin(frameCount*0.15)*0.08;ctx.fillStyle='#aa44dd';ctx.beginPath();ctx.arc(ppx,ppy,20,0,Math.PI*2);ctx.fill();ctx.restore();}
+    if(playerDebuffs.sleep&&playerDebuffs.sleep.timer>0){ctx.save();ctx.globalAlpha=0.4;ctx.fillStyle='#8888ff';ctx.beginPath();ctx.arc(ppx,ppy,20,0,Math.PI*2);ctx.fill();ctx.restore();}
     // Player light aura — biome-tinted
     ctx.save();ctx.globalAlpha=0.08+Math.sin(frameCount*0.04)*0.03;
     var pGlowColor=currentBiome.name==='Forest'?'#44dd88':(currentBiome.name==='Cave'?'#8888ee':'#aacc44');
@@ -2593,6 +2828,33 @@ function drawExpeditionHUD(){
         var remW=ctx.measureText(remStr).width+12;
         ctx.fillRect(W/2-remW/2,56,remW,14);
         ctx.fillStyle='#ff9944';ctx.fillText(remStr,W/2,66);
+    }
+    // Player debuff icons (bottom center, above quickbar)
+    var dbKeys=Object.keys(playerDebuffs).filter(function(k){return playerDebuffs[k]&&playerDebuffs[k].timer>0;});
+    if(dbKeys.length>0){
+        var dbIconSize=26,dbGap=4;
+        var dbTotalW=dbKeys.length*(dbIconSize+dbGap)-dbGap;
+        var dbX=(W-dbTotalW)/2, dbY=canvas.height-(isMobile?110:100);
+        for(var di=0;di<dbKeys.length;di++){
+            var dtype=dbKeys[di];
+            var ddef=STATUS_DEFS[dtype];
+            if(!ddef) continue;
+            var dx=dbX+di*(dbIconSize+dbGap);
+            // Background
+            ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(dx,dbY,dbIconSize,dbIconSize);
+            ctx.strokeStyle=ddef.color;ctx.lineWidth=1.5;ctx.strokeRect(dx,dbY,dbIconSize,dbIconSize);
+            // Icon
+            ctx.fillStyle=ddef.color;ctx.font='14px monospace';ctx.textAlign='center';
+            ctx.fillText(ddef.icon,dx+dbIconSize/2,dbY+dbIconSize/2+4);
+            // Timer bar at bottom
+            var db=playerDebuffs[dtype];
+            var dtRatio=db.timer/ddef.duration;
+            ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(dx,dbY+dbIconSize-3,dbIconSize,3);
+            ctx.fillStyle=ddef.color;ctx.fillRect(dx,dbY+dbIconSize-3,dbIconSize*dtRatio,3);
+            // Timer text
+            ctx.fillStyle='#fff';ctx.font='8px monospace';ctx.textAlign='center';
+            ctx.fillText(Math.ceil(db.timer/60)+'s',dx+dbIconSize/2,dbY+dbIconSize-5);
+        }
     }
     // Settings gear in expedition
     drawSettingsGear(W-38,15,26);
