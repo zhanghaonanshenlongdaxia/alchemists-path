@@ -136,6 +136,7 @@ function initSprites() {
 
 // Load custom enemy sprites
 function loadCustomEnemySprites() {
+    console.log('[Custom Enemy Sprites] Starting to load...');
     return new Promise(function(resolve) {
         // Enemy distribution by biome and floor
         var enemyPools = {
@@ -176,20 +177,31 @@ function loadCustomEnemySprites() {
         
         if (total === 0) { resolve(); return; }
         
+        console.log('[Custom Enemy Sprites] Total to load:', total);
+        
         toLoad.forEach(function(item) {
             var img = new Image();
             img.onload = function() {
                 SPR.customEnemies[item.biome][item.floor].push(img);
                 loaded++;
+                if (loaded % 20 === 0) {
+                    console.log('[Custom Enemy Sprites] Progress:', loaded + '/' + total);
+                }
                 if (loaded === total) {
-                    console.log('[Custom Enemy Sprites] Loaded ' + total + ' sprites across 3 biomes');
+                    console.log('[Custom Enemy Sprites] ✓ Successfully loaded ' + total + ' sprites');
+                    console.log('[Custom Enemy Sprites] Forest floors:', Object.keys(SPR.customEnemies.forest).map(f => f + ':' + SPR.customEnemies.forest[f].length));
+                    console.log('[Custom Enemy Sprites] Cave floors:', Object.keys(SPR.customEnemies.cave).map(f => f + ':' + SPR.customEnemies.cave[f].length));
+                    console.log('[Custom Enemy Sprites] Swamp floors:', Object.keys(SPR.customEnemies.swamp).map(f => f + ':' + SPR.customEnemies.swamp[f].length));
                     resolve();
                 }
             };
             img.onerror = function() {
-                console.warn('[Custom Enemy Sprites] Failed to load: ' + item.path);
+                console.error('[Custom Enemy Sprites] ✗ Failed to load: ' + item.path);
                 loaded++;
-                if (loaded === total) resolve();
+                if (loaded === total) {
+                    console.warn('[Custom Enemy Sprites] Finished with errors. Loaded: ' + loaded + '/' + total);
+                    resolve();
+                }
             };
             img.src = item.path;
         });

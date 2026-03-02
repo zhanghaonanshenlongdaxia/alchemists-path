@@ -1995,15 +1995,20 @@ function renderExpedition(){
             var et=SPR.enemies[currentBiome.enemyType];
             var spr=null;
             
-            // Use custom sprites based on floor
-            var floorKey='floor'+Math.min(currentFloor,5);
-            var pool=SPR.customEnemies[currentBiome.enemyType][floorKey];
+            // Use custom sprites based on floor (currentFloor is 0-indexed, but floorKey is 1-indexed)
+            var floorKey='floor'+Math.min(currentFloor+1,5);
+            var pool=SPR.customEnemies&&SPR.customEnemies[currentBiome.enemyType]?SPR.customEnemies[currentBiome.enemyType][floorKey]:null;
             if(pool&&pool.length>0){
                 // Assign sprite based on enemy index (consistent per enemy)
                 if(!e.spriteIndex) e.spriteIndex=Math.floor(Math.random()*pool.length);
                 spr=pool[e.spriteIndex%pool.length];
             } else if(et.frames.length>0){
                 spr=et.frames[e.animFrame%et.frames.length];
+            }
+            
+            // Debug: log if no sprite found
+            if(!spr&&frameCount%120===0&&enemies.indexOf(e)===0){
+                console.log('[Enemy Sprite Debug]', 'Biome:', currentBiome.enemyType, 'Floor:', currentFloor, 'FloorKey:', floorKey, 'Pool:', pool?pool.length:0, 'SPR.customEnemies:', SPR.customEnemies);
             }
             
             if(spr){
