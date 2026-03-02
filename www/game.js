@@ -1109,84 +1109,77 @@ function update(){
     var wepSpeedMul = equippedWeapon ? equippedWeapon.speed : 1;
     var wepRange = equippedWeapon ? equippedWeapon.range : 35;
     var wepDmg = equippedWeapon ? equippedWeapon.dmg : 1;
+    // Auto-attack with rotating weapons (continuous damage)
     var baseCooldown = Math.max(8, Math.round(18/wepSpeedMul));
-    if(mouse.down&&attackCooldown<=0){
+    if(attackCooldown<=0){
         attackCooldown=baseCooldown;
-        player.attackAnim=8;
-        playSound('swing');
-        var atkRange=wepRange+player.radius+8, atkArc=1.0;
+        var atkRange=wepRange*0.7+player.radius; // Match weapon circle radius
         for(var i=enemies.length-1;i>=0;i--){
             var e=enemies[i];
             var d=dist(player,e);
             if(d<atkRange){
-                var a=angleTo(player,e);
-                var diff=Math.abs(a-player.angle);
-                if(diff>Math.PI) diff=Math.PI*2-diff;
-                if(diff<atkArc){
-                    var dmg=Math.max(1, playerStats.atk+wepDmg-Math.floor(e.maxHp*0.05));
-                    if(playerStats.poison>0) dmg+=1;
-                    // Skill: powerStrike (10% crit)
-                    if(hasSkill('powerStrike')&&Math.random()<0.1){dmg=Math.floor(dmg*1.8);spawnFloat(e.x,e.y-20,'CRIT!','#ffdd00');}
-                    // Relic: Thunder Pearl (10% crit double damage)
-                    if(foundCollectibles.indexOf('thunder_pearl')>=0&&Math.random()<0.1){dmg*=2;spawnFloat(e.x,e.y-20,'⚡CRIT!','#ffdd44');}
-                    // Skill: berserker (+20% ATK when HP<30%)
-                    if(hasSkill('berserker')&&playerStats.hp<playerStats.maxHp*0.3) dmg=Math.floor(dmg*1.2);
-                    // Skill: execute (+50% DMG to enemies <25% HP)
-                    if(hasSkill('execute')&&e.hp<e.maxHp*0.25) dmg=Math.floor(dmg*1.5);
-                    // Enchant bonus
-                    if(equippedWeapon&&equippedWeapon.enchant){
-                        var ench=equippedWeapon.enchant;
-                        if(ench.effect==='attack') dmg+=ench.value;
-                        else if(ench.effect==='poison') dmg+=2;
-                    }
-                    e.hp-=dmg;
-                    spawnParticles(e.x,e.y,'#ff0',4);
-                    spawnFloat(e.x,e.y-10,'-'+dmg,'#ff4444');
-                    playSound('enemyHit');
-                    screenShake=3;
-                    e.alert=true;e.alertTimer=180;
-                    if(e.hp<=0){
-                        spawnParticles(e.x,e.y,'#ffd700',8);
-                        var luckBonus = getResearchBonus('luck');
-                        var goldDrop = e.isBoss?randInt(15,30+luckBonus*3):(e.isElite?randInt(5,12+luckBonus*2):randInt(1,4+luckBonus));
-                        // Skill: scavenger (+30% gold)
-                        if(hasSkill('scavenger')) goldDrop=Math.floor(goldDrop*1.3);
-                        // Relic: Ancient Coin (+15% gold)
-                        if(foundCollectibles.indexOf('ancient_coin')>=0) goldDrop=Math.floor(goldDrop*1.15);
-                        gold+=goldDrop;
-                        spawnFloat(e.x,e.y-10,'+'+goldDrop+' G','#ffd700');
-                        totalScore+=e.isBoss?50:(e.isElite?25:10);
-                        // Skill: lifeSteal (heal 1 HP per 5 kills)
-                        if(hasSkill('lifeSteal')){killCounter++;if(killCounter>=5){killCounter=0;if(playerStats.hp<playerStats.maxHp){playerStats.hp=Math.min(playerStats.maxHp,playerStats.hp+1);spawnFloat(player.x,player.y-20,'+1 HP','#ee4444');}}}
-                        // Relic: Blood Ruby (heal 1 HP per kill)
-                        if(foundCollectibles.indexOf('blood_ruby')>=0&&playerStats.hp<playerStats.maxHp){playerStats.hp=Math.min(playerStats.maxHp,playerStats.hp+1);spawnFloat(player.x,player.y-20,'+1 HP','#ee4444');}
-                        // Weapon drop chance (luck increases chance)
-                        if(e.isBoss||e.isElite||(Math.random()<0.1+luckBonus*0.04)){
-                            var pool=getWeaponDropPool(currentFloor,e.isBoss);
-                            if(pool.length>0){
-                                var wt=pool[randInt(0,pool.length-1)];
-                                var dropped=makeWeapon(wt);
-                                weaponPopup={weapon:dropped,x:e.x,y:e.y};
-                            }
+                var dmg=Math.max(1, playerStats.atk+wepDmg-Math.floor(e.maxHp*0.05));
+                if(playerStats.poison>0) dmg+=1;
+                // Skill: powerStrike (10% crit)
+                if(hasSkill('powerStrike')&&Math.random()<0.1){dmg=Math.floor(dmg*1.8);spawnFloat(e.x,e.y-20,'CRIT!','#ffdd00');}
+                // Relic: Thunder Pearl (10% crit double damage)
+                if(foundCollectibles.indexOf('thunder_pearl')>=0&&Math.random()<0.1){dmg*=2;spawnFloat(e.x,e.y-20,'⚡CRIT!','#ffdd44');}
+                // Skill: berserker (+20% ATK when HP<30%)
+                if(hasSkill('berserker')&&playerStats.hp<playerStats.maxHp*0.3) dmg=Math.floor(dmg*1.2);
+                // Skill: execute (+50% DMG to enemies <25% HP)
+                if(hasSkill('execute')&&e.hp<e.maxHp*0.25) dmg=Math.floor(dmg*1.5);
+                // Enchant bonus
+                if(equippedWeapon&&equippedWeapon.enchant){
+                    var ench=equippedWeapon.enchant;
+                    if(ench.effect==='attack') dmg+=ench.value;
+                    else if(ench.effect==='poison') dmg+=2;
+                }
+                e.hp-=dmg;
+                spawnParticles(e.x,e.y,'#ff0',4);
+                spawnFloat(e.x,e.y-10,'-'+dmg,'#ff4444');
+                playSound('enemyHit');
+                screenShake=3;
+                e.alert=true;e.alertTimer=180;
+                if(e.hp<=0){
+                    spawnParticles(e.x,e.y,'#ffd700',8);
+                    var luckBonus = getResearchBonus('luck');
+                    var goldDrop = e.isBoss?randInt(15,30+luckBonus*3):(e.isElite?randInt(5,12+luckBonus*2):randInt(1,4+luckBonus));
+                    // Skill: scavenger (+30% gold)
+                    if(hasSkill('scavenger')) goldDrop=Math.floor(goldDrop*1.3);
+                    // Relic: Ancient Coin (+15% gold)
+                    if(foundCollectibles.indexOf('ancient_coin')>=0) goldDrop=Math.floor(goldDrop*1.15);
+                    gold+=goldDrop;
+                    spawnFloat(e.x,e.y-10,'+'+goldDrop+' G','#ffd700');
+                    totalScore+=e.isBoss?50:(e.isElite?25:10);
+                    // Skill: lifeSteal (heal 1 HP per 5 kills)
+                    if(hasSkill('lifeSteal')){killCounter++;if(killCounter>=5){killCounter=0;if(playerStats.hp<playerStats.maxHp){playerStats.hp=Math.min(playerStats.maxHp,playerStats.hp+1);spawnFloat(player.x,player.y-20,'+1 HP','#ee4444');}}}
+                    // Relic: Blood Ruby (heal 1 HP per kill)
+                    if(foundCollectibles.indexOf('blood_ruby')>=0&&playerStats.hp<playerStats.maxHp){playerStats.hp=Math.min(playerStats.maxHp,playerStats.hp+1);spawnFloat(player.x,player.y-20,'+1 HP','#ee4444');}
+                    // Weapon drop chance (luck increases chance)
+                    if(e.isBoss||e.isElite||(Math.random()<0.1+luckBonus*0.04)){
+                        var pool=getWeaponDropPool(currentFloor,e.isBoss);
+                        if(pool.length>0){
+                            var wt=pool[randInt(0,pool.length-1)];
+                            var dropped=makeWeapon(wt);
+                            weaponPopup={weapon:dropped,x:e.x,y:e.y};
                         }
-                        if(e.isBoss){
-                            bossDefeated=true;
-                            bossRef=null;
-                            // Reveal exit in arena center
-                            exitZone={x:Math.floor(MAP_W/2)*TILE+TILE/2,y:Math.floor(MAP_H/2)*TILE+TILE/2};
-                            spawnFloat(player.x,player.y-30,T('bossDefeated'),'#ffdd44');
-                            spawnParticles(e.x,e.y,'#ffdd44',20);
-                            playSound('levelUp');
-                        } else if(e.isElite){
-                            spawnFloat(e.x,e.y-25,T('eliteSlain'),'#ffaa00');
-                        }
-                        enemies.splice(i,1);
                     }
+                    if(e.isBoss){
+                        bossDefeated=true;
+                        bossRef=null;
+                        // Reveal exit in arena center
+                        exitZone={x:Math.floor(MAP_W/2)*TILE+TILE/2,y:Math.floor(MAP_H/2)*TILE+TILE/2};
+                        spawnFloat(player.x,player.y-30,T('bossDefeated'),'#ffdd44');
+                        spawnParticles(e.x,e.y,'#ffdd44',20);
+                        playSound('levelUp');
+                    } else if(e.isElite){
+                        spawnFloat(e.x,e.y-25,T('eliteSlain'),'#ffaa00');
+                    }
+                    enemies.splice(i,1);
                 }
             }
         }
     }
-    if(player.attackAnim>0) player.attackAnim--;
 
     // Camera
     camera.x=player.x-canvas.width/2;
@@ -2125,133 +2118,7 @@ function renderExpedition(){
         }
     }
     
-    // Attack animation (for damage dealing, no visual change)
-    if(player.attackAnim>0){
-        var swingAlpha=player.attackAnim/8;
-        var wc=equippedWeapon?equippedWeapon.color:'#fff';
-        var wRange=equippedWeapon?equippedWeapon.range:30;
-        var wName=equippedWeapon?equippedWeapon.name:'';
-        var hasWeaponSprite=SPR.weapons&&SPR.weapons[wName];
-        if(hasWeaponSprite){
-            // Weapon sprites already drawn above, no additional visual needed
-        }
-        
-        // Weapon-specific rendering (fallback if no sprite)
-        ctx.save();ctx.translate(ppx,ppy);ctx.rotate(player.angle);
-        var wType=equippedWeapon?equippedWeapon.type:'sword';
-        if(!hasWeaponSprite&&wType==='sword'){
-            // Sword: Arc slash with blade trail
-            ctx.globalAlpha=swingAlpha*0.3;
-            ctx.strokeStyle=wc;ctx.lineWidth=8;
-            ctx.beginPath();ctx.arc(0,0,wRange,-0.7,0.7);ctx.stroke();
-            ctx.globalAlpha=swingAlpha;
-            ctx.strokeStyle=wc;ctx.lineWidth=3;
-            ctx.beginPath();ctx.arc(0,0,wRange,-0.5,0.5);ctx.stroke();
-            // Blade edge
-            ctx.globalAlpha=swingAlpha*0.9;
-            ctx.strokeStyle='#fff';ctx.lineWidth=1;
-            ctx.beginPath();ctx.moveTo(8,0);ctx.lineTo(wRange-5,0);ctx.stroke();
-            ctx.fillStyle='#fff';
-            ctx.beginPath();ctx.arc(wRange,0,2,0,Math.PI*2);ctx.fill();
-        } else if(!hasWeaponSprite&&wType==='dagger'){
-            // Dagger: Quick stab motion
-            ctx.globalAlpha=swingAlpha*0.5;
-            ctx.strokeStyle=wc;ctx.lineWidth=6;
-            ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(wRange*0.8,0);ctx.stroke();
-            ctx.globalAlpha=swingAlpha;
-            ctx.fillStyle=wc;
-            ctx.beginPath();ctx.moveTo(wRange*0.7,-3);ctx.lineTo(wRange,0);ctx.lineTo(wRange*0.7,3);ctx.fill();
-            // Twin gleam
-            for(var i=0;i<2;i++){
-                ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.6;
-                ctx.beginPath();ctx.arc(wRange*0.5+i*8,-2+i*4,1.5,0,Math.PI*2);ctx.fill();
-            }
-        } else if(!hasWeaponSprite&&wType==='axe'){
-            // Axe: Heavy swing with wide arc
-            ctx.globalAlpha=swingAlpha*0.4;
-            ctx.strokeStyle=wc;ctx.lineWidth=12;
-            ctx.beginPath();ctx.arc(0,0,wRange,-0.9,0.9);ctx.stroke();
-            ctx.globalAlpha=swingAlpha*0.8;
-            ctx.strokeStyle=wc;ctx.lineWidth=5;
-            ctx.beginPath();ctx.arc(0,0,wRange,-0.6,0.6);ctx.stroke();
-            // Axe head
-            ctx.globalAlpha=swingAlpha;
-            ctx.fillStyle=wc;
-            ctx.beginPath();ctx.moveTo(wRange-10,-8);ctx.lineTo(wRange,-3);ctx.lineTo(wRange,3);ctx.lineTo(wRange-10,8);ctx.fill();
-        } else if(!hasWeaponSprite&&wType==='staff'){
-            // Staff: Magic orb at tip
-            ctx.globalAlpha=swingAlpha*0.2;
-            ctx.strokeStyle=wc;ctx.lineWidth=4;
-            ctx.beginPath();ctx.arc(0,0,wRange,-0.5,0.5);ctx.stroke();
-            // Staff shaft
-            ctx.globalAlpha=swingAlpha*0.7;
-            ctx.strokeStyle='#8b7355';ctx.lineWidth=3;
-            ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(wRange*0.8,0);ctx.stroke();
-            // Magic orb
-            ctx.globalAlpha=swingAlpha;
-            var orbGlow=ctx.createRadialGradient(wRange,0,0,wRange,0,8);
-            orbGlow.addColorStop(0,wc);orbGlow.addColorStop(1,'rgba(0,0,0,0)');
-            ctx.fillStyle=orbGlow;ctx.fillRect(wRange-8,-8,16,16);
-            ctx.fillStyle=wc;
-            ctx.beginPath();ctx.arc(wRange,0,4,0,Math.PI*2);ctx.fill();
-            ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.8;
-            ctx.beginPath();ctx.arc(wRange,0,2,0,Math.PI*2);ctx.fill();
-        } else if(!hasWeaponSprite&&wType==='mace'){
-            // Mace: Crushing impact visual
-            ctx.globalAlpha=swingAlpha*0.5;
-            ctx.strokeStyle=wc;ctx.lineWidth=10;
-            ctx.beginPath();ctx.arc(0,0,wRange,-0.8,0.8);ctx.stroke();
-            ctx.globalAlpha=swingAlpha;
-            ctx.strokeStyle='#6b5b4a';ctx.lineWidth=4;
-            ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(wRange*0.75,0);ctx.stroke();
-            // Mace head
-            ctx.fillStyle=wc;
-            ctx.beginPath();ctx.arc(wRange,0,6,0,Math.PI*2);ctx.fill();
-            for(var s=0;s<4;s++){
-                var ang=s*Math.PI/2;
-                ctx.fillStyle=wc;ctx.globalAlpha=swingAlpha*0.7;
-                ctx.fillRect(wRange+Math.cos(ang)*6-1,-1+Math.sin(ang)*6,3,3);
-            }
-        } else if(!hasWeaponSprite&&wType==='spear'){
-            // Spear: Long thrust
-            ctx.globalAlpha=swingAlpha*0.4;
-            ctx.strokeStyle=wc;ctx.lineWidth=5;
-            ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(wRange*1.1,0);ctx.stroke();
-            ctx.globalAlpha=swingAlpha;
-            ctx.strokeStyle='#8b7355';ctx.lineWidth=3;
-            ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(wRange*0.9,0);ctx.stroke();
-            // Spear tip
-            ctx.fillStyle=wc;
-            ctx.beginPath();ctx.moveTo(wRange*0.85,-4);ctx.lineTo(wRange*1.05,0);ctx.lineTo(wRange*0.85,4);ctx.fill();
-            ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.9;
-            ctx.beginPath();ctx.arc(wRange*1.05,0,2,0,Math.PI*2);ctx.fill();
-        } else if(!hasWeaponSprite&&wType==='claw'){
-            // Claw: Triple slash marks
-            for(var cl=0;cl<3;cl++){
-                ctx.globalAlpha=swingAlpha*0.6;
-                ctx.strokeStyle=wc;ctx.lineWidth=3;
-                var clOff=(cl-1)*5;
-                ctx.beginPath();ctx.moveTo(wRange*0.3,clOff);ctx.lineTo(wRange,clOff);ctx.stroke();
-            }
-            ctx.globalAlpha=swingAlpha;
-            for(var cl=0;cl<3;cl++){
-                ctx.fillStyle=wc;
-                var clOff=(cl-1)*5;
-                ctx.beginPath();ctx.moveTo(wRange-8,clOff-2);ctx.lineTo(wRange,clOff);ctx.lineTo(wRange-8,clOff+2);ctx.fill();
-            }
-        } else {
-            // Default: simple arc
-            ctx.globalAlpha=swingAlpha*0.3;
-            ctx.strokeStyle=wc;ctx.lineWidth=8;
-            ctx.beginPath();ctx.arc(0,0,wRange,-0.7,0.7);ctx.stroke();
-            ctx.globalAlpha=swingAlpha;
-            ctx.strokeStyle=wc;ctx.lineWidth=3;
-            ctx.beginPath();ctx.arc(0,0,wRange,-0.5,0.5);ctx.stroke();
-            ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.8;
-            ctx.beginPath();ctx.arc(wRange,0,2,0,Math.PI*2);ctx.fill();
-        }
-        ctx.restore();
-    }
+    // No attack animation needed - weapons auto-rotate continuously
 
     // Particles & floats (improved with glow)
     for(var p of particles){
