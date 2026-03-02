@@ -2110,7 +2110,7 @@ function renderExpedition(){
             
             ctx.save();
             ctx.translate(wx,wy);
-            ctx.rotate(angle+Math.PI); // Weapon orientation (180 degrees - vertical)
+            ctx.rotate(angle); // Weapon orientation (blade outward)
             ctx.globalAlpha=0.9;
             var wSize=24;
             ctx.drawImage(SPR.weapons[equippedWeapon.name],0,-wSize/2,wSize,wSize);
