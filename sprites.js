@@ -83,7 +83,17 @@ function initSprites() {
     SPR.enemies = {
         forest: { frames: [tintTileGradient(320,'#66cc33','#2a6611'), tintTileGradient(321,'#66cc33','#2a6611'), tintTileGradient(322,'#66cc33','#2a6611')], color: '#55aa22' },
         cave:   { frames: [tintTileGradient(340,'#9988dd','#443388'), tintTileGradient(341,'#9988dd','#443388'), tintTileGradient(342,'#9988dd','#443388')], color: '#7766bb' },
-        swamp:  { frames: [tintTileGradient(360,'#bbaa33','#665511'), tintTileGradient(361,'#bbaa33','#665511'), tintTileGradient(362,'#bbaa33','#665511')], color: '#998822' }
+        swamp:  { frames: [], color: '#998822', customSprites: true } // Will load custom sprites
+    };
+    
+    // Custom enemy sprites (loaded separately)
+    SPR.customEnemies = {
+        swamp: {
+            normal: null,    // alligator_baby.png
+            elite: null,     // alligator.png
+            boss: null,      // anaconda.png
+            variant: null    // alligator_snapping_turtle.png
+        }
     };
 
     // Herbs/ingredients (colored gems/items)
@@ -119,4 +129,38 @@ function initSprites() {
     SPR.shield = tintTile(96, '#4488ee');
 
     console.log('[Sprites] Ready');
+}
+
+// Load custom enemy sprites
+function loadCustomEnemySprites() {
+    return new Promise(function(resolve) {
+        var toLoad = [
+            { path: 'enemy_sprites/alligator_baby.png', target: 'swamp', type: 'normal' },
+            { path: 'enemy_sprites/alligator.png', target: 'swamp', type: 'elite' },
+            { path: 'enemy_sprites/anaconda.png', target: 'swamp', type: 'boss' },
+            { path: 'enemy_sprites/alligator_snapping_turtle.png', target: 'swamp', type: 'variant' }
+        ];
+        var loaded = 0;
+        var total = toLoad.length;
+        
+        if (total === 0) { resolve(); return; }
+        
+        toLoad.forEach(function(item) {
+            var img = new Image();
+            img.onload = function() {
+                SPR.customEnemies[item.target][item.type] = img;
+                loaded++;
+                if (loaded === total) {
+                    console.log('[Custom Enemy Sprites] Loaded ' + total + ' sprites');
+                    resolve();
+                }
+            };
+            img.onerror = function() {
+                console.warn('[Custom Enemy Sprites] Failed to load: ' + item.path);
+                loaded++;
+                if (loaded === total) resolve();
+            };
+            img.src = item.path;
+        });
+    });
 }

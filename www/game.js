@@ -743,7 +743,8 @@ function setupFloor(biomeIdx, floor){
                     radius:isElite?9:7, alert:false, alertTimer:0,
                     patrolAngle:Math.random()*Math.PI*2, patrolTimer:randInt(60,180),
                     animFrame:0, attackCD:0, atk:Math.ceil(baseATK*atkMul),
-                    isElite:isElite, isBoss:false
+                    isElite:isElite, isBoss:false,
+                    spriteVariant:Math.random()>0.5?'normal':'variant'
                 });
             }
         }
@@ -761,6 +762,7 @@ function setupFloor(biomeIdx, floor){
             patrolAngle:0, patrolTimer:60,
             animFrame:0, attackCD:0, atk:bossATK,
             isElite:false, isBoss:true,
+            spriteVariant:'boss',
             // Boss special properties
             chargeCD:0, charging:false, chargeAngle:0, chargeTimer:0,
             slamCD:0
@@ -1289,7 +1291,8 @@ function update(){
                             radius:6,alert:true,alertTimer:180,
                             patrolAngle:Math.random()*Math.PI*2,patrolTimer:60,
                             animFrame:0,attackCD:0,atk:Math.ceil(baseATK2*0.7),
-                            isElite:false,isBoss:false
+                            isElite:false,isBoss:false,
+                            spriteVariant:Math.random()>0.5?'normal':'variant'
                         });
                         spawnParticles(sx2,sy2,'#aa44dd',6);
                     }
@@ -1993,13 +1996,38 @@ function renderExpedition(){
         }
         if(SPR.ready){
             var et=SPR.enemies[currentBiome.enemyType];
-            var spr=et.frames[e.animFrame%et.frames.length];
-            ctx.save();ctx.translate(e.x,e.y);
-            var scale=e.isBoss?2.0:(e.isElite?1.4:1.0);
-            var flip=(e.angle>Math.PI/2||e.angle<-Math.PI/2)?-1:1;
-            ctx.scale(flip*scale,scale);
-            ctx.drawImage(spr,-TILE/2,-TILE/2,TILE,TILE);
-            ctx.restore();
+            var spr=null;
+            
+            // Use custom sprites for swamp enemies
+            if(currentBiome.enemyType==='swamp'&&SPR.customEnemies.swamp.normal){
+                if(e.isBoss) spr=SPR.customEnemies.swamp.boss;
+                else if(e.isElite) spr=SPR.customEnemies.swamp.elite;
+                else spr=e.spriteVariant==='variant'?SPR.customEnemies.swamp.variant:SPR.customEnemies.swamp.normal;
+            } else if(et.frames.length>0){
+                spr=et.frames[e.animFrame%et.frames.length];
+            }
+            
+            if(spr){
+                // Floating animation (up and down)
+                var floatOffset=Math.sin(frameCount*0.05+e.x*0.1)*2;
+                // Breathing animation (scale pulse)
+                var breathScale=1.0+Math.sin(frameCount*0.08+e.y*0.1)*0.05;
+                
+                ctx.save();
+                ctx.translate(e.x,e.y+floatOffset);
+                var baseScale=e.isBoss?2.0:(e.isElite?1.4:1.0);
+                var scale=baseScale*breathScale;
+                var flip=(e.angle>Math.PI/2||e.angle<-Math.PI/2)?-1:1;
+                ctx.scale(flip*scale,scale);
+                
+                // Draw sprite (support both canvas and image)
+                var spriteSize=spr.width||TILE;
+                ctx.drawImage(spr,-spriteSize/2,-spriteSize/2,spriteSize,spriteSize);
+                ctx.restore();
+            } else {
+                ctx.fillStyle=e.isBoss?'#ff0000':(e.isElite?'#ff8800':(e.alert?'#ff4500':'#ffd700'));
+                ctx.beginPath();ctx.arc(e.x,e.y,e.radius,0,Math.PI*2);ctx.fill();
+            }
         } else {
             ctx.fillStyle=e.isBoss?'#ff0000':(e.isElite?'#ff8800':(e.alert?'#ff4500':'#ffd700'));
             ctx.beginPath();ctx.arc(e.x,e.y,e.radius,0,Math.PI*2);ctx.fill();
@@ -4844,4 +4872,4 @@ function render(){
     else if(state==='gameover') drawGameOver();
 }
 function gameLoop(){update();render();requestAnimationFrame(gameLoop);}
-(async function(){await loadTilesheet();initSprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
+(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
