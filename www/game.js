@@ -4831,17 +4831,7 @@ function handleLabClick(cx,cy){
     if(cx>=70&&cx<=92&&cy>=15&&cy<=37){showSettings=true;playSound('click');return;}
     // Bestiary button
     if(cx>=100&&cx<=146&&cy>=15&&cy<=37){labTab='bestiary';bestiaryPage=0;labScrollY=0;playSound('click');return;}
-    // Bestiary page nav (when open)
-    if(labTab==='bestiary'){
-        var pw3=Math.min(W-40,520),ph3=Math.min(H-60,500);
-        var ppx3=(W-pw3)/2,ppy3=(H-ph3)/2;
-        var perPage3=4,totalPages3=Math.ceil(Object.keys(seenEnemies).length/perPage3);
-        var navY3=ppy3+ph3-50;
-        if(cy>=navY3&&cy<=navY3+30){
-            if(cx<W/2-30&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
-            if(cx>W/2+30&&bestiaryPage<totalPages3-1){bestiaryPage++;playSound('click');return;}
-        }
-    }
+    // Bestiary page nav handled below inside labTab block
 
     if(labTab){
         var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
@@ -4849,6 +4839,16 @@ function handleLabClick(cx,cy){
         var cbS=28,cbX=ppx+pw-cbS-6,cbY=ppy+6;
         if(cx>=cbX&&cx<=cbX+cbS&&cy>=cbY&&cy<=cbY+cbS){labTab=null;labScrollY=0;selectedEssences=[];extractMini=null;playSound('click');return;}
         if(cx<ppx||cx>ppx+pw||cy<ppy||cy>ppy+ph){labTab=null;labScrollY=0;selectedEssences=[];extractMini=null;playSound('click');return;}
+        // Bestiary page nav (fixed bottom, no scroll offset)
+        if(labTab==='bestiary'){
+            var perPageB=4,totalPagesB=Math.ceil(Object.keys(seenEnemies).length/perPageB);
+            var navYB=ppy+ph-30;
+            var origCy=cy; // use original cy (not scroll-offset)
+            if(origCy>=navYB-10&&origCy<=ppy+ph){
+                if(cx<W/2-20&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
+                if(cx>W/2+20&&bestiaryPage<totalPagesB-1){bestiaryPage++;playSound('click');return;}
+            }
+        }
         // Apply scroll offset for content area clicks
         cy = cy - labScrollY;
         var contentY=ppy+50;
@@ -5181,9 +5181,9 @@ canvas.addEventListener('click',function(e){
             var cbX2=px2+pw2-32,cbY2=py2+6,cbS2=24;
             if(cx>=cbX2&&cx<=cbX2+cbS2&&cy>=cbY2&&cy<=cbY2+cbS2){showBestiary=false;playSound('click');return;}
             var perPage2=5,totalPages2=Math.ceil(Object.keys(seenEnemies).length/perPage2);
-            if(cy>=py2+ph2-30&&cy<=py2+ph2){
-                if(cx<W2/2-30&&bestiaryPage>0){bestiaryPage--;playSound('click');}
-                else if(cx>W2/2+30&&bestiaryPage<totalPages2-1){bestiaryPage++;playSound('click');}
+            if(cy>=py2+ph2-40&&cy<=py2+ph2){
+                if(cx>=px2&&cx<W2/2-10&&bestiaryPage>0){bestiaryPage--;playSound('click');}
+                else if(cx>W2/2+10&&cx<=px2+pw2&&bestiaryPage<totalPages2-1){bestiaryPage++;playSound('click');}
             }
             return;
         }
