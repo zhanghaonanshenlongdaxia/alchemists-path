@@ -4430,7 +4430,9 @@ function drawLabSkills(cy){
 function drawLabBestiary(cy){
     // Book-style bestiary: one enemy per spread, left page = portrait, right page = stats+desc
     var W=canvas.width,H=canvas.height;
-    var bW=Math.min(W-20,560),bH=Math.min(H-80,400);
+    var ph=Math.min(H-60,500),ppy=(H-ph)/2;
+    var navRowH=28;
+    var bW=Math.min(W-20,560),bH=Math.min(Math.min(H-80,400),ph-(cy-ppy)-navRowH-10);
     var bX=(W-bW)/2,bY=cy-10;
     var seenKeys=Object.keys(seenEnemies);
     var total=seenKeys.length;
@@ -4587,8 +4589,8 @@ function drawLabBestiary(cy){
         }
     }
 
-    // ---- Navigation arrows (bottom of book) ----
-    var navY2=bY+bH+18;
+    // ---- Navigation — inside panel, just below book ----
+    var navY2=bY+bH+navRowH/2+4;
     ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
     ctx.fillText((bestiaryPage+1)+'/'+total,W/2,navY2);
     if(bestiaryPage>0){
@@ -4955,12 +4957,12 @@ function handleLabClick(cx,cy){
     if(labTab){
         var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
         var ppx=(W-pw)/2,ppy=(H-ph)/2;
-        // Bestiary page nav: book-style, nav below book — check BEFORE out-of-bounds close
+        // Bestiary page nav: inside panel, below book
         if(labTab==='bestiary'){
-            var bWb=Math.min(W-20,560),bHb=Math.min(H-80,400);
-            var bXb=(W-bWb)/2,contentYb=ppy+50;
-            var bYb=contentYb-10;
-            var navYb=bYb+bHb+18;
+            var navRowHb=28;
+            var bWb=Math.min(W-20,560),bHb=Math.min(Math.min(H-80,400),ph-(ppy+50-ppy)-navRowHb-10);
+            var bXb=(W-bWb)/2,bYb=(ppy+50)-10;
+            var navYb=bYb+bHb+navRowHb/2+4;
             var totalB=Object.keys(seenEnemies).length;
             if(cy>=navYb-14&&cy<=navYb+14){
                 if(cx>=bXb&&cx<W/2-20&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
