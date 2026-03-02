@@ -211,59 +211,40 @@ function loadCustomEnemySprites() {
     });
 }
 
-// Load weapon sprites from res/item/weapon/
+// Load weapon sprites from res/item/weapon/ (driven by WEAPONS array sprite field)
 function loadWeaponSprites() {
     console.log('[Weapon Sprites] Starting to load...');
     return new Promise(function(resolve) {
-        // Map weapon names to sprite files
-        var weaponMap = {
-            'Rusty Dagger': 'res/item/weapon/dagger.png',
-            'Wooden Club': 'res/item/weapon/club.png',
-            'Old Sword': 'res/item/weapon/short_sword1.png',
-            'Worn Axe': 'res/item/weapon/hand_axe1.png',
-            'Iron Sword': 'res/item/weapon/long_sword1.png',
-            'Steel Blade': 'res/item/weapon/sabre1_silver.png',
-            'Bronze Spear': 'res/item/weapon/spear1_elven.png',
-            'Shadow Knife': 'res/item/weapon/elven_dagger.png',
-            'War Axe': 'res/item/weapon/war_axe1.png',
-            'Crystal Staff': 'res/item/weapon/quarterstaff.png',
-            'Venom Fang': 'res/item/weapon/knife.png',
-            'Flame Sword': 'res/item/weapon/blessed_blade.png',
-            'Frost Mace': 'res/item/weapon/morningstar1.png',
-            'Thunder Spear': 'res/item/weapon/demon_trident.png',
-            'Dragon Claw': 'res/item/weapon/triple_sword.png',
-            'Arcane Blade': 'res/item/weapon/katana1.png'
-        };
-        
-        var loaded = 0;
-        var total = Object.keys(weaponMap).length;
-        
-        if (total === 0) { resolve(); return; }
-        
-        for (var weaponName in weaponMap) {
-            (function(name, path) {
-                var img = new Image();
-                img.onload = function() {
-                    SPR.weapons[name] = img;
-                    loaded++;
-                    if (loaded % 5 === 0) {
-                        console.log('[Weapon Sprites] Progress:', loaded + '/' + total);
-                    }
-                    if (loaded === total) {
-                        console.log('[Weapon Sprites] ✓ Successfully loaded ' + total + ' weapon sprites');
-                        resolve();
-                    }
-                };
-                img.onerror = function() {
-                    console.error('[Weapon Sprites] ✗ Failed to load: ' + path);
-                    loaded++;
-                    if (loaded === total) {
-                        console.warn('[Weapon Sprites] Finished with errors.');
-                        resolve();
-                    }
-                };
-                img.src = path;
-            })(weaponName, weaponMap[weaponName]);
+        // Build weapon map from WEAPONS array in game.js
+        var toLoad = [];
+        if (typeof WEAPONS !== 'undefined') {
+            WEAPONS.forEach(function(w) {
+                if (w.sprite) {
+                    toLoad.push({ name: w.name, path: 'res/item/weapon/' + w.sprite });
+                }
+            });
         }
+
+        var loaded = 0;
+        var total = toLoad.length;
+        if (total === 0) { resolve(); return; }
+
+        toLoad.forEach(function(item) {
+            var img = new Image();
+            img.onload = function() {
+                SPR.weapons[item.name] = img;
+                loaded++;
+                if (loaded === total) {
+                    console.log('[Weapon Sprites] ✓ Loaded ' + total + ' weapon sprites');
+                    resolve();
+                }
+            };
+            img.onerror = function() {
+                console.warn('[Weapon Sprites] ✗ Failed: ' + item.path);
+                loaded++;
+                if (loaded === total) resolve();
+            };
+            img.src = item.path;
+        });
     });
 }

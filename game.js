@@ -237,32 +237,74 @@ const WEAPON_NAMES_ZH = {
 };
 function weaponName(w) { return lang==='zh' ? (WEAPON_NAMES_ZH[w.name]||w.name) : w.name; }
 
+// Rarity system: 0=white, 1=green, 2=blue, 3=purple, 4=gold, 5=red
+const RARITY_COLORS = ['#cccccc','#44ee44','#4488ff','#cc44ff','#ffcc00','#ff2222'];
+const RARITY_NAMES  = ['Common','Uncommon','Rare','Epic','Legendary','Mythic'];
+
 const WEAPONS = [
-    { name:'Rusty Dagger', tier:0, dmg:1, speed:1.2, range:42, color:'#888888', type:'dagger' },
-    { name:'Wooden Club',  tier:0, dmg:1, speed:0.8, range:38, color:'#8b7355', type:'mace' },
-    { name:'Old Sword',    tier:0, dmg:1, speed:1.0, range:44, color:'#999999', type:'sword' },
-    { name:'Worn Axe',     tier:0, dmg:2, speed:0.7, range:40, color:'#aa8866', type:'axe' },
-    { name:'Iron Sword',   tier:1, dmg:2, speed:1.0, range:50, color:'#aabbcc', type:'sword' },
-    { name:'Steel Blade',  tier:1, dmg:3, speed:0.9, range:52, color:'#ccddee', type:'sword' },
-    { name:'Bronze Spear', tier:1, dmg:2, speed:0.9, range:58, color:'#cd7f32', type:'spear' },
-    { name:'War Axe',      tier:2, dmg:5, speed:0.7, range:48, color:'#dd8844', type:'axe' },
-    { name:'Crystal Staff', tier:2, dmg:4, speed:1.0, range:62, color:'#88ccff', type:'staff' },
-    { name:'Shadow Knife', tier:1, dmg:2, speed:1.4, range:40, color:'#6644aa', type:'dagger' },
-    { name:'Flame Sword',  tier:3, dmg:7, speed:0.8, range:55, color:'#ff6622', type:'sword' },
-    { name:'Frost Mace',   tier:3, dmg:6, speed:0.7, range:50, color:'#44ddff', type:'mace' },
-    { name:'Venom Fang',   tier:2, dmg:4, speed:1.1, range:44, color:'#aa44dd', type:'dagger' },
-    { name:'Thunder Spear',tier:3, dmg:8, speed:0.6, range:68, color:'#ffdd44', type:'spear' },
-    { name:'Dragon Claw',  tier:4, dmg:10, speed:0.9, range:58, color:'#ff4400', type:'claw' },
-    { name:'Arcane Blade', tier:4, dmg:12, speed:0.8, range:62, color:'#ddaaff', type:'sword' },
+    // === TIER 0 — White (Common) ===
+    { name:'Rusty Dagger',      rarity:0, tier:0, dmg:1,  speed:1.2, range:42, color:RARITY_COLORS[0], type:'dagger', sprite:'dagger.png' },
+    { name:'Wooden Club',       rarity:0, tier:0, dmg:1,  speed:0.8, range:38, color:RARITY_COLORS[0], type:'mace',   sprite:'club.png' },
+    { name:'Old Sword',         rarity:0, tier:0, dmg:1,  speed:1.0, range:44, color:RARITY_COLORS[0], type:'sword',  sprite:'short_sword1.png' },
+    { name:'Worn Axe',          rarity:0, tier:0, dmg:2,  speed:0.7, range:40, color:RARITY_COLORS[0], type:'axe',    sprite:'hand_axe1.png' },
+    { name:'Hunting Knife',     rarity:0, tier:0, dmg:1,  speed:1.3, range:38, color:RARITY_COLORS[0], type:'dagger', sprite:'knife.png' },
+    { name:'Plain Club',        rarity:0, tier:0, dmg:2,  speed:0.7, range:36, color:RARITY_COLORS[0], type:'mace',   sprite:'giant_club.png' },
+    { name:'Broken Spear',      rarity:0, tier:0, dmg:1,  speed:1.1, range:50, color:RARITY_COLORS[0], type:'spear',  sprite:'spear1.png' },
+    { name:'Stone Hammer',      rarity:0, tier:0, dmg:3,  speed:0.6, range:36, color:RARITY_COLORS[0], type:'mace',   sprite:'hammer1.png' },
+
+    // === TIER 1 — Green (Uncommon) ===
+    { name:'Iron Sword',        rarity:1, tier:1, dmg:2,  speed:1.0, range:50, color:RARITY_COLORS[1], type:'sword',  sprite:'long_sword1.png' },
+    { name:'Steel Blade',       rarity:1, tier:1, dmg:3,  speed:0.9, range:52, color:RARITY_COLORS[1], type:'sword',  sprite:'falchion1.png' },
+    { name:'Bronze Spear',      rarity:1, tier:1, dmg:2,  speed:0.9, range:58, color:RARITY_COLORS[1], type:'spear',  sprite:'spear1_elven.png' },
+    { name:'Shadow Knife',      rarity:1, tier:1, dmg:2,  speed:1.4, range:40, color:RARITY_COLORS[1], type:'dagger', sprite:'elven_dagger.png' },
+    { name:'Short Mace',        rarity:1, tier:1, dmg:3,  speed:0.8, range:44, color:RARITY_COLORS[1], type:'mace',   sprite:'mace1.png' },
+    { name:'Elven Blade',       rarity:1, tier:1, dmg:3,  speed:1.1, range:48, color:RARITY_COLORS[1], type:'sword',  sprite:'elven_short_sword.png' },
+    { name:'Hand Axe',          rarity:1, tier:1, dmg:3,  speed:0.9, range:44, color:RARITY_COLORS[1], type:'axe',    sprite:'hand_axe2.png' },
+    { name:'War Hammer',        rarity:1, tier:1, dmg:4,  speed:0.7, range:46, color:RARITY_COLORS[1], type:'mace',   sprite:'hammer2.png' },
+
+    // === TIER 2 — Blue (Rare) ===
+    { name:'War Axe',           rarity:2, tier:2, dmg:5,  speed:0.7, range:48, color:RARITY_COLORS[2], type:'axe',    sprite:'war_axe1.png' },
+    { name:'Crystal Staff',     rarity:2, tier:2, dmg:4,  speed:1.0, range:62, color:RARITY_COLORS[2], type:'staff',  sprite:'quarterstaff.png' },
+    { name:'Venom Fang',        rarity:2, tier:2, dmg:4,  speed:1.1, range:44, color:RARITY_COLORS[2], type:'dagger', sprite:'ankus.png' },
+    { name:'Broad Axe',         rarity:2, tier:2, dmg:5,  speed:0.7, range:50, color:RARITY_COLORS[2], type:'axe',    sprite:'broad_axe1.png' },
+    { name:'Battle Axe',        rarity:2, tier:2, dmg:6,  speed:0.6, range:52, color:RARITY_COLORS[2], type:'axe',    sprite:'battle_axe1.png' },
+    { name:'Flail',             rarity:2, tier:2, dmg:5,  speed:0.8, range:50, color:RARITY_COLORS[2], type:'mace',   sprite:'flail1.png' },
+    { name:'Glaive',            rarity:2, tier:2, dmg:5,  speed:0.8, range:60, color:RARITY_COLORS[2], type:'spear',  sprite:'glaive1.png' },
+    { name:'Halberd',           rarity:2, tier:2, dmg:6,  speed:0.7, range:64, color:RARITY_COLORS[2], type:'spear',  sprite:'halberd1.png' },
+
+    // === TIER 3 — Purple (Epic) ===
+    { name:'Flame Sword',       rarity:3, tier:3, dmg:7,  speed:0.8, range:55, color:RARITY_COLORS[3], type:'sword',  sprite:'demon_blade.png' },
+    { name:'Frost Mace',        rarity:3, tier:3, dmg:6,  speed:0.7, range:50, color:RARITY_COLORS[3], type:'mace',   sprite:'great_flail1.png' },
+    { name:'Thunder Spear',     rarity:3, tier:3, dmg:8,  speed:0.6, range:68, color:RARITY_COLORS[3], type:'spear',  sprite:'demon_trident.png' },
+    { name:'Katana',            rarity:3, tier:3, dmg:7,  speed:1.0, range:56, color:RARITY_COLORS[3], type:'sword',  sprite:'katana1.png' },
+    { name:'Great Sword',       rarity:3, tier:3, dmg:9,  speed:0.6, range:58, color:RARITY_COLORS[3], type:'sword',  sprite:'greatsword1.png' },
+    { name:'Executioner Axe',   rarity:3, tier:3, dmg:10, speed:0.5, range:56, color:RARITY_COLORS[3], type:'axe',    sprite:'executioner_axe1.png' },
+    { name:'Bardiche',          rarity:3, tier:3, dmg:8,  speed:0.6, range:66, color:RARITY_COLORS[3], type:'spear',  sprite:'bardiche1.png' },
+    { name:'Double Sword',      rarity:3, tier:3, dmg:8,  speed:0.9, range:52, color:RARITY_COLORS[3], type:'sword',  sprite:'double_sword.png' },
+
+    // === TIER 4 — Gold (Legendary) ===
+    { name:'Dragon Claw',       rarity:4, tier:4, dmg:10, speed:0.9, range:58, color:RARITY_COLORS[4], type:'claw',   sprite:'triple_sword.png' },
+    { name:'Arcane Blade',      rarity:4, tier:4, dmg:12, speed:0.8, range:62, color:RARITY_COLORS[4], type:'sword',  sprite:'blessed_blade.png' },
+    { name:'Holy Scourge',      rarity:4, tier:4, dmg:11, speed:0.8, range:60, color:RARITY_COLORS[4], type:'mace',   sprite:'holy_scourge.png' },
+    { name:'Demon Whip',        rarity:4, tier:4, dmg:10, speed:1.1, range:64, color:RARITY_COLORS[4], type:'mace',   sprite:'demon_whip.png' },
+    { name:'Lajatang',          rarity:4, tier:4, dmg:11, speed:0.9, range:62, color:RARITY_COLORS[4], type:'spear',  sprite:'lajatang1.png' },
+
+    // === TIER 5 — Red (Mythic) ===
+    { name:'Scythe of Curses',  rarity:5, tier:5, dmg:15, speed:0.7, range:72, color:RARITY_COLORS[5], type:'spear',  sprite:'artefact/spwpn_scythe_of_curses.png' },
+    { name:'Sword of Cerebov',  rarity:5, tier:5, dmg:18, speed:0.8, range:68, color:RARITY_COLORS[5], type:'sword',  sprite:'artefact/spwpn_sword_of_cerebov.png' },
+    { name:'Wrath of Trog',     rarity:5, tier:5, dmg:16, speed:0.9, range:62, color:RARITY_COLORS[5], type:'mace',   sprite:'artefact/spwpn_wrath_of_trog.png' },
+    { name:'Staff of Dispater', rarity:5, tier:5, dmg:14, speed:1.0, range:76, color:RARITY_COLORS[5], type:'staff',  sprite:'artefact/spwpn_staff_of_dispater.png' },
 ];
 
 function makeWeapon(template) {
-    return { name:template.name, tier:template.tier, dmg:template.dmg, speed:template.speed, range:template.range, color:template.color, type:template.type, enchant:null };
+    return { name:template.name, rarity:template.rarity||0, tier:template.tier, dmg:template.dmg, speed:template.speed, range:template.range, color:template.color, type:template.type, sprite:template.sprite||null, enchant:null };
 }
 
 function getWeaponDropPool(floor, isBoss) {
-    if (isBoss) return WEAPONS.filter(function(w){ return w.tier >= floor && w.tier <= floor+1; });
-    return WEAPONS.filter(function(w){ return w.tier >= Math.max(0,floor-1) && w.tier <= floor; });
+    var maxRarity = isBoss ? Math.min(5, floor+1) : Math.min(4, floor);
+    var minRarity = Math.max(0, floor-1);
+    // Boss can drop higher rarity, elite drops at current tier, normal drops lower
+    return WEAPONS.filter(function(w){ return w.rarity >= minRarity && w.rarity <= maxRarity; });
 }
 
 // ============ GAME DATA ============
@@ -280,6 +322,56 @@ const BIOMES = [
       wallTint:'rgba(60,70,20,0.15)', wallHighlight:'rgba(120,140,40,0.06)',
       herbs:['swampGoo','purpleMoss','greenLeaf'], enemyType:'swamp' }
 ];
+// ============ ENEMY TYPES ============
+// skill types: charge, poison, split, leech, shield, summon, rage, teleport, slam, shoot
+const ENEMY_TYPES = {
+    // === Forest ===
+    rat:      { name:'Rat',       nameZh:'老鼠',     hp:1.0, atk:0.8, spd:1.1, color:'#996644', desc:'A common pest, weak but numerous.',     descZh:'常见害虫，弱但数量众多。', skills:[] },
+    wolf:     { name:'Wolf',      nameZh:'狼',       hp:1.5, atk:1.3, spd:1.2, color:'#888888', desc:'Hunts in packs, fast and fierce.',       descZh:'成群狩猎，速度极快。', skills:['charge'] },
+    bear:     { name:'Bear',      nameZh:'熊',       hp:3.0, atk:1.8, spd:0.7, color:'#885533', desc:'A massive beast with thunderous swipes.', descZh:'体型巨大，横扫一切。', skills:['slam'] },
+    bee:      { name:'Giant Bee', nameZh:'巨蜂',    hp:0.8, atk:1.0, spd:1.4, color:'#ffcc00', desc:'Stings and leaves venom behind.',         descZh:'蜂刺留下毒素。', skills:['poison'] },
+    hound:    { name:'Hound',     nameZh:'猎犬',    hp:1.2, atk:1.2, spd:1.3, color:'#aa6633', desc:'Trained for war, charges without fear.',  descZh:'受训战犬，无惧冲锋。', skills:['charge'] },
+    // Forest Elites
+    wolf_pack:{ name:'Wolf Pack Alpha', nameZh:'狼群首领', hp:2.5, atk:1.8, spd:1.2, color:'#aaaaaa', isEliteType:true,
+                desc:'The alpha of the pack. Summons wolves and charges from afar.', descZh:'狼群首领，召唤狼群并从远处冲锋。',
+                skills:['charge','summon'] },
+    // Forest Boss
+    grizzly:  { name:'Ancient Grizzly', nameZh:'远古灰熊', hp:8.0, atk:2.5, spd:0.8, color:'#885533', isBossType:true,
+                desc:'An ancient bear awakened from centuries of slumber. Its roar shakes the earth.', descZh:'沉睡数百年的远古灰熊，怒吼使大地颤抖。',
+                skills:['slam','charge','rage'], skillDescs:['Ground Slam: deals AoE damage','Furious Charge: rushes the player','Enrage: doubles speed below 40% HP'] },
+    // === Cave ===
+    bat:      { name:'Giant Bat',    nameZh:'巨蝙蝠',  hp:0.7, atk:0.9, spd:1.5, color:'#664488', desc:'Swoops from the darkness without warning.', descZh:'从黑暗中突然俯冲。', skills:[] },
+    spider:   { name:'Wolf Spider',  nameZh:'狼蛛',    hp:1.0, atk:1.1, spd:1.1, color:'#886644', desc:'Weaves webs to slow prey.',                 descZh:'结网减缓猎物。', skills:['poison'] },
+    centipede:{ name:'Centipede',    nameZh:'蜈蚣',    hp:1.3, atk:1.0, spd:1.0, color:'#447744', desc:'Coils around victims, hard to shake off.',   descZh:'缠绕猎物，难以摆脱。', skills:['poison'] },
+    beetle:   { name:'Boulder Beetle',nameZh:'磐石甲虫',hp:2.5, atk:1.4, spd:0.6, color:'#557733', desc:'Armored shell deflects weak blows.',        descZh:'装甲外壳偏转弱攻击。', skills:['shield'] },
+    // Cave Elites
+    tarantella:{ name:'Tarantella',  nameZh:'毒舞蜘蛛', hp:2.0, atk:1.6, spd:1.3, color:'#aa4488', isEliteType:true,
+                desc:'A venomous dance spider that poisons and teleports.', descZh:'有毒的舞蹈蜘蛛，下毒并瞬移。',
+                skills:['poison','teleport'] },
+    // Cave Boss
+    kraken:   { name:'Cave Kraken',  nameZh:'洞穴克拉肯', hp:10.0, atk:2.2, spd:0.6, color:'#224488', isBossType:true,
+                desc:'A tentacled horror from the deep cave. Its ink blinds, its grip crushes.', descZh:'来自深洞的触手恐魔，墨汁致盲，握力粉碎一切。',
+                skills:['slam','shoot','summon'], skillDescs:['Ink Blast: blinds player briefly','Tentacle Slam: crushes nearby enemies','Summon Spawn: calls small tentacles'] },
+    // === Swamp ===
+    frog:     { name:'Giant Frog',   nameZh:'巨蛙',    hp:1.0, atk:1.0, spd:0.9, color:'#448833', desc:'Leaps unexpectedly at prey.',              descZh:'出人意料地跳向猎物。', skills:[] },
+    lizard:   { name:'Komodo Dragon',nameZh:'科莫多龙', hp:2.0, atk:1.5, spd:0.8, color:'#668833', desc:'Venomous bite causes lasting damage.',      descZh:'毒性咬伤造成持续伤害。', skills:['poison'] },
+    leech:    { name:'Giant Leech',  nameZh:'巨蚂蟥',  hp:1.5, atk:0.9, spd:0.7, color:'#884433', desc:'Drains life force from its victim.',        descZh:'吸取受害者的生命力。', skills:['leech'] },
+    croc:     { name:'Crocodile',    nameZh:'鳄鱼',    hp:2.5, atk:1.6, spd:0.7, color:'#446633', desc:'Lurks in water, ambushes from close range.', descZh:'潜伏水中，近距离伏击。', skills:['charge'] },
+    // Swamp Elites
+    anaconda: { name:'Anaconda',     nameZh:'水蟒',    hp:3.0, atk:1.7, spd:0.9, color:'#336644', isEliteType:true,
+                desc:'A massive serpent that squeezes the life from prey.', descZh:'巨型蛇类，将猎物活活压死。',
+                skills:['leech','charge'] },
+    // Swamp Boss
+    dragon:   { name:'Swamp Dragon', nameZh:'沼泽龙',  hp:12.0, atk:3.0, spd:0.9, color:'#228844', isBossType:true,
+                desc:'An ancient dragon that has claimed the swamp as its domain. Breathes acid, summons minions, and enrages when wounded.', descZh:'古老的龙，以沼泽为领地。喷射酸液，召唤仆从，受伤后狂怒。',
+                skills:['shoot','summon','rage'], skillDescs:['Acid Breath: deals poison damage in cone','Call Minions: summons lizards and frogs','Blood Rage: +50% ATK below 30% HP'] },
+};
+
+// Bestiary (seen enemies tracker)
+let seenEnemies = {};
+let showBestiary = false;
+let bestiaryPage = 0;
+
 const HERBS = {
     greenLeaf:  { name:'Green Leaf',   yields:['vita','herba'],  biome:'Forest' },
     redBerry:   { name:'Red Berry',    yields:['vita','ignis'],  biome:'Forest' },
@@ -740,13 +832,22 @@ function setupFloor(biomeIdx, floor){
                 var pos=findOpenTile(r);
                 var isElite = (j===0 && i>1 && Math.random()<0.3+floor*0.15);
                 var hpMul = isElite?2.5:1, atkMul = isElite?1.8:1;
+                // Assign enemy type key based on biome and elite status
+                var biomeEnemyPools={
+                    forest:{normal:['rat','wolf','bear','bee','hound'],elite:['wolf_pack']},
+                    cave:{normal:['bat','spider','centipede','beetle'],elite:['tarantella']},
+                    swamp:{normal:['frog','lizard','leech','croc'],elite:['anaconda']}
+                };
+                var bName=currentBiome.enemyType||'forest';
+                var ePool=biomeEnemyPools[bName]||(biomeEnemyPools.forest);
+                var eTypeKey=isElite?ePool.elite[randInt(0,ePool.elite.length-1)]:ePool.normal[randInt(0,ePool.normal.length-1)];
                 enemies.push({
                     x:pos.x,y:pos.y,angle:Math.random()*Math.PI*2,
                     hp:Math.ceil(baseHP*hpMul), maxHp:Math.ceil(baseHP*hpMul),
                     radius:isElite?9:7, alert:false, alertTimer:0,
                     patrolAngle:Math.random()*Math.PI*2, patrolTimer:randInt(60,180),
                     animFrame:0, attackCD:0, atk:Math.ceil(baseATK*atkMul),
-                    isElite:isElite, isBoss:false
+                    isElite:isElite, isBoss:false, enemyTypeKey:eTypeKey
                 });
             }
         }
@@ -757,13 +858,15 @@ function setupFloor(biomeIdx, floor){
         var bossHP = baseHP*6+expeditionNum*3;
         var bossATK = Math.ceil(baseATK*2.5);
         var bcx=Math.floor(MAP_W/2)*TILE+TILE/2, bcy=Math.floor(MAP_H/2)*TILE+TILE/2;
+        var bossTypeKeys={forest:'grizzly',cave:'kraken',swamp:'dragon'};
+        var bossTypeKey=bossTypeKeys[currentBiome.enemyType]||'grizzly';
         var boss={
             x:bcx,y:bcy,angle:0,
             hp:bossHP, maxHp:bossHP,
             radius:16, alert:true, alertTimer:9999,
             patrolAngle:0, patrolTimer:60,
             animFrame:0, attackCD:0, atk:bossATK,
-            isElite:false, isBoss:true,
+            isElite:false, isBoss:true, enemyTypeKey:bossTypeKey,
             // Boss special properties
             chargeCD:0, charging:false, chargeAngle:0, chargeTimer:0,
             slamCD:0
@@ -1304,6 +1407,12 @@ function update(){
         if(playerStats.stealth>0&&!e.alert) canSee=canSee&&d<60;
         if(canSee||(e.alert&&d<200)){
             e.alert=true;e.alertTimer=180;
+            // Record to bestiary on first sight
+            if(canSee&&e.enemyTypeKey){
+                var etKey=e.enemyTypeKey;
+                if(!seenEnemies[etKey]) seenEnemies[etKey]={count:0,sprite:e.sprite||null};
+                if(!e._seenRecorded){seenEnemies[etKey].count++;e._seenRecorded=true;}
+            }
             e.angle=angleTo(e,player);
             var espd = e.isElite?ENEMY_SPEED*1.1:ENEMY_SPEED*1.2;
             if(d>28) tryMove(e,Math.cos(e.angle)*espd,Math.sin(e.angle)*espd);
@@ -1412,11 +1521,17 @@ function update(){
         }
     }
 
-    // Stairs zone (next floor)
+    // Stairs zone (next floor) - locked until all enemies defeated
     if(stairsZone){
         if(dist(player,stairsZone)<24){
-            extracting++;
-            if(extracting>=120){extracting=0;goNextFloor();return;}
+            if(enemies.length>0){
+                // Show locked message
+                if(frameCount%60===0) spawnFloat(stairsZone.x,stairsZone.y-20,lang==='zh'?'消灭所有敌人!':'Defeat all enemies!','#ff6644');
+                extracting=0;
+            } else {
+                extracting++;
+                if(extracting>=120){extracting=0;goNextFloor();return;}
+            }
         } else extracting=0;
     }
 
@@ -2152,6 +2267,7 @@ function renderExpedition(){
     if(isMobile) drawMobileStick();
 
     // Popups (drawn on top of everything)
+    if(showBestiary) drawBestiary();
     if(weaponPopup) drawWeaponPopup();
     if(merchantPopup) drawMerchantPopup();
     if(buffPopup) drawBuffPopup();
@@ -2464,6 +2580,20 @@ function drawExpeditionHUD(){
             }
         }
     }
+    // Bestiary book button (top-right, left of settings)
+    var bookX=W-72,bookY=14,bookS=26;
+    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(bookX,bookY,bookS,bookS);
+    ctx.strokeStyle='#cc9944';ctx.lineWidth=1.5;ctx.strokeRect(bookX,bookY,bookS,bookS);
+    ctx.fillStyle='#cc9944';ctx.font='bold 16px monospace';ctx.textAlign='center';
+    ctx.fillText('\uD83D\uDCDA',bookX+bookS/2,bookY+bookS/2+5);
+    // Enemy count on floor
+    if(enemies.length>0&&stairsZone){
+        var remStr=(lang==='zh'?'剩余: ':'Left: ')+enemies.length;
+        ctx.fillStyle='rgba(0,0,0,0.5)';ctx.font='10px monospace';ctx.textAlign='center';
+        var remW=ctx.measureText(remStr).width+12;
+        ctx.fillRect(W/2-remW/2,56,remW,14);
+        ctx.fillStyle='#ff9944';ctx.fillText(remStr,W/2,66);
+    }
     // Settings gear in expedition
     drawSettingsGear(W-38,15,26);
 }
@@ -2702,6 +2832,101 @@ function drawWeaponModel(x,y,weapon,scale){
     ctx.restore();
 }
 
+function drawBestiary(){
+    var W=canvas.width,H=canvas.height;
+    ctx.fillStyle='rgba(0,0,0,0.75)';ctx.fillRect(0,0,W,H);
+    var pw=Math.min(W-30,420),ph=Math.min(H-30,520),px=(W-pw)/2,py=(H-ph)/2;
+    ctx.fillStyle='rgba(12,10,20,0.97)';ctx.fillRect(px,py,pw,ph);
+    ctx.strokeStyle='#cc9944';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
+
+    // Title
+    ctx.fillStyle='#cc9944';ctx.font='bold 16px monospace';ctx.textAlign='center';
+    ctx.fillText(lang==='zh'?'\uD83D\uDCDA 图鉴':'\uD83D\uDCDA Bestiary',W/2,py+26);
+
+    // Close button
+    var cbX=px+pw-32,cbY=py+6,cbS=24;
+    ctx.fillStyle='rgba(255,60,60,0.15)';ctx.fillRect(cbX,cbY,cbS,cbS);
+    ctx.strokeStyle='#ff4444';ctx.lineWidth=1;ctx.strokeRect(cbX,cbY,cbS,cbS);
+    ctx.fillStyle='#ff6666';ctx.font='bold 14px monospace';ctx.textAlign='center';
+    ctx.fillText('X',cbX+cbS/2,cbY+cbS/2+4);
+
+    var seenKeys=Object.keys(seenEnemies);
+    if(seenKeys.length===0){
+        ctx.fillStyle='#666';ctx.font='12px monospace';ctx.textAlign='center';
+        ctx.fillText(lang==='zh'?'尚未遇到任何敌人':'No enemies encountered yet',W/2,py+ph/2);
+    } else {
+        // Paged list
+        var perPage=5;
+        var totalPages=Math.ceil(seenKeys.length/perPage);
+        bestiaryPage=Math.max(0,Math.min(bestiaryPage,totalPages-1));
+        var startIdx=bestiaryPage*perPage;
+        var pageKeys=seenKeys.slice(startIdx,startIdx+perPage);
+        var iy=py+46;
+        for(var ki=0;ki<pageKeys.length;ki++){
+            var key=pageKeys[ki];
+            var data=seenEnemies[key];
+            var et=ENEMY_TYPES[key];
+            if(!et) continue;
+            var ex=px+12,ew=pw-24,eh=78;
+            // Background
+            var isBoss=et.isBossType,isElite=et.isEliteType;
+            var frameColor=isBoss?'#ff4444':(isElite?'#cc44ff':'#446688');
+            ctx.fillStyle='rgba(20,20,40,0.8)';ctx.fillRect(ex,iy,ew,eh);
+            ctx.strokeStyle=frameColor;ctx.lineWidth=1;ctx.strokeRect(ex,iy,ew,eh);
+            // Enemy sprite (circle placeholder)
+            var sprX=ex+34,sprY=iy+eh/2;
+            if(SPR.customEnemies&&data.sprite){
+                ctx.save();ctx.translate(sprX,sprY);
+                ctx.drawImage(data.sprite,-16,-16,32,32);
+                ctx.restore();
+            } else {
+                ctx.fillStyle=et.color||'#888';
+                ctx.beginPath();ctx.arc(sprX,sprY,14,0,Math.PI*2);ctx.fill();
+            }
+            // Type badge
+            if(isBoss){ ctx.fillStyle='#ff4444';ctx.font='bold 8px monospace';ctx.textAlign='center';ctx.fillText('BOSS',sprX,iy+eh-4); }
+            else if(isElite){ ctx.fillStyle='#cc44ff';ctx.font='bold 8px monospace';ctx.textAlign='center';ctx.fillText('ELITE',sprX,iy+eh-4); }
+            // Name
+            var nameStr=lang==='zh'?(et.nameZh||et.name):et.name;
+            ctx.fillStyle=frameColor;ctx.font='bold 12px monospace';ctx.textAlign='left';
+            ctx.fillText(nameStr,ex+70,iy+16);
+            // Seen count
+            ctx.fillStyle='#888';ctx.font='9px monospace';
+            ctx.fillText((lang==='zh'?'遇到 ':'Seen ')+data.count+'x',ex+70,iy+29);
+            // Description
+            var desc=lang==='zh'?(et.descZh||et.desc):et.desc;
+            ctx.fillStyle='#aaa';ctx.font='10px monospace';
+            // Word wrap
+            var words=desc.split(' '),line='',descY=iy+43;
+            for(var wi=0;wi<words.length;wi++){
+                var test=line+(line?' ':'')+words[wi];
+                if(ctx.measureText(test).width>ew-80&&line){
+                    ctx.fillText(line,ex+70,descY);descY+=13;line=words[wi];
+                    if(descY>iy+eh-4) break;
+                } else line=test;
+            }
+            if(line&&descY<=iy+eh-4) ctx.fillText(line,ex+70,descY);
+            // Skills
+            if(et.skills&&et.skills.length>0){
+                ctx.fillStyle='#ffcc44';ctx.font='9px monospace';
+                ctx.fillText('['+et.skills.join(', ')+']',ex+70,iy+eh-6);
+            }
+            iy+=eh+6;
+        }
+        // Page nav
+        if(totalPages>1){
+            ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
+            ctx.fillText((bestiaryPage+1)+'/'+totalPages,W/2,py+ph-14);
+            // Prev/Next buttons
+            if(bestiaryPage>0){ctx.fillStyle='#44aaff';ctx.fillText('< PREV',px+70,py+ph-14);}
+            if(bestiaryPage<totalPages-1){ctx.fillStyle='#44aaff';ctx.fillText('NEXT >',px+pw-70,py+ph-14);}
+        }
+    }
+    // Seen count summary
+    ctx.fillStyle='#666';ctx.font='9px monospace';ctx.textAlign='left';
+    ctx.fillText((lang==='zh'?'已发现: ':'Discovered: ')+seenKeys.length+'/'+Object.keys(ENEMY_TYPES).length,px+10,py+ph-14);
+}
+
 function drawWeaponPopup(){
     var W=canvas.width,H=canvas.height;
     ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
@@ -2710,17 +2935,30 @@ function drawWeaponPopup(){
     ctx.strokeStyle='#ffd700';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
 
     var w=weaponPopup.weapon;
+    var rarityColor=RARITY_COLORS[w.rarity||0];
+    var rarityName=RARITY_NAMES[w.rarity||0];
+    ctx.strokeStyle=rarityColor;ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
     ctx.fillStyle='#ffd700';ctx.font='bold 16px monospace';ctx.textAlign='center';
     ctx.fillText(T('weaponFound'),W/2,py+28);
 
-    // Draw weapon model
-    drawWeaponModel(W/2,py+70,w,1.8);
+    // Draw weapon image (sprite) or fallback model
+    var sprImg=SPR.weapons&&SPR.weapons[w.name];
+    if(sprImg){
+        ctx.save();ctx.translate(W/2,py+72);
+        ctx.drawImage(sprImg,-22,-22,44,44);
+        ctx.restore();
+    } else {
+        drawWeaponModel(W/2,py+70,w,1.8);
+    }
 
-    // New weapon
-    ctx.fillStyle=w.color;ctx.font='bold 14px monospace';
-    ctx.fillText(weaponName(w),W/2,py+115);
+    // New weapon with rarity color and label
+    var rarityLabel='['+rarityName+']';
+    ctx.fillStyle=rarityColor;ctx.font='bold 11px monospace';
+    ctx.fillText(rarityLabel,W/2,py+108);
+    ctx.fillStyle=rarityColor;ctx.font='bold 14px monospace';
+    ctx.fillText(weaponName(w),W/2,py+124);
     ctx.fillStyle='#aaa';ctx.font='11px monospace';
-    ctx.fillText(T('dmg')+':'+w.dmg+' '+T('spd')+':'+w.speed.toFixed(1)+' '+T('rng')+':'+w.range+' T'+w.tier,W/2,py+133);
+    ctx.fillText(T('dmg')+':'+w.dmg+' '+T('spd')+':'+w.speed.toFixed(1)+' '+T('rng')+':'+w.range,W/2,py+140);
 
     // Current weapon
     if(equippedWeapon){
@@ -4571,10 +4809,25 @@ canvas.addEventListener('click',function(e){
     else if(state==='expedition'){
         if(showSettings){handleSettingsClick(cx,cy);return;}
         if(tutorialPhase==='expedition'){handleTutorialClick(cx,cy);return;}
+        if(showBestiary){
+            // Handle bestiary close/nav
+            var W2=canvas.width,H2=canvas.height;
+            var pw2=Math.min(W2-30,420),ph2=Math.min(H2-30,520),px2=(W2-pw2)/2,py2=(H2-ph2)/2;
+            var cbX2=px2+pw2-32,cbY2=py2+6,cbS2=24;
+            if(cx>=cbX2&&cx<=cbX2+cbS2&&cy>=cbY2&&cy<=cbY2+cbS2){showBestiary=false;playSound('click');return;}
+            var perPage2=5,totalPages2=Math.ceil(Object.keys(seenEnemies).length/perPage2);
+            if(cy>=py2+ph2-30&&cy<=py2+ph2){
+                if(cx<W2/2-30&&bestiaryPage>0){bestiaryPage--;playSound('click');}
+                else if(cx>W2/2+30&&bestiaryPage<totalPages2-1){bestiaryPage++;playSound('click');}
+            }
+            return;
+        }
         if(weaponPopup||merchantPopup||buffPopup){handleExpeditionPopupClick(cx,cy);return;}
         // Settings gear
         var W=canvas.width;
         if(cx>=W-38&&cx<=W-12&&cy>=15&&cy<=41){showSettings=true;playSound('click');return;}
+        // Bestiary book button
+        if(cx>=W-72&&cx<=W-46&&cy>=14&&cy<=40){showBestiary=true;bestiaryPage=0;playSound('click');return;}
         // Click on buff icons (left side)
         if(window.renderedBuffs&&window.renderedBuffs.length>0){
             for(var bi=0;bi<window.renderedBuffs.length;bi++){
@@ -4738,7 +4991,8 @@ function saveGame(){
         inventory:inventory, equippedWeapon:equippedWeapon,
         discoveredRecipes:discoveredRecipes, carriedPotions:carriedPotions,
         researchLevels:researchLevels, foundCollectibles:foundCollectibles,
-        playerKeys:playerKeys, lang:lang, unlockedSkills:unlockedSkills
+        playerKeys:playerKeys, lang:lang, unlockedSkills:unlockedSkills,
+        seenEnemies:seenEnemies
     };
     try{ localStorage.setItem('alchemist_save',JSON.stringify(data)); labMessage=T('saved'); labMessageTimer=90; }
     catch(e){ labMessage='Save failed'; labMessageTimer=90; }
@@ -4751,6 +5005,7 @@ function loadGame(){
         gold=data.gold||0; totalScore=data.totalScore||0; expeditionNum=data.expeditionNum||0;
         inventory=data.inventory||{herbs:{},essences:{},potions:[],weapons:[]};
         equippedWeapon=data.equippedWeapon||makeWeapon(WEAPONS[0]);
+        if(data.seenEnemies) seenEnemies=data.seenEnemies;
         
         // Fix missing type property in old saves
         if(equippedWeapon&&!equippedWeapon.type){
