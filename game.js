@@ -4428,67 +4428,176 @@ function drawLabSkills(cy){
 }
 
 function drawLabBestiary(cy){
-    var W=canvas.width;
-    var pw=Math.min(W-40,520),ppx=(W-pw)/2;
+    // Book-style bestiary: one enemy per spread, left page = portrait, right page = stats+desc
+    var W=canvas.width,H=canvas.height;
+    var bW=Math.min(W-20,560),bH=Math.min(H-80,400);
+    var bX=(W-bW)/2,bY=cy-10;
     var seenKeys=Object.keys(seenEnemies);
-    ctx.fillStyle='#888';ctx.font='11px monospace';ctx.textAlign='center';
-    ctx.fillText((lang==='zh'?'已发现: ':'Discovered: ')+seenKeys.length+'/'+Object.keys(ENEMY_TYPES).length,W/2,cy);cy+=20;
-    if(seenKeys.length===0){
-        ctx.fillStyle='#666';ctx.font='12px monospace';
-        ctx.fillText(lang==='zh'?'尚未遇到任何敌人':'No enemies encountered yet',W/2,cy+40);
+    var total=seenKeys.length;
+    bestiaryPage=Math.max(0,Math.min(bestiaryPage,total-1));
+
+    // Discovered counter
+    ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
+    ctx.fillText((lang==='zh'?'已发现: ':'Discovered: ')+total+'/'+Object.keys(ENEMY_TYPES).length,W/2,bY-4);
+
+    if(total===0){
+        ctx.fillStyle='#666';ctx.font='12px monospace';ctx.textAlign='center';
+        ctx.fillText(lang==='zh'?'尚未遇到任何敌人':'No enemies encountered yet',W/2,bY+bH/2);
         return;
     }
-    var perPage=4,totalPages=Math.ceil(seenKeys.length/perPage);
-    bestiaryPage=Math.max(0,Math.min(bestiaryPage,totalPages-1));
-    var startIdx=bestiaryPage*perPage;
-    var pageKeys=seenKeys.slice(startIdx,startIdx+perPage);
-    for(var ki=0;ki<pageKeys.length;ki++){
-        var key=pageKeys[ki];
-        var data=seenEnemies[key];
-        var et=ENEMY_TYPES[key];
-        if(!et) continue;
-        var ew=pw-24,eh=82;
-        var ex2=ppx+12;
-        var isBoss=et.isBossType,isElite=et.isEliteType;
-        var frameColor2=isBoss?'#ff4444':(isElite?'#cc44ff':'#446688');
-        ctx.fillStyle='rgba(20,20,40,0.8)';ctx.fillRect(ex2,cy,ew,eh);
-        ctx.strokeStyle=frameColor2;ctx.lineWidth=1;ctx.strokeRect(ex2,cy,ew,eh);
-        // Color circle (placeholder sprite)
-        ctx.fillStyle=et.color||'#888';
-        ctx.beginPath();ctx.arc(ex2+34,cy+eh/2,14,0,Math.PI*2);ctx.fill();
-        if(isBoss){ctx.fillStyle='#ff4444';ctx.font='bold 8px monospace';ctx.textAlign='center';ctx.fillText('BOSS',ex2+34,cy+eh-4);}
-        else if(isElite){ctx.fillStyle='#cc44ff';ctx.font='bold 8px monospace';ctx.textAlign='center';ctx.fillText('ELITE',ex2+34,cy+eh-4);}
-        var nameStr2=lang==='zh'?(et.nameZh||et.name):et.name;
-        ctx.fillStyle=frameColor2;ctx.font='bold 12px monospace';ctx.textAlign='left';
-        ctx.fillText(nameStr2,ex2+70,cy+16);
-        ctx.fillStyle='#888';ctx.font='9px monospace';
-        ctx.fillText((lang==='zh'?'遇到 ':'Seen ')+data.count+'x',ex2+70,cy+29);
-        var desc2=lang==='zh'?(et.descZh||et.desc):et.desc;
-        ctx.fillStyle='#aaa';ctx.font='10px monospace';
-        var words2=desc2.split(' '),line2='',descY2=cy+42;
-        for(var wi2=0;wi2<words2.length;wi2++){
-            var test2=line2+(line2?' ':'')+words2[wi2];
-            if(ctx.measureText(test2).width>ew-80&&line2){
-                ctx.fillText(line2,ex2+70,descY2);descY2+=13;line2=words2[wi2];
-                if(descY2>cy+eh-8) break;
-            } else line2=test2;
-        }
-        if(line2&&descY2<=cy+eh-8) ctx.fillText(line2,ex2+70,descY2);
-        if(et.skills&&et.skills.length>0){
-            ctx.fillStyle='#ffcc44';ctx.font='9px monospace';
-            ctx.fillText('['+et.skills.join(', ')+']',ex2+70,cy+eh-6);
-        }
-        cy+=eh+6;
+
+    var key=seenKeys[bestiaryPage];
+    var data=seenEnemies[key];
+    var et=ENEMY_TYPES[key];
+    if(!et) return;
+
+    var isBoss=et.isBossType,isElite=et.isEliteType;
+    var accentColor=isBoss?'#ff4444':(isElite?'#cc44ff':'#88bbdd');
+    var midX=bX+bW/2;
+
+    // ---- Book background ----
+    // Left page
+    ctx.fillStyle='#1a1428';ctx.fillRect(bX,bY,bW/2,bH);
+    ctx.strokeStyle=accentColor;ctx.lineWidth=2;ctx.strokeRect(bX,bY,bW/2,bH);
+    // Right page
+    ctx.fillStyle='#12101e';ctx.fillRect(midX,bY,bW/2,bH);
+    ctx.strokeStyle=accentColor;ctx.lineWidth=2;ctx.strokeRect(midX,bY,bW/2,bH);
+    // Spine
+    ctx.fillStyle='#2a2040';ctx.fillRect(midX-3,bY,6,bH);
+    ctx.strokeStyle=accentColor;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(midX,bY);ctx.lineTo(midX,bY+bH);ctx.stroke();
+
+    // ---- LEFT PAGE: portrait ----
+    var lCx=bX+bW/4, lCy=bY+bH/2-20;
+    // Large circle portrait
+    var circR=Math.min(bW/6,60);
+    ctx.save();
+    ctx.shadowColor=et.color||'#888';ctx.shadowBlur=18;
+    ctx.fillStyle=et.color||'#888';
+    ctx.beginPath();ctx.arc(lCx,lCy,circR,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    // Glow ring
+    ctx.strokeStyle=accentColor;ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(lCx,lCy,circR+4,0,Math.PI*2);ctx.stroke();
+    // Type badge
+    if(isBoss){
+        ctx.fillStyle='#ff4444';ctx.fillRect(lCx-22,lCy+circR+8,44,16);
+        ctx.fillStyle='#fff';ctx.font='bold 9px monospace';ctx.textAlign='center';
+        ctx.fillText('BOSS',lCx,lCy+circR+19);
+    } else if(isElite){
+        ctx.fillStyle='#cc44ff';ctx.fillRect(lCx-22,lCy+circR+8,44,16);
+        ctx.fillStyle='#fff';ctx.font='bold 9px monospace';ctx.textAlign='center';
+        ctx.fillText('ELITE',lCx,lCy+circR+19);
     }
-    // Page nav — fixed at panel bottom so click detection aligns
-    var H2=canvas.height;
-    var ph2=Math.min(H2-60,500),ppy2=(H2-ph2)/2;
-    var navY=ppy2+ph2-20;
-    if(totalPages>1){
-        ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
-        ctx.fillText((bestiaryPage+1)+'/'+totalPages,W/2,navY);
-        if(bestiaryPage>0){ctx.fillStyle='#44aaff';ctx.fillText(lang==='zh'?'< 上页':'< PREV',ppx+60,navY);}
-        if(bestiaryPage<totalPages-1){ctx.fillStyle='#44aaff';ctx.fillText(lang==='zh'?'下页 >':'NEXT >',ppx+pw-60,navY);}
+    // Name (left page bottom)
+    var nameStr=lang==='zh'?(et.nameZh||et.name):et.name;
+    ctx.fillStyle=accentColor;ctx.font='bold 14px monospace';ctx.textAlign='center';
+    ctx.fillText(nameStr,lCx,bY+bH-40);
+    // Seen count
+    ctx.fillStyle='#888';ctx.font='9px monospace';
+    ctx.fillText((lang==='zh'?'遭遇 ':'Seen ')+data.count+'x',lCx,bY+bH-26);
+    // Page number bottom-left
+    ctx.fillStyle='#555';ctx.font='9px monospace';
+    ctx.fillText((bestiaryPage+1)+'/'+total,lCx,bY+bH-10);
+
+    // ---- RIGHT PAGE: stats + desc ----
+    var rX=midX+14,rW=bW/2-28,ry=bY+18;
+    // Name header
+    ctx.fillStyle=accentColor;ctx.font='bold 13px monospace';ctx.textAlign='left';
+    ctx.fillText(nameStr,rX,ry);ry+=18;
+    // Divider
+    ctx.strokeStyle=accentColor;ctx.lineWidth=1;ctx.globalAlpha=0.4;
+    ctx.beginPath();ctx.moveTo(rX,ry);ctx.lineTo(rX+rW,ry);ctx.stroke();
+    ctx.globalAlpha=1;ry+=12;
+
+    // Stats row
+    var stats=[
+        {k:lang==='zh'?'生命':'HP', v:et.hp.toFixed(1), c:'#ff6666'},
+        {k:lang==='zh'?'攻击':'ATK',v:et.atk.toFixed(1),c:'#ff9944'},
+        {k:lang==='zh'?'速度':'SPD',v:et.spd.toFixed(1),c:'#44ddff'},
+    ];
+    var statW=rW/3;
+    for(var si=0;si<stats.length;si++){
+        var sx=rX+si*statW+statW/2;
+        ctx.fillStyle='#666';ctx.font='9px monospace';ctx.textAlign='center';
+        ctx.fillText(stats[si].k,sx,ry);
+        ctx.fillStyle=stats[si].c;ctx.font='bold 13px monospace';
+        ctx.fillText(stats[si].v,sx,ry+14);
+    }
+    ry+=34;
+
+    // Divider
+    ctx.strokeStyle='#334';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(rX,ry);ctx.lineTo(rX+rW,ry);ctx.stroke();
+    ry+=12;
+
+    // Description
+    var desc=lang==='zh'?(et.descZh||et.desc):et.desc;
+    ctx.fillStyle='#ccbbee';ctx.font='10px monospace';ctx.textAlign='left';
+    // Word-wrap description
+    var words=lang==='zh'?desc.split(''):desc.split(' ');
+    var line='',lineH=15,maxLineW=rW;
+    if(lang==='zh'){
+        var chars=desc.split(''),cLine='';
+        for(var ci=0;ci<chars.length;ci++){
+            var test=cLine+chars[ci];
+            if(ctx.measureText(test).width>maxLineW&&cLine){
+                ctx.fillText(cLine,rX,ry);ry+=lineH;cLine=chars[ci];
+                if(ry>bY+bH-70) break;
+            } else cLine=test;
+        }
+        if(cLine&&ry<=bY+bH-70){ctx.fillText(cLine,rX,ry);ry+=lineH;}
+    } else {
+        var ws=desc.split(' ');
+        for(var wi=0;wi<ws.length;wi++){
+            var tl=line+(line?' ':'')+ws[wi];
+            if(ctx.measureText(tl).width>maxLineW&&line){
+                ctx.fillText(line,rX,ry);ry+=lineH;line=ws[wi];
+                if(ry>bY+bH-70) break;
+            } else line=tl;
+        }
+        if(line&&ry<=bY+bH-70){ctx.fillText(line,rX,ry);ry+=lineH;}
+    }
+    ry+=6;
+
+    // Skills
+    if(et.skills&&et.skills.length>0){
+        ctx.strokeStyle='#334';ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(rX,ry);ctx.lineTo(rX+rW,ry);ctx.stroke();
+        ry+=12;
+        ctx.fillStyle='#888';ctx.font='9px monospace';ctx.textAlign='left';
+        ctx.fillText(lang==='zh'?'技能：':'Skills:',rX,ry);ry+=13;
+        var skillColorMap={charge:'#ff9944',poison:'#aa44dd',slam:'#ff6666',shoot:'#44aaff',
+            summon:'#ffcc44',rage:'#ff4444',leech:'#aa44aa',teleport:'#44ffcc',
+            split:'#88ff44',shield:'#44aaff'};
+        for(var ski=0;ski<et.skills.length;ski++){
+            var sk=et.skills[ski];
+            var skC=skillColorMap[sk]||'#aaa';
+            ctx.fillStyle=skC;ctx.font='bold 10px monospace';
+            ctx.fillText('▶ '+sk,rX+4,ry);
+            // skill desc if Boss
+            if(et.skillDescs&&et.skillDescs[ski]){
+                ctx.fillStyle='#888';ctx.font='9px monospace';
+                ctx.fillText('  '+et.skillDescs[ski].substring(0,Math.floor(rW/6)),rX+14,ry+11);
+                ry+=24;
+            } else {
+                ry+=14;
+            }
+            if(ry>bY+bH-16) break;
+        }
+    }
+
+    // ---- Navigation arrows (bottom of book) ----
+    var navY2=bY+bH+18;
+    ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
+    ctx.fillText((bestiaryPage+1)+'/'+total,W/2,navY2);
+    if(bestiaryPage>0){
+        ctx.fillStyle='#44aaff';ctx.font='bold 13px monospace';
+        ctx.fillText(lang==='zh'?'◀ 上一个':'◀ PREV',bX+60,navY2);
+    }
+    if(bestiaryPage<total-1){
+        ctx.fillStyle='#44aaff';ctx.font='bold 13px monospace';
+        ctx.fillText(lang==='zh'?'下一个 ▶':'NEXT ▶',bX+bW-60,navY2);
     }
 }
 
@@ -4846,18 +4955,21 @@ function handleLabClick(cx,cy){
     if(labTab){
         var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
         var ppx=(W-pw)/2,ppy=(H-ph)/2;
+        // Bestiary page nav: book-style, nav below book — check BEFORE out-of-bounds close
+        if(labTab==='bestiary'){
+            var bWb=Math.min(W-20,560),bHb=Math.min(H-80,400);
+            var bXb=(W-bWb)/2,contentYb=ppy+50;
+            var bYb=contentYb-10;
+            var navYb=bYb+bHb+18;
+            var totalB=Object.keys(seenEnemies).length;
+            if(cy>=navYb-14&&cy<=navYb+14){
+                if(cx>=bXb&&cx<W/2-20&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
+                if(cx>W/2+20&&cx<=bXb+bWb&&bestiaryPage<totalB-1){bestiaryPage++;playSound('click');return;}
+            }
+        }
         var cbS=28,cbX=ppx+pw-cbS-6,cbY=ppy+6;
         if(cx>=cbX&&cx<=cbX+cbS&&cy>=cbY&&cy<=cbY+cbS){labTab=null;labScrollY=0;selectedEssences=[];extractMini=null;playSound('click');return;}
         if(cx<ppx||cx>ppx+pw||cy<ppy||cy>ppy+ph){labTab=null;labScrollY=0;selectedEssences=[];extractMini=null;playSound('click');return;}
-        // Bestiary page nav (fixed bottom, navY = ppy+ph-20)
-        if(labTab==='bestiary'){
-            var perPageB=4,totalPagesB=Math.ceil(Object.keys(seenEnemies).length/perPageB);
-            var navYB=ppy+ph-20;
-            if(cy>=navYB-16&&cy<=ppy+ph){
-                if(cx>=ppx&&cx<W/2-20&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
-                if(cx>W/2+20&&cx<=ppx+pw&&bestiaryPage<totalPagesB-1){bestiaryPage++;playSound('click');return;}
-            }
-        }
         // Apply scroll offset for content area clicks
         cy = cy - labScrollY;
         var contentY=ppy+50;
