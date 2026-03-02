@@ -2461,11 +2461,12 @@ function renderExpedition(){
     }
     
     // Auto-rotating weapon circle (always active)
-    if(equippedWeapon&&SPR.weapons&&SPR.weapons[equippedWeapon.name]){
+    if(equippedWeapon){
         var wRange=equippedWeapon.range;
-        var weaponCount=8; // Number of weapons in the circle
-        var rotationSpeed=frameCount*0.05; // Continuous rotation
-        var circleRadius=wRange*1.0; // Radius matching weapon range
+        var weaponCount=8;
+        var rotationSpeed=frameCount*0.05;
+        var circleRadius=wRange*1.0;
+        var wSprite=SPR.weapons&&SPR.weapons[equippedWeapon.name];
         
         for(var i=0;i<weaponCount;i++){
             var angle=i*Math.PI*2/weaponCount+rotationSpeed;
@@ -2474,10 +2475,16 @@ function renderExpedition(){
             
             ctx.save();
             ctx.translate(wx,wy);
-            ctx.rotate(angle+Math.PI/2+Math.PI/4); // Weapon orientation (+135 degrees = perpendicular to circle)
+            ctx.rotate(angle+Math.PI/2+Math.PI/4);
             ctx.globalAlpha=0.9;
             var wSize=24;
-            ctx.drawImage(SPR.weapons[equippedWeapon.name],0,-wSize/2,wSize,wSize);
+            if(wSprite){
+                ctx.drawImage(wSprite,0,-wSize/2,wSize,wSize);
+            } else {
+                // Fallback: draw a colored bar
+                ctx.fillStyle=equippedWeapon.color||'#aabbcc';
+                ctx.fillRect(0,-wSize/2,4,wSize);
+            }
             ctx.restore();
         }
     }
