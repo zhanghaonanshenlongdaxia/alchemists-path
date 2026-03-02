@@ -509,6 +509,7 @@ let state = 'menu';
 let expeditionNum = 0, frameCount = 0;
 let inventory = { herbs:{}, essences:{}, potions:[], weapons:[] };
 let equippedWeapon = makeWeapon(WEAPONS[0]); // start with rusty dagger
+let forgedWeapon = null; // weapon forged in alchemy lab, carried into expedition
 let gold = 0;
 let discoveredRecipes = [];
 let totalScore = 0;
@@ -792,6 +793,7 @@ let explored = []; // 2D array same size as map
 let labTab = null;
 let selectedEssences = [];
 let labScrollY = 0, labScrollTouchId = -1, labScrollLastY = 0, labScrollMoved = false;
+let labScrollMax = 600; // dynamic, updated each frame by content height
 let merchantScrollY = 0, merchantScrollTouchId = -1, merchantScrollLastY = 0, merchantScrollMoved = false;
 let labMessage = '', labMessageTimer = 0;
 let extractMini = null;
@@ -1097,7 +1099,8 @@ function setupFloor(biomeIdx, floor){
     if(!isBossFloor){
     var biomeHerbs = currentBiome.herbs;
     for(var i=1;i<rooms.length;i++){
-        var r=rooms[i], hCount=randInt(1,3);
+        if(Math.random()>0.5) continue; // ~50% rooms have herbs
+        var r=rooms[i], hCount=randInt(1,2);
         for(var h=0;h<hCount;h++){
             var pos=findOpenTile(r);
             herbDrops.push({x:pos.x,y:pos.y,herbKey:biomeHerbs[randInt(0,biomeHerbs.length-1)],bobOffset:Math.random()*6.28,collected:false});
@@ -1115,7 +1118,7 @@ function setupFloor(biomeIdx, floor){
             x:cp.x, y:cp.y, opened:false, type:'normal',
             goldReward: randInt(3+floor*2, 8+floor*5),
             weaponReward: hasWeapon&&pool.length>0 ? makeWeapon(pool[randInt(0,pool.length-1)]) : null,
-            relicChance: Math.random()<0.2 // 20% chance relic choice
+            relicChance: Math.random()<0.08 // 8% chance relic choice
         });
     }
 
@@ -1160,10 +1163,9 @@ function setupFloor(biomeIdx, floor){
             }
         }
         if(doorPlaced){
-            // Key chest inside locked room — guaranteed relic choice on open
-            var cp = findOpenTile(lr);
-            chests.push({x:cp.x,y:cp.y,opened:false,type:'key_chest',
-                goldReward:randInt(8+floor*3,18+floor*6),weaponReward:null,relicGuaranteed:true});
+            // Store gold reward and relic trigger on the locked door itself
+            lockedDoors[lockedDoors.length-1].goldReward = randInt(8+floor*3,18+floor*6);
+            lockedDoors[lockedDoors.length-1].relicOnUnlock = true;
         }
     }
     } // end if(!isBossFloor)
@@ -1179,6 +1181,8 @@ function startExpedition(biomeIdx){
     attackCooldown=0; regenTimer=0; screenShake=0; extracting=0;
     killCounter=0; // reset for lifeSteal tracking
     expeditionFoundRelics = []; // reset expedition relics
+    // Equip forged weapon for this expedition (returns to forgedWeapon after)
+    equippedWeapon = forgedWeapon || makeWeapon(WEAPONS[0]);
     missionTimer = 90*60; // 90 seconds total
 
     // Generate shop stock for merchant
@@ -1235,7 +1239,7 @@ canvas.addEventListener('wheel',function(e){
     if(state==='lab'&&labTab){
         labScrollY-=e.deltaY;
         if(labScrollY>0) labScrollY=0;
-        if(labScrollY<-600) labScrollY=-600;
+        if(labScrollY<-labScrollMax) labScrollY=-labScrollMax;
         e.preventDefault();
     }
     if(state==='expedition'&&merchantPopup){
@@ -1328,7 +1332,7 @@ canvas.addEventListener('touchmove',function(e){
             if(Math.abs(dy)>3) labScrollMoved=true;
             labScrollY+=dy;
             if(labScrollY>0) labScrollY=0;
-            if(labScrollY<-600) labScrollY=-600;
+            if(labScrollY<-labScrollMax) labScrollY=-labScrollMax;
             labScrollLastY=t.clientY;
             continue;
         }
@@ -1404,6 +1408,17 @@ function update(){
             var gdrop=de.isBoss?randInt(15,30):(de.isElite?randInt(5,12):randInt(1,4));
             gold+=gdrop; spawnFloat(de.x,de.y-10,'+'+gdrop+' G','#ffd700');
             totalScore+=de.isBoss?50:(de.isElite?25:10);
+            if(de.isBoss){
+                bossDefeated=true; bossRef=null;
+                exitZone={x:Math.floor(MAP_W/2)*TILE+TILE/2,y:Math.floor(MAP_H/2)*TILE+TILE/2};
+                spawnFloat(player.x,player.y-30,T('bossDefeated'),'#ffdd44');
+                playSound('levelUp');
+                chests.push({x:de.x,y:de.y,opened:false,type:'boss_chest',
+                    goldReward:randInt(20+currentFloor*5,40+currentFloor*8),
+                    weaponReward:null,relicGuaranteed:true});
+            } else if(de.isElite){
+                if(Math.random()<0.3) openRelicChoice('elite');
+            }
             enemies.splice(dei,1);
         }
     }
@@ -1767,6 +1782,14 @@ function update(){
                 spawnFloat(ldx,ldy-10,T('key')+' -1','#ffcc44');
                 spawnParticles(ldx,ldy,'#ffcc44',8);
                 playSound('craft');
+                // Gold + guaranteed relic choice
+                if(ld.goldReward){
+                    gold+=ld.goldReward;
+                    spawnFloat(ldx,ldy-26,'+'+ld.goldReward+'G','#ffd700');
+                }
+                if(ld.relicOnUnlock){
+                    openRelicChoice('key_chest');
+                }
             } else {
                 // Show hint (only once per second)
                 if(frameCount%60===0) spawnFloat(ldx,ldy-10,T('needKey'),'#ff4444');
@@ -1864,6 +1887,8 @@ function update(){
 function endExpedition(){
     activeBuffs=[];
     carriedPotions=[]; // Clear used potions after expedition
+    // Restore pre-expedition weapon (expedition weapons are single-use)
+    equippedWeapon = forgedWeapon || makeWeapon(WEAPONS[0]);
     state='lab'; labTab=null;
     labMessage=T('expComplete');
     labMessageTimer=180;
@@ -2739,7 +2764,7 @@ function drawExpeditionHUD(){
 
     // Boss HP bar (big bar at top of screen)
     if(bossRef&&!bossDefeated){
-        var bhpW=Math.min(300,W*0.5),bhpH=12,bhpX=W/2-bhpW/2,bhpY=62;
+        var bhpW=Math.min(300,W*0.5),bhpH=12,bhpX=W/2-bhpW/2,bhpY=78;
         var bRatio=bossRef.hp/bossRef.maxHp;
         // Background
         ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(bhpX-2,bhpY-2,bhpW+4,bhpH+4);
@@ -2752,10 +2777,10 @@ function drawExpeditionHUD(){
             ctx.fillStyle='rgba(255,255,255,0.12)';ctx.fillRect(bhpX,bhpY,bhpW*bRatio,bhpH/2);
         }
         ctx.strokeStyle=bossPhase===1?'#ff4400':'rgba(255,100,100,0.5)';ctx.lineWidth=1;ctx.strokeRect(bhpX-2,bhpY-2,bhpW+4,bhpH+4);
-        // Boss name
+        // Boss name (above bar)
         ctx.fillStyle=bossPhase===1?'#ff4400':'#ff6666';ctx.font='bold 10px monospace';ctx.textAlign='center';
-        ctx.fillText('BOSS'+(bossPhase===1?(lang==='zh'?' [狂暴]':' [ENRAGED]'):''),W/2,bhpY-4);
-        // HP text
+        ctx.fillText('BOSS'+(bossPhase===1?(lang==='zh'?' [狂暴]':' [ENRAGED]'):''),W/2,bhpY-6);
+        // HP text (below bar)
         ctx.fillStyle='#fff';ctx.font='9px monospace';
         ctx.fillText(bossRef.hp+'/'+bossRef.maxHp,W/2,bhpY+bhpH+10);
     }
@@ -2803,7 +2828,8 @@ function drawExpeditionHUD(){
             else if(coll.effect.regenBonus) relicSymbol='💚';
             allBuffs.push({
                 color:coll.color, symbol:relicSymbol, tier:null,
-                timer:null, type:'relic', name:lang==='zh'?coll.nameZh:coll.name
+                timer:null, type:'relic', name:lang==='zh'?coll.nameZh:coll.name,
+                relicId:coll.id
             });
         }
     }
@@ -2845,7 +2871,7 @@ function drawExpeditionHUD(){
     if(buffTooltipIndex!==null&&window.renderedBuffs){
         var rb=window.renderedBuffs.find(function(b){return b.index===buffTooltipIndex;});
         if(rb){
-            var tooltipW=180,tooltipH=80;
+            var tooltipW=190,tooltipH=rb.buff.type==='relic'?100:80;
             // Tooltip appears below the icon row
             var tx=rb.x,ty=rb.y+rb.h+12;
             if(tx+tooltipW>canvas.width) tx=canvas.width-tooltipW-4;
@@ -2881,20 +2907,38 @@ function drawExpeditionHUD(){
                 ctx.fillText(bonus,tx+10,cy);cy+=14;
                 ctx.fillText(T('duration')+': '+rb.buff.timer+'s',tx+10,cy);
             } else if(rb.buff.type==='relic'){
-                // Relic buff details
-                ctx.fillText(rb.buff.name,tx+10,cy);cy+=16;
-                ctx.fillStyle='#aaa';ctx.font='10px monospace';
-                var coll=COLLECTIBLES.find(function(c){return(lang==='zh'?c.nameZh:c.name)===rb.buff.name;});
+                // Relic buff details — show name + skillDesc
+                ctx.fillStyle=rb.buff.color;ctx.font='bold 10px monospace';
+                ctx.fillText(rb.buff.name,tx+10,cy);cy+=15;
+                var coll=COLLECTIBLES.find(function(c){return c.id===rb.buff.relicId;});
                 if(coll){
-                    if(coll.effect.attackBonus) ctx.fillText('+'+coll.effect.attackBonus+' '+T('atk'),tx+10,cy),cy+=12;
-                    if(coll.effect.defenseBonus) ctx.fillText('+'+coll.effect.defenseBonus+' '+T('def'),tx+10,cy),cy+=12;
-                    if(coll.effect.maxHpBonus) ctx.fillText('+'+coll.effect.maxHpBonus+' Max HP',tx+10,cy),cy+=12;
-                    if(coll.effect.speedBonus) ctx.fillText('+'+coll.effect.speedBonus+'% '+T('spd'),tx+10,cy),cy+=12;
-                    if(coll.effect.goldBonus) ctx.fillText('+'+coll.effect.goldBonus+'% Gold',tx+10,cy),cy+=12;
-                    if(coll.effect.dodgeChance) ctx.fillText((coll.effect.dodgeChance*100).toFixed(0)+'% Dodge',tx+10,cy),cy+=12;
-                    if(coll.effect.critChance) ctx.fillText((coll.effect.critChance*100).toFixed(0)+'% Crit',tx+10,cy),cy+=12;
-                    if(coll.effect.lifeSteal) ctx.fillText('+'+coll.effect.lifeSteal+' HP/kill',tx+10,cy),cy+=12;
-                    if(coll.effect.regenBonus) ctx.fillText('+'+coll.effect.regenBonus+' HP/5s',tx+10,cy),cy+=12;
+                    var sd=lang==='zh'?(coll.skillDescZh||coll.skillDesc):coll.skillDesc;
+                    ctx.fillStyle='#ccbbee';ctx.font='9px monospace';
+                    // word wrap description
+                    var sdW=tooltipW-20,sdLines=[];
+                    if(lang==='zh'){
+                        var sdCl='';
+                        for(var sdi=0;sdi<sd.length;sdi++){
+                            var sdT=sdCl+sd[sdi];
+                            if(ctx.measureText(sdT).width>sdW&&sdCl){sdLines.push(sdCl);sdCl=sd[sdi];}
+                            else sdCl=sdT;
+                        }
+                        if(sdCl) sdLines.push(sdCl);
+                    } else {
+                        var sdWl='',sdWs=sd.split(' ');
+                        for(var swi=0;swi<sdWs.length;swi++){
+                            var sdTl=sdWl+(sdWl?' ':'')+sdWs[swi];
+                            if(ctx.measureText(sdTl).width>sdW&&sdWl){sdLines.push(sdWl);sdWl=sdWs[swi];}
+                            else sdWl=sdTl;
+                        }
+                        if(sdWl) sdLines.push(sdWl);
+                    }
+                    for(var sli=0;sli<Math.min(sdLines.length,4);sli++){ctx.fillText(sdLines[sli],tx+10,cy);cy+=12;}
+                    // Skill name
+                    if(coll.skillName){
+                        ctx.fillStyle='#ffcc44';ctx.font='bold 8px monospace';
+                        ctx.fillText('['+( lang==='zh'?coll.skillNameZh:coll.skillName)+']',tx+10,cy);cy+=12;
+                    }
                 }
             }
         }
@@ -3626,14 +3670,12 @@ function handleExpeditionPopupClick(cx,cy){
         var btnW=110,btnH=34,gap=20;
         var b1x=W/2-btnW-gap/2,b2x=W/2+gap/2,bty=py+ph-50;
         if(cx>=b1x&&cx<=b1x+btnW&&cy>=bty&&cy<=bty+btnH){
-            // Replace weapon — old goes to inventory
-            if(equippedWeapon&&equippedWeapon.name!=='Rusty Dagger') inventory.weapons.push(equippedWeapon);
+            // Replace weapon — expedition mode, old weapon discarded
             equippedWeapon=weaponPopup.weapon;
             weaponPopup=null; playSound('craft'); return;
         }
         if(cx>=b2x&&cx<=b2x+btnW&&cy>=bty&&cy<=bty+btnH){
-            // Keep current — new goes to inventory
-            inventory.weapons.push(weaponPopup.weapon);
+            // Keep current — discard new weapon (expedition only)
             weaponPopup=null; playSound('click'); return;
         }
         return;
@@ -3755,6 +3797,9 @@ function getLabLayout(){
     // Merchant corner (right side, near shelf)
     var merchW=Math.min(70,W*0.08),merchH=Math.min(80,H*0.12);
     var merchX=W*0.68,merchY=H*0.62;
+    // Alchemy Forge (weapon forging) — below bench, bottom-left area
+    var forgeW=Math.min(70,W*0.09),forgeH=Math.min(60,H*0.09);
+    var forgeX=W*0.1,forgeY=H*0.72;
     return {
         vp:{x:vpx,y:vpy}, backWall:{x:vpx-bwW/2,y:vpy-bwH/2,w:bwW,h:bwH},
         door:{x:exitX,y:exitY,w:exitW,h:exitH},
@@ -3765,7 +3810,8 @@ function getLabLayout(){
         merch:{x:merchX,y:merchY,w:merchW,h:merchH},
         research:{x:W*0.18,y:H*0.72,w:Math.min(90,W*0.1),h:Math.min(60,H*0.09)},
         relicCase:{x:W*0.78,y:H*0.72,w:Math.min(80,W*0.09),h:Math.min(60,H*0.09)},
-        skillBook:{x:W*0.48,y:H*0.78,w:Math.min(80,W*0.09),h:Math.min(55,H*0.08)}
+        skillBook:{x:W*0.48,y:H*0.78,w:Math.min(80,W*0.09),h:Math.min(55,H*0.08)},
+        forge:{x:forgeX,y:forgeY,w:forgeW,h:forgeH}
     };
 }
 
@@ -3977,6 +4023,28 @@ function drawCaveScene(){
     ctx.fillStyle=skillHov?'#dd8844':'#886633';ctx.font='bold 11px monospace';ctx.textAlign='center';
     ctx.fillText(T('tabSkills'),sb.x+sb.w/2,sb.y+sb.h+16);
 
+    // Alchemy Forge (weapon crafting anvil)
+    var fg=lay.forge,forgeHov=labHover==='forge';
+    ctx.fillStyle=forgeHov?'#2a1a10':'#1a1008';
+    ctx.fillRect(fg.x,fg.y,fg.w,fg.h);
+    ctx.strokeStyle=forgeHov?'#ff8844':'#884422';ctx.lineWidth=2;ctx.strokeRect(fg.x,fg.y,fg.w,fg.h);
+    // Anvil shape
+    var ax=fg.x+fg.w/2,ay=fg.y+fg.h*0.55;
+    ctx.fillStyle=forgeHov?'#666':'#444';
+    ctx.fillRect(ax-fg.w*0.35,ay-fg.h*0.2,fg.w*0.7,fg.h*0.25); // top
+    ctx.fillRect(ax-fg.w*0.22,ay+fg.h*0.05,fg.w*0.44,fg.h*0.22); // body
+    ctx.fillRect(ax-fg.w*0.14,ay+fg.h*0.27,fg.w*0.28,fg.h*0.15); // base
+    // Hammer
+    ctx.fillStyle=forgeHov?'#cc8833':'#996622';
+    ctx.save();ctx.translate(ax+fg.w*0.2,ay-fg.h*0.15);ctx.rotate(-0.6);
+    ctx.fillRect(-3,-10,6,16);ctx.fillRect(-6,-12,12,8);ctx.restore();
+    // Fire glow
+    if(forgeHov){ctx.save();ctx.globalAlpha=0.1;var fgG=ctx.createRadialGradient(ax,ay,3,ax,ay,fg.w*0.8);fgG.addColorStop(0,'#ff6600');fgG.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=fgG;ctx.fillRect(fg.x-10,fg.y-10,fg.w+20,fg.h+20);ctx.restore();}
+    // Forged weapon indicator
+    if(forgedWeapon){ctx.fillStyle='#ffcc44';ctx.font='bold 7px monospace';ctx.textAlign='center';ctx.fillText('★',ax,fg.y+fg.h*0.15);}
+    ctx.fillStyle=forgeHov?'#ff8844':'#cc6622';ctx.font='bold 11px monospace';ctx.textAlign='center';
+    ctx.fillText(lang==='zh'?'锻造':'Forge',fg.x+fg.w/2,fg.y+fg.h+16);
+
     // Torches
     var torchSpots=[{x:bw.x-W*0.08,y:bw.y+bw.h*0.3},{x:bw.x+bw.w+W*0.08,y:bw.y+bw.h*0.3},{x:W*0.06,y:H*0.45},{x:W*0.94,y:H*0.45}];
     for(var i=0;i<torchSpots.length;i++){var tp=torchSpots[i];ctx.fillStyle='#3a3030';ctx.fillRect(tp.x-2,tp.y+3,4,8);ctx.fillStyle='#4a3318';ctx.fillRect(tp.x-2,tp.y-10,4,16);var flk=Math.sin(t*7+i*2.3)*2,fSz=8+Math.sin(t*4+i)*2;var fGr=ctx.createRadialGradient(tp.x,tp.y-12+flk,1,tp.x,tp.y-12+flk,fSz);fGr.addColorStop(0,'rgba(255,200,50,0.85)');fGr.addColorStop(0.4,'rgba(255,120,20,0.35)');fGr.addColorStop(1,'rgba(255,60,0,0)');ctx.fillStyle=fGr;ctx.beginPath();ctx.arc(tp.x,tp.y-12+flk,fSz,0,Math.PI*2);ctx.fill();var wG=ctx.createRadialGradient(tp.x,tp.y,5,tp.x,tp.y,80+i*10);wG.addColorStop(0,'rgba(255,160,50,0.06)');wG.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=wG;ctx.fillRect(tp.x-90,tp.y-80,180,160);}
@@ -4042,7 +4110,7 @@ function renderLab(){
         ctx.fillStyle='#ff6666';ctx.font='bold 16px monospace';ctx.textAlign='center';
         ctx.fillText('X',cbX+cbS/2,cbY+cbS/2+5);
         // Title
-        var panelTitles={extract:T('tabExtract'),brew:T('tabBrew'),potions:T('tabPotions'),expedition:T('tabExpedition'),weapons:T('tabWeapons'),shop:T('tabShop'),research:T('tabResearch'),relics:T('relicCase'),skills:T('skillTree'),bestiary:(lang==='zh'?'📚 图鉴':'📚 Bestiary')};
+        var panelTitles={extract:T('tabExtract'),brew:T('tabBrew'),potions:T('tabPotions'),expedition:T('tabExpedition'),weapons:T('tabWeapons'),shop:T('tabShop'),research:T('tabResearch'),relics:T('relicCase'),skills:T('skillTree'),bestiary:(lang==='zh'?'📚 图鉴':'📚 Bestiary'),forge:(lang==='zh'?'⚒ 炼金锻造':'⚒ Alchemy Forge')};
         ctx.fillStyle='#44dd88';ctx.font='bold 18px monospace';ctx.textAlign='center';
         ctx.fillText(panelTitles[labTab]||'',W/2,ppy+30);
         var contentY=ppy+50;
@@ -4059,6 +4127,7 @@ function renderLab(){
         else if(labTab==='relics') drawLabRelics(contentY);
         else if(labTab==='skills') drawLabSkills(contentY);
         else if(labTab==='bestiary') drawLabBestiary(contentY);
+        else if(labTab==='forge') drawLabForge(contentY);
         ctx.restore();
     }
 
@@ -4378,6 +4447,80 @@ function drawLabWeapons(cy){
         ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='center';
         ctx.fillText(T('equip'),btnX+btnW/2,btnY+btnH/2+4);
     }
+    cy+=inventory.weapons.length*40+20;
+    // Update dynamic scroll max based on content height
+    var H2=canvas.height,ph2=Math.min(H2-60,500);
+    labScrollMax=Math.max(0, cy - (ph2+50));
+}
+
+// ============ ALCHEMY FORGE PANEL ============
+// Selected potions for forging (indices into inventory.potions)
+var forgeSelected = [];
+
+function drawLabForge(cy){
+    var W=canvas.width;
+    ctx.fillStyle='#ff8844';ctx.font='bold 13px monospace';ctx.textAlign='center';
+    ctx.fillText(lang==='zh'?'⚒ 炼金锻造':'⚒ Alchemy Forge',W/2,cy);cy+=18;
+    ctx.fillStyle='#888';ctx.font='10px monospace';
+    ctx.fillText(lang==='zh'?'选择3瓶药水炼制武器（最高紫色品质）':'Select 3 potions to forge a weapon (max purple quality)',W/2,cy);cy+=16;
+    ctx.fillText(lang==='zh'?'药水等级越高，武器品质越好':'Higher tier potions = better weapon quality',W/2,cy);cy+=20;
+
+    // Current forged weapon
+    ctx.fillStyle='#aaa';ctx.font='11px monospace';
+    ctx.fillText(lang==='zh'?'— 当前锻造武器 —':'— Forged Weapon —',W/2,cy);cy+=16;
+    if(forgedWeapon){
+        ctx.fillStyle=forgedWeapon.color;ctx.font='bold 13px monospace';
+        ctx.fillText(weaponName(forgedWeapon),W/2,cy);cy+=14;
+        ctx.fillStyle='#aaa';ctx.font='10px monospace';
+        ctx.fillText(T('dmg')+':'+forgedWeapon.dmg+' '+T('spd')+':'+forgedWeapon.speed.toFixed(1)+' T'+forgedWeapon.tier,W/2,cy);cy+=18;
+    } else {
+        ctx.fillStyle='#555';ctx.font='11px monospace';
+        ctx.fillText(lang==='zh'?'（无）':'(None)',W/2,cy);cy+=18;
+    }
+
+    cy+=8;
+    // Potion selection list
+    ctx.fillStyle='#cc8844';ctx.font='bold 11px monospace';
+    ctx.fillText(lang==='zh'?'选择药水（已选：'+forgeSelected.length+'/3）':'Select potions ('+forgeSelected.length+'/3 selected)',W/2,cy);cy+=16;
+
+    var startX=W/2-160;
+    if(inventory.potions.length===0){
+        ctx.fillStyle='#444';ctx.font='10px monospace';ctx.fillText(lang==='zh'?'背包中没有药水':'No potions in inventory',W/2,cy+10);
+        cy+=30;
+    } else {
+        for(var i=0;i<inventory.potions.length;i++){
+            var p=inventory.potions[i];
+            var iy=cy+i*36;
+            var isSel=forgeSelected.indexOf(i)>=0;
+            ctx.fillStyle=isSel?'rgba(255,136,68,0.25)':'#111118';ctx.fillRect(startX,iy,320,32);
+            ctx.strokeStyle=isSel?'#ff8844':(p.color||'#333');ctx.lineWidth=isSel?2:1;ctx.strokeRect(startX,iy,320,32);
+            // Tier stars
+            var tierStr='';for(var ts=0;ts<=p.tier;ts++) tierStr+='★';
+            ctx.fillStyle=p.color||'#ddd';ctx.font='10px monospace';ctx.textAlign='left';
+            ctx.fillText(tierStr+' '+recipeName(p)+' (T'+p.tier+')',startX+10,iy+13);
+            ctx.fillStyle='#777';ctx.font='9px monospace';
+            ctx.fillText(recipeDesc(p),startX+10,iy+25);
+            // Select button
+            var btnX=startX+248,btnW=60,btnH=24,btnY=iy+4;
+            ctx.fillStyle=isSel?'#ff8844':'#555';ctx.fillRect(btnX,btnY,btnW,btnH);
+            ctx.fillStyle='#fff';ctx.font='bold 9px monospace';ctx.textAlign='center';
+            ctx.fillText(isSel?(lang==='zh'?'取消':'Deselect'):(lang==='zh'?'选择':'Select'),btnX+btnW/2,btnY+btnH/2+3);
+        }
+        cy+=inventory.potions.length*36+8;
+    }
+
+    // Forge button
+    cy+=8;
+    var canForge=forgeSelected.length===3;
+    var fbW=160,fbH=36,fbX=W/2-fbW/2,fbY=cy;
+    ctx.fillStyle=canForge?'#ff8844':'#333';ctx.fillRect(fbX,fbY,fbW,fbH);
+    ctx.fillStyle=canForge?'#000':'#555';ctx.font='bold 12px monospace';ctx.textAlign='center';
+    ctx.fillText(lang==='zh'?'⚒ 锻造武器':'⚒ Forge Weapon',fbX+fbW/2,fbY+fbH/2+4);
+    cy+=fbH+10;
+
+    // Update scroll max
+    var H2=canvas.height,ph2=Math.min(H2-60,500);
+    labScrollMax=Math.max(0, cy-(ph2+50));
 }
 
 function drawLabShop(cy){
@@ -4523,10 +4666,21 @@ function drawLabRelics(cy){
         ctx.fillStyle=found?'#111120':'#0a0a12';ctx.fillRect(cx2,cy2,cellW,cellH);
         ctx.strokeStyle=found?c.color:'#222';ctx.lineWidth=2;ctx.strokeRect(cx2,cy2,cellW,cellH);
         if(found){
-            // Diamond icon
-            ctx.fillStyle=c.color;
-            ctx.beginPath();ctx.moveTo(cx2+cellW/2,cy2+8);ctx.lineTo(cx2+cellW/2+8,cy2+20);
-            ctx.lineTo(cx2+cellW/2,cy2+32);ctx.lineTo(cx2+cellW/2-8,cy2+20);ctx.closePath();ctx.fill();
+            // Sprite icon (or fallback diamond)
+            var relSpr=SPR.relicSprites&&SPR.relicSprites[c.id];
+            var iconSz=28,iconX=cx2+cellW/2-iconSz/2,iconY=cy2+6;
+            if(relSpr){
+                ctx.save();ctx.imageSmoothingEnabled=false;
+                ctx.shadowColor=c.color;ctx.shadowBlur=6;
+                var sc3=Math.min(iconSz/relSpr.width,iconSz/relSpr.height);
+                var dw3=Math.round(relSpr.width*sc3),dh3=Math.round(relSpr.height*sc3);
+                ctx.drawImage(relSpr,cx2+cellW/2-dw3/2,iconY+(iconSz-dh3)/2,dw3,dh3);
+                ctx.restore();
+            } else {
+                ctx.fillStyle=c.color;
+                ctx.beginPath();ctx.moveTo(cx2+cellW/2,cy2+8);ctx.lineTo(cx2+cellW/2+8,cy2+20);
+                ctx.lineTo(cx2+cellW/2,cy2+32);ctx.lineTo(cx2+cellW/2-8,cy2+20);ctx.closePath();ctx.fill();
+            }
             ctx.fillStyle='#ddd';ctx.font='bold 9px monospace';ctx.textAlign='center';
             ctx.fillText(collectibleName(c),cx2+cellW/2,cy2+44);
             // Skill info
@@ -5276,6 +5430,48 @@ function handleLabClick(cx,cy){
                     }
                 }
             }
+        } else if(labTab==='forge'){
+            var startX=W/2-160;
+            var fgCy=contentY+88+(forgedWeapon?48:18)+8+16; // after header/forgedWeapon/label
+            // Potion select buttons
+            for(var i=0;i<inventory.potions.length;i++){
+                var iy=fgCy+i*36;
+                var btnX=startX+248,btnW=60,btnH=24,btnY=iy+4;
+                if(cx>=btnX&&cx<=btnX+btnW&&cy>=btnY&&cy<=btnY+btnH){
+                    var selIdx=forgeSelected.indexOf(i);
+                    if(selIdx>=0){ forgeSelected.splice(selIdx,1); }
+                    else if(forgeSelected.length<3){ forgeSelected.push(i); }
+                    playSound('click'); return;
+                }
+            }
+            // Forge button
+            var fgPotionListH=inventory.potions.length>0?inventory.potions.length*36+8:30;
+            var fbY=fgCy+fgPotionListH+8;
+            var fbW=160,fbH=36,fbX=W/2-fbW/2;
+            if(forgeSelected.length===3&&cx>=fbX&&cx<=fbX+fbW&&cy>=fbY&&cy<=fbY+fbH){
+                // Determine quality from avg potion tier
+                var avgTier=0;
+                forgeSelected.forEach(function(idx){avgTier+=inventory.potions[idx].tier;});
+                avgTier/=3;
+                // Map avg tier to rarity: 0→0(gray), 1→1(green), 2→2(blue), 3→3(purple), max purple
+                var rarity=Math.min(3,Math.round(avgTier));
+                // Pick weapon tier proportionally
+                var wepTier=Math.min(2,Math.floor(avgTier));
+                var pool=WEAPONS.filter(function(w){return (w.tier||0)===wepTier;});
+                if(pool.length===0) pool=WEAPONS;
+                var wType=pool[randInt(0,pool.length-1)];
+                var forged=makeWeapon(wType);
+                forged.rarity=rarity;
+                forged.color=RARITY_COLORS[rarity];
+                // Remove used potions (sort descending to avoid index shift)
+                forgeSelected.sort(function(a,b){return b-a;});
+                forgeSelected.forEach(function(idx){inventory.potions.splice(idx,1);});
+                forgeSelected=[];
+                forgedWeapon=forged;
+                // Also equip it as current weapon for next expedition
+                labMessage=lang==='zh'?('锻造成功：'+weaponName(forged)):'Forged: '+weaponName(forged);
+                labMessageTimer=180; playSound('levelUp'); return;
+            }
         } else if(labTab==='expedition'){
             var pw2=Math.min(W-40,520),ppx2=(W-pw2)/2;
             var pad2=12,gap2=10,availW2=pw2-pad2*2;
@@ -5391,6 +5587,7 @@ function handleLabClick(cx,cy){
         if(lay.research&&hitBox(cx,cy,lay.research)){labTab='research';labScrollY=0;playSound('click');return;}
         if(lay.relicCase&&hitBox(cx,cy,lay.relicCase)){labTab='relics';labScrollY=0;playSound('click');return;}
         if(lay.skillBook&&hitBox(cx,cy,lay.skillBook)){labTab='skills';labScrollY=0;playSound('click');return;}
+        if(lay.forge&&hitBox(cx,cy,lay.forge)){labTab='forge';labScrollY=0;playSound('click');return;}
     }
 }
 
@@ -5412,6 +5609,7 @@ function handleMenuTouch(cx,cy){
         gold=0; totalScore=0; expeditionNum=0;
         inventory={herbs:{},essences:{},potions:[],weapons:[]};
         equippedWeapon=makeWeapon(WEAPONS[0]);
+        forgedWeapon=null; forgeSelected=[];
         discoveredRecipes=[];
         carriedPotions=[];
         researchLevels={};
@@ -5533,6 +5731,7 @@ canvas.addEventListener('mousemove',function(e){
     else if(lay.research&&hitBox(cx,cy,lay.research)) labHover='research';
     else if(lay.relicCase&&hitBox(cx,cy,lay.relicCase)) labHover='relics';
     else if(lay.skillBook&&hitBox(cx,cy,lay.skillBook)) labHover='skills';
+    else if(lay.forge&&hitBox(cx,cy,lay.forge)) labHover='forge';
     else labHover=null;
     canvas.style.cursor=labHover?'pointer':'default';
 });
@@ -5644,7 +5843,7 @@ function drawGameOver(){
 function saveGame(){
     var data={
         gold:gold, totalScore:totalScore, expeditionNum:expeditionNum,
-        inventory:inventory, equippedWeapon:equippedWeapon,
+        inventory:inventory, equippedWeapon:equippedWeapon, forgedWeapon:forgedWeapon,
         discoveredRecipes:discoveredRecipes, carriedPotions:carriedPotions,
         researchLevels:researchLevels, foundCollectibles:foundCollectibles,
         playerKeys:playerKeys, lang:lang, unlockedSkills:unlockedSkills,
@@ -5661,6 +5860,7 @@ function loadGame(){
         gold=data.gold||0; totalScore=data.totalScore||0; expeditionNum=data.expeditionNum||0;
         inventory=data.inventory||{herbs:{},essences:{},potions:[],weapons:[]};
         equippedWeapon=data.equippedWeapon||makeWeapon(WEAPONS[0]);
+        forgedWeapon=data.forgedWeapon||null;
         if(data.seenEnemies) seenEnemies=data.seenEnemies;
         
         // Fix missing type property in old saves
