@@ -2109,9 +2109,32 @@ function renderExpedition(){
         var wc=equippedWeapon?equippedWeapon.color:'#fff';
         var wRange=equippedWeapon?equippedWeapon.range:30;
         var wType=equippedWeapon?equippedWeapon.type:'sword';
+        var wName=equippedWeapon?equippedWeapon.name:'';
         
-        // Weapon-specific rendering
-        if(wType==='sword'){
+        // Draw weapon sprite at swing position if available
+        var hasWeaponSprite=SPR.weapons&&SPR.weapons[wName];
+        if(hasWeaponSprite){
+            var swingAngle=player.attackAnim/8*Math.PI*0.4-Math.PI*0.2; // -0.2 to 0.2 radians
+            var wx=Math.cos(swingAngle)*wRange;
+            var wy=Math.sin(swingAngle)*wRange;
+            ctx.save();
+            ctx.translate(wx,wy);
+            ctx.rotate(swingAngle);
+            ctx.globalAlpha=swingAlpha;
+            var wSize=24;
+            ctx.drawImage(SPR.weapons[wName],-wSize/2,-wSize/2,wSize,wSize);
+            ctx.restore();
+            // Motion blur trail
+            ctx.globalAlpha=swingAlpha*0.2;
+            ctx.strokeStyle=wc;
+            ctx.lineWidth=4;
+            ctx.beginPath();
+            ctx.arc(0,0,wRange,swingAngle-0.3,swingAngle+0.1);
+            ctx.stroke();
+        }
+        
+        // Weapon-specific rendering (fallback if no sprite)
+        if(!hasWeaponSprite&&wType==='sword'){
             // Sword: Arc slash with blade trail
             ctx.globalAlpha=swingAlpha*0.3;
             ctx.strokeStyle=wc;ctx.lineWidth=8;
@@ -2125,7 +2148,7 @@ function renderExpedition(){
             ctx.beginPath();ctx.moveTo(8,0);ctx.lineTo(wRange-5,0);ctx.stroke();
             ctx.fillStyle='#fff';
             ctx.beginPath();ctx.arc(wRange,0,2,0,Math.PI*2);ctx.fill();
-        } else if(wType==='dagger'){
+        } else if(!hasWeaponSprite&&wType==='dagger'){
             // Dagger: Quick stab motion
             ctx.globalAlpha=swingAlpha*0.5;
             ctx.strokeStyle=wc;ctx.lineWidth=6;
@@ -2138,7 +2161,7 @@ function renderExpedition(){
                 ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.6;
                 ctx.beginPath();ctx.arc(wRange*0.5+i*8,-2+i*4,1.5,0,Math.PI*2);ctx.fill();
             }
-        } else if(wType==='axe'){
+        } else if(!hasWeaponSprite&&wType==='axe'){
             // Axe: Heavy swing with wide arc
             ctx.globalAlpha=swingAlpha*0.4;
             ctx.strokeStyle=wc;ctx.lineWidth=12;
@@ -2150,7 +2173,7 @@ function renderExpedition(){
             ctx.globalAlpha=swingAlpha;
             ctx.fillStyle=wc;
             ctx.beginPath();ctx.moveTo(wRange-10,-8);ctx.lineTo(wRange,-3);ctx.lineTo(wRange,3);ctx.lineTo(wRange-10,8);ctx.fill();
-        } else if(wType==='staff'){
+        } else if(!hasWeaponSprite&&wType==='staff'){
             // Staff: Magic orb at tip
             ctx.globalAlpha=swingAlpha*0.2;
             ctx.strokeStyle=wc;ctx.lineWidth=4;
@@ -2168,7 +2191,7 @@ function renderExpedition(){
             ctx.beginPath();ctx.arc(wRange,0,4,0,Math.PI*2);ctx.fill();
             ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.8;
             ctx.beginPath();ctx.arc(wRange,0,2,0,Math.PI*2);ctx.fill();
-        } else if(wType==='mace'){
+        } else if(!hasWeaponSprite&&wType==='mace'){
             // Mace: Crushing impact visual
             ctx.globalAlpha=swingAlpha*0.5;
             ctx.strokeStyle=wc;ctx.lineWidth=10;
@@ -2184,7 +2207,7 @@ function renderExpedition(){
                 ctx.fillStyle=wc;ctx.globalAlpha=swingAlpha*0.7;
                 ctx.fillRect(wRange+Math.cos(ang)*6-1,-1+Math.sin(ang)*6,3,3);
             }
-        } else if(wType==='spear'){
+        } else if(!hasWeaponSprite&&wType==='spear'){
             // Spear: Long thrust
             ctx.globalAlpha=swingAlpha*0.4;
             ctx.strokeStyle=wc;ctx.lineWidth=5;
@@ -2197,7 +2220,7 @@ function renderExpedition(){
             ctx.beginPath();ctx.moveTo(wRange*0.85,-4);ctx.lineTo(wRange*1.05,0);ctx.lineTo(wRange*0.85,4);ctx.fill();
             ctx.fillStyle='#fff';ctx.globalAlpha=swingAlpha*0.9;
             ctx.beginPath();ctx.arc(wRange*1.05,0,2,0,Math.PI*2);ctx.fill();
-        } else if(wType==='claw'){
+        } else if(!hasWeaponSprite&&wType==='claw'){
             // Claw: Triple slash marks
             for(var cl=0;cl<3;cl++){
                 ctx.globalAlpha=swingAlpha*0.6;
