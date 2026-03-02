@@ -875,6 +875,8 @@ function applyBuffs(){
         else if(eff==='stealth') playerStats.stealth+=b.value;
         else if(eff==='revive') playerStats.revive=true;
     }
+    // Apply weapon enchant defense bonus
+    if(equippedWeapon&&equippedWeapon._defBonus) playerStats.def+=equippedWeapon._defBonus;
 }
 function spawnParticles(x,y,color,count){
     for(var i=0;i<count;i++){ var a=Math.random()*Math.PI*2,sp=Math.random()*3+1;
@@ -1475,13 +1477,11 @@ function update(){
                 if(hasSkill('berserker')&&playerStats.hp<playerStats.maxHp*0.3) dmg=Math.floor(dmg*1.2);
                 // Skill: execute (+50% DMG to enemies <25% HP)
                 if(hasSkill('execute')&&e.hp<e.maxHp*0.25) dmg=Math.floor(dmg*1.5);
-                // Enchant bonus
-                if(equippedWeapon&&equippedWeapon.enchant){
-                    var ench=equippedWeapon.enchant;
-                    if(ench.effect==='attack') dmg+=ench.value;
-                    else if(ench.effect==='poison') dmg+=2;
-                }
                 e.hp-=dmg;
+                // Poison enchant: apply poison on-hit
+                if(equippedWeapon&&equippedWeapon.enchant&&equippedWeapon.enchant.effect==='poison'){
+                    if(Math.random()<0.4) applyStatusToEnemy(e,'poison',STATUS_DEFS['poison']);
+                }
                 // Apply weapon on-hit status effect
                 if(equippedWeapon){
                     var wfx=WEAPON_EFFECTS[equippedWeapon.name];
@@ -5418,9 +5418,26 @@ function handleLabClick(cx,cy){
                     var iy=enchCy+i*36;
                     var btnX=startX+240,btnY=iy+4,btnW=70,btnH=24;
                     if(cx>=btnX&&cx<=btnX+btnW&&cy>=btnY&&cy<=btnY+btnH){
-                        equippedWeapon.enchant=enchantable[i];
+                        var ep=enchantable[i];
+                        // Remove previous enchant stats first
+                        if(equippedWeapon.enchant){
+                            var prev=equippedWeapon.enchant;
+                            if(prev.effect==='attack') equippedWeapon.dmg=Math.max(1,equippedWeapon.dmg-Math.ceil(prev.value*0.5+1));
+                            else if(prev.effect==='speed') equippedWeapon.speed=Math.max(0.5,parseFloat((equippedWeapon.speed-(0.2+prev.tier*0.1)).toFixed(1)));
+                            else if(prev.effect==='defense') equippedWeapon._defBonus=0;
+                        }
+                        equippedWeapon.enchant=ep;
+                        // Apply new enchant stats
+                        if(ep.effect==='attack'){
+                            var bonus=Math.ceil(ep.value*0.5+1);
+                            equippedWeapon.dmg+=bonus;
+                        } else if(ep.effect==='speed'){
+                            equippedWeapon.speed=parseFloat((equippedWeapon.speed+(0.2+ep.tier*0.1)).toFixed(1));
+                        } else if(ep.effect==='defense'){
+                            equippedWeapon._defBonus=ep.tier+1;
+                        }
                         // Remove potion from inventory
-                        var idx=inventory.potions.indexOf(enchantable[i]);
+                        var idx=inventory.potions.indexOf(ep);
                         if(idx>=0) inventory.potions.splice(idx,1);
                         labMessage=T('enchanted');labMessageTimer=120;playSound('levelUp');return;
                     }
