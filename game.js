@@ -1075,8 +1075,8 @@ function update(){
     if(state!=='expedition') return;
     if(weaponPopup||merchantPopup||buffPopup) return; // pause while popup open
     frameCount++;
-    if(currentFloor<MAX_FLOORS-1) missionTimer--; // no timer on boss floor
-    if(missionTimer<=0){endExpedition();return;}
+    if(currentFloor<MAX_FLOORS-1&&!godMode) missionTimer--; // no timer on boss floor or in god mode
+    if(missionTimer<=0&&!godMode){endExpedition();return;}
 
     // Movement
     var mx=0,my=0;
@@ -2373,11 +2373,12 @@ function drawExpeditionHUD(){
 
     // Timer (improved with background)
     var secs=Math.ceil(missionTimer/60),mins=Math.floor(secs/60),s=secs%60;
-    var timeStr=mins+':'+(s<10?'0':'')+s;
+    var timeStr=godMode?'∞':mins+':'+(s<10?'0':'')+s;
     var timeW=ctx.measureText(timeStr).width+20;
     ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(W/2-timeW/2,8,timeW,24);
     ctx.font='bold 16px monospace';ctx.textAlign='center';
-    if(secs<15){ctx.save();ctx.shadowColor='#ff0000';ctx.shadowBlur=8;ctx.fillStyle='#ee4444';ctx.fillText(timeStr,W/2,26);ctx.restore();}
+    if(godMode){ctx.save();ctx.shadowColor='#ffd700';ctx.shadowBlur=8;ctx.fillStyle='#ffd700';ctx.fillText(timeStr,W/2,26);ctx.restore();}
+    else if(secs<15){ctx.save();ctx.shadowColor='#ff0000';ctx.shadowBlur=8;ctx.fillStyle='#ee4444';ctx.fillText(timeStr,W/2,26);ctx.restore();}
     else{ctx.fillStyle='#fff';ctx.fillText(timeStr,W/2,26);}
 
     // Floor + Biome (with background)
