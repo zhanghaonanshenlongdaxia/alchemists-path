@@ -2607,6 +2607,16 @@ function drawWeaponModel(x,y,weapon,scale){
     var wc=weapon.color;
     var wn=weapon.name;
     
+    // Use sprite if available
+    if(SPR.weapons && SPR.weapons[wn]){
+        var img = SPR.weapons[wn];
+        var size = 32; // weapon sprite size
+        ctx.drawImage(img, -size/2, -size/2, size, size);
+        ctx.restore();
+        return;
+    }
+    
+    // Fallback to procedural drawing if sprite not loaded
     // Each weapon has unique appearance
     if(wn==='Rusty Dagger'){
         // Small rusty dagger
@@ -4893,4 +4903,4 @@ function render(){
     else if(state==='gameover') drawGameOver();
 }
 function gameLoop(){update();render();requestAnimationFrame(gameLoop);}
-(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
+(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Enemy Sprites</title>
+    <style>
+        body { background: #222; color: #fff; font-family: monospace; padding: 20px; }
+        .sprite { display: inline-block; margin: 10px; text-align: center; }
+        .sprite img { width: 32px; height: 32px; image-rendering: pixelated; }
+        .sprite div { font-size: 10px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Enemy Sprite Loading Test</h2>
+    <div id="forest"></div>
+    <div id="cave"></div>
+    <div id="swamp"></div>
+    
+    <script>
+        var enemyPools = {
+            forest: {
+                floor1: ['rat.png', 'grey_rat.png', 'quokka.png', 'butterfly.png', 'butterfly1.png', 'small_snake.png'],
+                floor2: ['green_rat.png', 'orange_rat.png', 'sheep.png', 'black_sheep.png', 'bumblebee.png', 'snake.png'],
+                floor3: ['wolf.png', 'jackal.png', 'hound.png', 'killer_bee.png', 'giant_beetle.png', 'viper.png'],
+                floor4: ['bear.png', 'hog.png', 'war_dog.png', 'warg.png', 'queen_bee.png', 'giant_scorpion.png'],
+                floor5: ['grizzly_bear.png', 'black_bear.png', 'polar_bear.png', 'hell_hound.png', 'death_yak.png']
+            },
+            cave: {
+                floor1: ['giant_bat.png', 'wolf_spider.png', 'boring_beetle.png', 'worm.png', 'giant_cockroach.png'],
+                floor2: ['jumping_spider.png', 'trapdoor_spider.png', 'giant_centipede.png', 'brain_worm.png', 'giant_mite.png'],
+                floor3: ['tarantella.png', 'redback.png', 'scorpion.png', 'rock_worm.png', 'boulder_beetle.png'],
+                floor4: ['giant_scorpion.png', 'giant_ant.png', 'soldier_ant.png', 'queen_ant.png', 'lava_worm.png'],
+                floor5: ['kraken_head.png', 'giant_blowfly.png', 'moth_of_wrath.png', 'ghost_moth.png']
+            },
+            swamp: {
+                floor1: ['giant_frog.png', 'blink_frog.png', 'giant_newt.png', 'giant_gecko.png', 'small_snake.png'],
+                floor2: ['giant_toad.png', 'spiny_frog.png', 'iguana.png', 'gila_monster.png', 'water_moccasin.png'],
+                floor3: ['alligator_baby.png', 'crocodile.png', 'komodo_dragon.png', 'sea_snake.png', 'swamp_worm.png'],
+                floor4: ['alligator.png', 'snapping_turtle.png', 'alligator_snapping_turtle.png', 'black_mamba.png', 'giant_leech.png'],
+                floor5: ['anaconda.png', 'electric_eel.png', 'shark.png', 'big_fish.png']
+            }
+        };
+        
+        for (var biome in enemyPools) {
+            var container = document.getElementById(biome);
+            container.innerHTML = '<h3>' + biome.toUpperCase() + '</h3>';
+            for (var floor in enemyPools[biome]) {
+                container.innerHTML += '<h4>' + floor + '</h4>';
+                enemyPools[biome][floor].forEach(function(filename) {
+                    var div = document.createElement('div');
+                    div.className = 'sprite';
+                    var img = document.createElement('img');
+                    img.src = 'enemy_sprites/' + filename;
+                    img.onerror = function() { this.style.border = '2px solid red'; };
+                    img.onload = function() { this.style.border = '2px solid green'; };
+                    div.appendChild(img);
+                    var label = document.createElement('div');
+                    label.textContent = filename.replace('.png', '');
+                    div.appendChild(label);
+                    container.appendChild(div);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
