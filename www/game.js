@@ -2856,6 +2856,12 @@ function drawExpeditionHUD(){
             ctx.fillText(Math.ceil(db.timer/60)+'s',dx+dbIconSize/2,dbY+dbIconSize-5);
         }
     }
+    // Exit expedition button (bottom-left)
+    var exitBtnX=10,exitBtnY=canvas.height-36,exitBtnW=60,exitBtnH=26;
+    ctx.fillStyle='rgba(120,20,20,0.7)';ctx.fillRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
+    ctx.strokeStyle='#ff4444';ctx.lineWidth=1;ctx.strokeRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
+    ctx.fillStyle='#ff8888';ctx.font='bold 9px monospace';ctx.textAlign='center';
+    ctx.fillText(lang==='zh'?'退出冒险':'Exit Run',exitBtnX+exitBtnW/2,exitBtnY+exitBtnH/2+3);
     // Settings gear in expedition
     drawSettingsGear(W-38,15,26);
 }
@@ -3822,6 +3828,13 @@ function renderLab(){
     // Settings gear
     drawSettingsGear(70,15,22);
 
+    // Bestiary button in lab
+    var bkX=100,bkY=15,bkW=46,bkH=22;
+    ctx.fillStyle='rgba(10,10,20,0.6)';ctx.fillRect(bkX,bkY,bkW,bkH);
+    ctx.strokeStyle='#cc9944';ctx.lineWidth=1;ctx.strokeRect(bkX,bkY,bkW,bkH);
+    ctx.fillStyle='#cc9944';ctx.font='bold 9px monospace';ctx.textAlign='center';
+    ctx.fillText('📚 '+(lang==='zh'?'图鉴':'Bestiary'),bkX+bkW/2,bkY+bkH/2+3);
+
     // Carried potions belt
     if(carriedPotions.length>0){
         var beltW=carriedPotions.length*50+80;
@@ -3845,7 +3858,7 @@ function renderLab(){
         ctx.fillStyle='#ff6666';ctx.font='bold 16px monospace';ctx.textAlign='center';
         ctx.fillText('X',cbX+cbS/2,cbY+cbS/2+5);
         // Title
-        var panelTitles={extract:T('tabExtract'),brew:T('tabBrew'),potions:T('tabPotions'),expedition:T('tabExpedition'),weapons:T('tabWeapons'),shop:T('tabShop'),research:T('tabResearch'),relics:T('relicCase'),skills:T('skillTree')};
+        var panelTitles={extract:T('tabExtract'),brew:T('tabBrew'),potions:T('tabPotions'),expedition:T('tabExpedition'),weapons:T('tabWeapons'),shop:T('tabShop'),research:T('tabResearch'),relics:T('relicCase'),skills:T('skillTree'),bestiary:(lang==='zh'?'📚 图鉴':'📚 Bestiary')};
         ctx.fillStyle='#44dd88';ctx.font='bold 18px monospace';ctx.textAlign='center';
         ctx.fillText(panelTitles[labTab]||'',W/2,ppy+30);
         var contentY=ppy+50;
@@ -3861,6 +3874,7 @@ function renderLab(){
         else if(labTab==='research') drawLabResearch(contentY);
         else if(labTab==='relics') drawLabRelics(contentY);
         else if(labTab==='skills') drawLabSkills(contentY);
+        else if(labTab==='bestiary') drawLabBestiary(contentY);
         ctx.restore();
     }
 
@@ -4392,6 +4406,68 @@ function drawLabSkills(cy){
     }
 }
 
+function drawLabBestiary(cy){
+    var W=canvas.width;
+    var pw=Math.min(W-40,520),ppx=(W-pw)/2;
+    var seenKeys=Object.keys(seenEnemies);
+    ctx.fillStyle='#888';ctx.font='11px monospace';ctx.textAlign='center';
+    ctx.fillText((lang==='zh'?'已发现: ':'Discovered: ')+seenKeys.length+'/'+Object.keys(ENEMY_TYPES).length,W/2,cy);cy+=20;
+    if(seenKeys.length===0){
+        ctx.fillStyle='#666';ctx.font='12px monospace';
+        ctx.fillText(lang==='zh'?'尚未遇到任何敌人':'No enemies encountered yet',W/2,cy+40);
+        return;
+    }
+    var perPage=4,totalPages=Math.ceil(seenKeys.length/perPage);
+    bestiaryPage=Math.max(0,Math.min(bestiaryPage,totalPages-1));
+    var startIdx=bestiaryPage*perPage;
+    var pageKeys=seenKeys.slice(startIdx,startIdx+perPage);
+    for(var ki=0;ki<pageKeys.length;ki++){
+        var key=pageKeys[ki];
+        var data=seenEnemies[key];
+        var et=ENEMY_TYPES[key];
+        if(!et) continue;
+        var ew=pw-24,eh=82;
+        var ex2=ppx+12;
+        var isBoss=et.isBossType,isElite=et.isEliteType;
+        var frameColor2=isBoss?'#ff4444':(isElite?'#cc44ff':'#446688');
+        ctx.fillStyle='rgba(20,20,40,0.8)';ctx.fillRect(ex2,cy,ew,eh);
+        ctx.strokeStyle=frameColor2;ctx.lineWidth=1;ctx.strokeRect(ex2,cy,ew,eh);
+        // Color circle (placeholder sprite)
+        ctx.fillStyle=et.color||'#888';
+        ctx.beginPath();ctx.arc(ex2+34,cy+eh/2,14,0,Math.PI*2);ctx.fill();
+        if(isBoss){ctx.fillStyle='#ff4444';ctx.font='bold 8px monospace';ctx.textAlign='center';ctx.fillText('BOSS',ex2+34,cy+eh-4);}
+        else if(isElite){ctx.fillStyle='#cc44ff';ctx.font='bold 8px monospace';ctx.textAlign='center';ctx.fillText('ELITE',ex2+34,cy+eh-4);}
+        var nameStr2=lang==='zh'?(et.nameZh||et.name):et.name;
+        ctx.fillStyle=frameColor2;ctx.font='bold 12px monospace';ctx.textAlign='left';
+        ctx.fillText(nameStr2,ex2+70,cy+16);
+        ctx.fillStyle='#888';ctx.font='9px monospace';
+        ctx.fillText((lang==='zh'?'遇到 ':'Seen ')+data.count+'x',ex2+70,cy+29);
+        var desc2=lang==='zh'?(et.descZh||et.desc):et.desc;
+        ctx.fillStyle='#aaa';ctx.font='10px monospace';
+        var words2=desc2.split(' '),line2='',descY2=cy+42;
+        for(var wi2=0;wi2<words2.length;wi2++){
+            var test2=line2+(line2?' ':'')+words2[wi2];
+            if(ctx.measureText(test2).width>ew-80&&line2){
+                ctx.fillText(line2,ex2+70,descY2);descY2+=13;line2=words2[wi2];
+                if(descY2>cy+eh-8) break;
+            } else line2=test2;
+        }
+        if(line2&&descY2<=cy+eh-8) ctx.fillText(line2,ex2+70,descY2);
+        if(et.skills&&et.skills.length>0){
+            ctx.fillStyle='#ffcc44';ctx.font='9px monospace';
+            ctx.fillText('['+et.skills.join(', ')+']',ex2+70,cy+eh-6);
+        }
+        cy+=eh+6;
+    }
+    // Page nav
+    if(totalPages>1){
+        ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
+        ctx.fillText((bestiaryPage+1)+'/'+totalPages,W/2,cy+16);
+        if(bestiaryPage>0){ctx.fillStyle='#44aaff';ctx.fillText(lang==='zh'?'< 上页':'< PREV',ppx+60,cy+16);}
+        if(bestiaryPage<totalPages-1){ctx.fillStyle='#44aaff';ctx.fillText(lang==='zh'?'下页 >':'NEXT >',ppx+pw-60,cy+16);}
+    }
+}
+
 function drawLabExpedition(cy){
     var W=canvas.width,H=canvas.height;
     var pw=Math.min(W-40,520),ppx=(W-pw)/2;
@@ -4739,6 +4815,19 @@ function handleLabClick(cx,cy){
     if(cx>=svX&&cx<=svX+svW&&cy>=svY&&cy<=svY+svH){saveGame();playSound('click');return;}
     // Settings gear
     if(cx>=70&&cx<=92&&cy>=15&&cy<=37){showSettings=true;playSound('click');return;}
+    // Bestiary button
+    if(cx>=100&&cx<=146&&cy>=15&&cy<=37){labTab='bestiary';bestiaryPage=0;labScrollY=0;playSound('click');return;}
+    // Bestiary page nav (when open)
+    if(labTab==='bestiary'){
+        var pw3=Math.min(W-40,520),ph3=Math.min(H-60,500);
+        var ppx3=(W-pw3)/2,ppy3=(H-ph3)/2;
+        var perPage3=4,totalPages3=Math.ceil(Object.keys(seenEnemies).length/perPage3);
+        var navY3=ppy3+ph3-50;
+        if(cy>=navY3&&cy<=navY3+30){
+            if(cx<W/2-30&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
+            if(cx>W/2+30&&bestiaryPage<totalPages3-1){bestiaryPage++;playSound('click');return;}
+        }
+    }
 
     if(labTab){
         var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
@@ -5090,6 +5179,13 @@ canvas.addEventListener('click',function(e){
         if(cx>=W-38&&cx<=W-12&&cy>=15&&cy<=41){showSettings=true;playSound('click');return;}
         // Bestiary book button
         if(cx>=W-72&&cx<=W-46&&cy>=14&&cy<=40){showBestiary=true;bestiaryPage=0;playSound('click');return;}
+        // Exit expedition button (bottom-left)
+        if(cx>=10&&cx<=70&&cy>=canvas.height-36&&cy<=canvas.height-10){
+            if(confirm(lang==='zh'?'确定退出本次冒险？进度将丢失。':'Abandon this run? Progress will be lost.')){
+                endExpedition();
+            }
+            return;
+        }
         // Click on buff icons (left side)
         if(window.renderedBuffs&&window.renderedBuffs.length>0){
             for(var bi=0;bi<window.renderedBuffs.length;bi++){
