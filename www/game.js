@@ -743,8 +743,7 @@ function setupFloor(biomeIdx, floor){
                     radius:isElite?9:7, alert:false, alertTimer:0,
                     patrolAngle:Math.random()*Math.PI*2, patrolTimer:randInt(60,180),
                     animFrame:0, attackCD:0, atk:Math.ceil(baseATK*atkMul),
-                    isElite:isElite, isBoss:false,
-                    spriteVariant:Math.random()>0.5?'normal':'variant'
+                    isElite:isElite, isBoss:false
                 });
             }
         }
@@ -762,7 +761,6 @@ function setupFloor(biomeIdx, floor){
             patrolAngle:0, patrolTimer:60,
             animFrame:0, attackCD:0, atk:bossATK,
             isElite:false, isBoss:true,
-            spriteVariant:'boss',
             // Boss special properties
             chargeCD:0, charging:false, chargeAngle:0, chargeTimer:0,
             slamCD:0
@@ -1291,8 +1289,7 @@ function update(){
                             radius:6,alert:true,alertTimer:180,
                             patrolAngle:Math.random()*Math.PI*2,patrolTimer:60,
                             animFrame:0,attackCD:0,atk:Math.ceil(baseATK2*0.7),
-                            isElite:false,isBoss:false,
-                            spriteVariant:Math.random()>0.5?'normal':'variant'
+                            isElite:false,isBoss:false
                         });
                         spawnParticles(sx2,sy2,'#aa44dd',6);
                     }
@@ -1998,11 +1995,13 @@ function renderExpedition(){
             var et=SPR.enemies[currentBiome.enemyType];
             var spr=null;
             
-            // Use custom sprites for swamp enemies
-            if(currentBiome.enemyType==='swamp'&&SPR.customEnemies.swamp.normal){
-                if(e.isBoss) spr=SPR.customEnemies.swamp.boss;
-                else if(e.isElite) spr=SPR.customEnemies.swamp.elite;
-                else spr=e.spriteVariant==='variant'?SPR.customEnemies.swamp.variant:SPR.customEnemies.swamp.normal;
+            // Use custom sprites based on floor
+            var floorKey='floor'+Math.min(currentFloor,5);
+            var pool=SPR.customEnemies[currentBiome.enemyType][floorKey];
+            if(pool&&pool.length>0){
+                // Assign sprite based on enemy index (consistent per enemy)
+                if(!e.spriteIndex) e.spriteIndex=Math.floor(Math.random()*pool.length);
+                spr=pool[e.spriteIndex%pool.length];
             } else if(et.frames.length>0){
                 spr=et.frames[e.animFrame%et.frames.length];
             }

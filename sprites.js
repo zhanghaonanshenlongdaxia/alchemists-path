@@ -81,18 +81,21 @@ function initSprites() {
 
     // Enemies by biome (gradient tinted for depth — more distinct per biome)
     SPR.enemies = {
-        forest: { frames: [tintTileGradient(320,'#66cc33','#2a6611'), tintTileGradient(321,'#66cc33','#2a6611'), tintTileGradient(322,'#66cc33','#2a6611')], color: '#55aa22' },
-        cave:   { frames: [tintTileGradient(340,'#9988dd','#443388'), tintTileGradient(341,'#9988dd','#443388'), tintTileGradient(342,'#9988dd','#443388')], color: '#7766bb' },
-        swamp:  { frames: [], color: '#998822', customSprites: true } // Will load custom sprites
+        forest: { frames: [], color: '#55aa22', customSprites: true },
+        cave:   { frames: [], color: '#7766bb', customSprites: true },
+        swamp:  { frames: [], color: '#998822', customSprites: true }
     };
     
     // Custom enemy sprites (loaded separately)
     SPR.customEnemies = {
+        forest: {
+            floor1: [], floor2: [], floor3: [], floor4: [], floor5: []
+        },
+        cave: {
+            floor1: [], floor2: [], floor3: [], floor4: [], floor5: []
+        },
         swamp: {
-            normal: null,    // alligator_baby.png
-            elite: null,     // alligator.png
-            boss: null,      // anaconda.png
-            variant: null    // alligator_snapping_turtle.png
+            floor1: [], floor2: [], floor3: [], floor4: [], floor5: []
         }
     };
 
@@ -134,12 +137,40 @@ function initSprites() {
 // Load custom enemy sprites
 function loadCustomEnemySprites() {
     return new Promise(function(resolve) {
-        var toLoad = [
-            { path: 'enemy_sprites/alligator_baby.png', target: 'swamp', type: 'normal' },
-            { path: 'enemy_sprites/alligator.png', target: 'swamp', type: 'elite' },
-            { path: 'enemy_sprites/anaconda.png', target: 'swamp', type: 'boss' },
-            { path: 'enemy_sprites/alligator_snapping_turtle.png', target: 'swamp', type: 'variant' }
-        ];
+        // Enemy distribution by biome and floor
+        var enemyPools = {
+            forest: {
+                floor1: ['rat.png', 'grey_rat.png', 'quokka.png', 'butterfly.png', 'butterfly1.png', 'small_snake.png'],
+                floor2: ['green_rat.png', 'orange_rat.png', 'sheep.png', 'black_sheep.png', 'bumblebee.png', 'snake.png'],
+                floor3: ['wolf.png', 'jackal.png', 'hound.png', 'killer_bee.png', 'giant_beetle.png', 'viper.png'],
+                floor4: ['bear.png', 'hog.png', 'war_dog.png', 'warg.png', 'queen_bee.png', 'giant_scorpion.png'],
+                floor5: ['grizzly_bear.png', 'black_bear.png', 'polar_bear.png', 'hell_hound.png', 'death_yak.png']
+            },
+            cave: {
+                floor1: ['giant_bat.png', 'wolf_spider.png', 'boring_beetle.png', 'worm.png', 'giant_cockroach.png'],
+                floor2: ['jumping_spider.png', 'trapdoor_spider.png', 'giant_centipede.png', 'brain_worm.png', 'giant_mite.png'],
+                floor3: ['tarantella.png', 'redback.png', 'scorpion.png', 'rock_worm.png', 'boulder_beetle.png'],
+                floor4: ['giant_scorpion.png', 'giant_ant.png', 'soldier_ant.png', 'queen_ant.png', 'lava_worm.png'],
+                floor5: ['kraken_head.png', 'giant_blowfly.png', 'moth_of_wrath.png', 'ghost_moth.png']
+            },
+            swamp: {
+                floor1: ['giant_frog.png', 'blink_frog.png', 'giant_newt.png', 'giant_gecko.png', 'small_snake.png'],
+                floor2: ['giant_toad.png', 'spiny_frog.png', 'iguana.png', 'gila_monster.png', 'water_moccasin.png'],
+                floor3: ['alligator_baby.png', 'crocodile.png', 'komodo_dragon.png', 'sea_snake.png', 'swamp_worm.png'],
+                floor4: ['alligator.png', 'snapping_turtle.png', 'alligator_snapping_turtle.png', 'black_mamba.png', 'giant_leech.png'],
+                floor5: ['anaconda.png', 'electric_eel.png', 'shark.png', 'big_fish.png']
+            }
+        };
+        
+        var toLoad = [];
+        for (var biome in enemyPools) {
+            for (var floor in enemyPools[biome]) {
+                enemyPools[biome][floor].forEach(function(filename) {
+                    toLoad.push({ path: 'enemy_sprites/' + filename, biome: biome, floor: floor });
+                });
+            }
+        }
+        
         var loaded = 0;
         var total = toLoad.length;
         
@@ -148,10 +179,10 @@ function loadCustomEnemySprites() {
         toLoad.forEach(function(item) {
             var img = new Image();
             img.onload = function() {
-                SPR.customEnemies[item.target][item.type] = img;
+                SPR.customEnemies[item.biome][item.floor].push(img);
                 loaded++;
                 if (loaded === total) {
-                    console.log('[Custom Enemy Sprites] Loaded ' + total + ' sprites');
+                    console.log('[Custom Enemy Sprites] Loaded ' + total + ' sprites across 3 biomes');
                     resolve();
                 }
             };

@@ -36,12 +36,12 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- 图标1别名（示例：可以准备不同的图标资源） -->
+        <!-- 图标1别名（紫色主题） -->
         <activity-alias
             android:name=".MainActivity.icon1"
             android:targetActivity=".MainActivity"
-            android:icon="@mipmap/ic_launcher"
-            android:roundIcon="@mipmap/ic_launcher_round"
+            android:icon="@mipmap/ic_launcher_icon1"
+            android:roundIcon="@mipmap/ic_launcher_icon1_round"
             android:label="@string/app_name"
             android:enabled="false"
             android:exported="true">
@@ -51,12 +51,12 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- 图标2别名 -->
+        <!-- 图标2别名（绿色主题） -->
         <activity-alias
             android:name=".MainActivity.icon2"
             android:targetActivity=".MainActivity"
-            android:icon="@mipmap/ic_launcher"
-            android:roundIcon="@mipmap/ic_launcher_round"
+            android:icon="@mipmap/ic_launcher_icon2"
+            android:roundIcon="@mipmap/ic_launcher_icon2_round"
             android:label="@string/app_name"
             android:enabled="false"
             android:exported="true">
@@ -66,12 +66,12 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- 图标3别名 -->
+        <!-- 图标3别名（橙色主题） -->
         <activity-alias
             android:name=".MainActivity.icon3"
             android:targetActivity=".MainActivity"
-            android:icon="@mipmap/ic_launcher"
-            android:roundIcon="@mipmap/ic_launcher_round"
+            android:icon="@mipmap/ic_launcher_icon3"
+            android:roundIcon="@mipmap/ic_launcher_icon3_round"
             android:label="@string/app_name"
             android:enabled="false"
             android:exported="true">
