@@ -2114,22 +2114,25 @@ function renderExpedition(){
         // Draw weapon sprite at swing position if available
         var hasWeaponSprite=SPR.weapons&&SPR.weapons[wName];
         if(hasWeaponSprite){
-            var swingAngle=player.attackAnim/8*Math.PI*0.4-Math.PI*0.2; // -0.2 to 0.2 radians
-            var wx=Math.cos(swingAngle)*wRange;
-            var wy=Math.sin(swingAngle)*wRange;
+            var swingAngle=player.attackAnim/8*Math.PI*0.8-Math.PI*0.4; // -0.4 to 0.4 radians swing arc
             ctx.save();
-            ctx.translate(wx,wy);
             ctx.rotate(swingAngle);
             ctx.globalAlpha=swingAlpha;
-            var wSize=24;
-            ctx.drawImage(SPR.weapons[wName],-wSize/2,-wSize/2,wSize,wSize);
+            var wSize=32;
+            // Draw weapon with handle at origin (player hand), blade pointing outward
+            ctx.drawImage(SPR.weapons[wName],0,-wSize/2,wSize,wSize);
             ctx.restore();
-            // Motion blur trail
-            ctx.globalAlpha=swingAlpha*0.2;
+            // Motion blur trail (arc effect)
+            ctx.globalAlpha=swingAlpha*0.25;
             ctx.strokeStyle=wc;
-            ctx.lineWidth=4;
+            ctx.lineWidth=6;
             ctx.beginPath();
-            ctx.arc(0,0,wRange,swingAngle-0.3,swingAngle+0.1);
+            ctx.arc(0,0,wRange,swingAngle-0.2,swingAngle+0.2);
+            ctx.stroke();
+            ctx.globalAlpha=swingAlpha*0.15;
+            ctx.lineWidth=12;
+            ctx.beginPath();
+            ctx.arc(0,0,wRange,swingAngle-0.3,swingAngle+0.3);
             ctx.stroke();
         }
         
