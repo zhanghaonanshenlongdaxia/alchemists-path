@@ -229,17 +229,31 @@ const MAX_FLOORS = 6;
 
 // ============ WEAPON DATA ============
 const WEAPON_NAMES_ZH = {
-    'Rusty Dagger':'生锈匕首','Wooden Club':'木棍','Old Sword':'旧剑','Worn Axe':'破旧斧',
-    'Iron Sword':'铁剑','Steel Blade':'钢刃','Bronze Spear':'青铜矛','War Axe':'战斧',
-    'Crystal Staff':'水晶法杖','Shadow Knife':'暗影短刀','Flame Sword':'烈焰剑',
-    'Frost Mace':'霜冻锤','Venom Fang':'毒牙刃','Thunder Spear':'雷霆枪',
-    'Dragon Claw':'龙爪','Arcane Blade':'奥术之刃'
+    // 白色 (Common)
+    'Rusty Dagger':'生锈匕首', 'Wooden Club':'木棍', 'Old Sword':'旧剑', 'Worn Axe':'破旧斧',
+    'Hunting Knife':'猎刀', 'Plain Club':'普通棍棒', 'Broken Spear':'断矛', 'Stone Hammer':'石锤',
+    // 绿色 (Uncommon)
+    'Iron Sword':'铁剑', 'Steel Blade':'钢刃', 'Bronze Spear':'青铜矛', 'Shadow Knife':'暗影短刀',
+    'Short Mace':'短锤', 'Elven Blade':'精灵刃', 'Hand Axe':'手斧', 'War Hammer':'战锤',
+    // 蓝色 (Rare)
+    'War Axe':'战斧', 'Crystal Staff':'水晶法杖', 'Venom Fang':'毒牙刃', 'Broad Axe':'阔斧',
+    'Battle Axe':'战斧', 'Flail':'连枷', 'Glaive':'战戟', 'Halberd':'长戟',
+    // 紫色 (Epic)
+    'Flame Sword':'烈焰剑', 'Frost Mace':'霜冻锤', 'Thunder Spear':'雷霆枪', 'Katana':'武士刀',
+    'Great Sword':'巨剑', 'Executioner Axe':'斩首斧', 'Bardiche':'大刀', 'Double Sword':'双刃剑',
+    // 金色 (Legendary)
+    'Dragon Claw':'龙爪', 'Arcane Blade':'奥术之刃', 'Holy Scourge':'神圣鞭', 'Demon Whip':'恶魔鞭',
+    'Lajatang':'两端刃', 'Blessed Blade':'祝福之刃',
+    // 红色 (Mythic)
+    'Scythe of Curses':'诅咒之镰', 'Sword of Cerebov':'赛瑞伯夫之剑', 'Wrath of Trog':'特罗格之怒',
+    'Staff of Dispater':'迪斯佩特之杖', 'Triple Sword':'三重剑',
 };
 function weaponName(w) { return lang==='zh' ? (WEAPON_NAMES_ZH[w.name]||w.name) : w.name; }
 
 // Rarity system: 0=white, 1=green, 2=blue, 3=purple, 4=gold, 5=red
 const RARITY_COLORS = ['#cccccc','#44ee44','#4488ff','#cc44ff','#ffcc00','#ff2222'];
 const RARITY_NAMES  = ['Common','Uncommon','Rare','Epic','Legendary','Mythic'];
+const RARITY_NAMES_ZH = ['普通','优秀','稀有','史诗','传说','神话'];
 
 const WEAPONS = [
     // === TIER 0 — White (Common) ===
@@ -3204,7 +3218,7 @@ function drawWeaponPopup(){
 
     var w=weaponPopup.weapon;
     var rarityColor=RARITY_COLORS[w.rarity||0];
-    var rarityName=RARITY_NAMES[w.rarity||0];
+    var rarityName=lang==='zh'?RARITY_NAMES_ZH[w.rarity||0]:RARITY_NAMES[w.rarity||0];
     ctx.strokeStyle=rarityColor;ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
     ctx.fillStyle='#ffd700';ctx.font='bold 16px monospace';ctx.textAlign='center';
     ctx.fillText(T('weaponFound'),W/2,py+28);
