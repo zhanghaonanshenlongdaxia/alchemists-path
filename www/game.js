@@ -1113,7 +1113,7 @@ function update(){
     var baseCooldown = Math.max(8, Math.round(18/wepSpeedMul));
     if(attackCooldown<=0){
         attackCooldown=baseCooldown;
-        var atkRange=wepRange*0.8+player.radius; // Match weapon circle radius (increased)
+        var atkRange=wepRange*1.0+player.radius; // Match weapon circle radius
         for(var i=enemies.length-1;i>=0;i--){
             var e=enemies[i];
             var d=dist(player,e);
@@ -2101,7 +2101,7 @@ function renderExpedition(){
         var wRange=equippedWeapon.range;
         var weaponCount=8; // Number of weapons in the circle
         var rotationSpeed=frameCount*0.05; // Continuous rotation
-        var circleRadius=wRange*0.8; // Increased radius for larger attack range
+        var circleRadius=wRange*1.0; // Radius matching weapon range
         
         for(var i=0;i<weaponCount;i++){
             var angle=i*Math.PI*2/weaponCount+rotationSpeed;
@@ -2110,7 +2110,7 @@ function renderExpedition(){
             
             ctx.save();
             ctx.translate(wx,wy);
-            ctx.rotate(angle+Math.PI/2); // Weapon orientation (blade outward + 90 degrees to make vertical)
+            ctx.rotate(angle+Math.PI/2+Math.PI/4); // Weapon orientation (+135 degrees = perpendicular to circle)
             ctx.globalAlpha=0.9;
             var wSize=24;
             ctx.drawImage(SPR.weapons[equippedWeapon.name],0,-wSize/2,wSize,wSize);
