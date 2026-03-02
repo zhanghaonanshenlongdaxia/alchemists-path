@@ -4480,12 +4480,15 @@ function drawLabBestiary(cy){
         }
         cy+=eh+6;
     }
-    // Page nav
+    // Page nav — fixed at panel bottom so click detection aligns
+    var H2=canvas.height;
+    var ph2=Math.min(H2-60,500),ppy2=(H2-ph2)/2;
+    var navY=ppy2+ph2-20;
     if(totalPages>1){
         ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
-        ctx.fillText((bestiaryPage+1)+'/'+totalPages,W/2,cy+16);
-        if(bestiaryPage>0){ctx.fillStyle='#44aaff';ctx.fillText(lang==='zh'?'< 上页':'< PREV',ppx+60,cy+16);}
-        if(bestiaryPage<totalPages-1){ctx.fillStyle='#44aaff';ctx.fillText(lang==='zh'?'下页 >':'NEXT >',ppx+pw-60,cy+16);}
+        ctx.fillText((bestiaryPage+1)+'/'+totalPages,W/2,navY);
+        if(bestiaryPage>0){ctx.fillStyle='#44aaff';ctx.fillText(lang==='zh'?'< 上页':'< PREV',ppx+60,navY);}
+        if(bestiaryPage<totalPages-1){ctx.fillStyle='#44aaff';ctx.fillText(lang==='zh'?'下页 >':'NEXT >',ppx+pw-60,navY);}
     }
 }
 
@@ -4846,14 +4849,13 @@ function handleLabClick(cx,cy){
         var cbS=28,cbX=ppx+pw-cbS-6,cbY=ppy+6;
         if(cx>=cbX&&cx<=cbX+cbS&&cy>=cbY&&cy<=cbY+cbS){labTab=null;labScrollY=0;selectedEssences=[];extractMini=null;playSound('click');return;}
         if(cx<ppx||cx>ppx+pw||cy<ppy||cy>ppy+ph){labTab=null;labScrollY=0;selectedEssences=[];extractMini=null;playSound('click');return;}
-        // Bestiary page nav (fixed bottom, no scroll offset)
+        // Bestiary page nav (fixed bottom, navY = ppy+ph-20)
         if(labTab==='bestiary'){
             var perPageB=4,totalPagesB=Math.ceil(Object.keys(seenEnemies).length/perPageB);
-            var navYB=ppy+ph-30;
-            var origCy=cy; // use original cy (not scroll-offset)
-            if(origCy>=navYB-10&&origCy<=ppy+ph){
-                if(cx<W/2-20&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
-                if(cx>W/2+20&&bestiaryPage<totalPagesB-1){bestiaryPage++;playSound('click');return;}
+            var navYB=ppy+ph-20;
+            if(cy>=navYB-16&&cy<=ppy+ph){
+                if(cx>=ppx&&cx<W/2-20&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
+                if(cx>W/2+20&&cx<=ppx+pw&&bestiaryPage<totalPagesB-1){bestiaryPage++;playSound('click');return;}
             }
         }
         // Apply scroll offset for content area clicks
