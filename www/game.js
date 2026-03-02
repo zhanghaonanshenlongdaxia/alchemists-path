@@ -1222,7 +1222,6 @@ window.addEventListener('keydown',function(e){
         else if(e.code==='KeyE'&&nearMerchantRef&&!weaponPopup&&!merchantPopup){
             merchantPopup=nearMerchantRef;
             merchantScrollY=0;
-            generateShopStock(BIOMES.indexOf(currentBiome), currentFloor);
             playSound('click');
         }
     }
@@ -1294,7 +1293,6 @@ canvas.addEventListener('touchstart',function(e){
         if(Math.abs(t0.clientX-mx2)<50&&Math.abs(t0.clientY-my2)<50){
             merchantPopup=nearMerchantRef;
             merchantScrollY=0;
-            generateShopStock(BIOMES.indexOf(currentBiome), currentFloor);
             playSound('click');return;
         }
     }
@@ -2810,34 +2808,34 @@ function drawExpeditionHUD(){
         }
     }
     
-    // Draw all buffs on left side (store for click detection)
+    // Draw all buffs as HORIZONTAL row below stats panel
     window.renderedBuffs = []; // Store buff positions for click detection
     if(allBuffs.length>0){
-        var buffIconSize=32,buffGap=4;
-        var buffX=145,buffStartY=72;
+        var buffIconSize=28,buffGap=3;
+        var buffStartX=8, buffY=130; // horizontal row below the stat text
         for(var bi=0;bi<allBuffs.length;bi++){
             var buff=allBuffs[bi];
-            var biy=buffStartY+bi*(buffIconSize+buffGap);
+            var bix=buffStartX+bi*(buffIconSize+buffGap);
             // Store for click detection
-            window.renderedBuffs.push({x:buffX, y:biy, w:buffIconSize, h:buffIconSize, buff:buff, index:bi});
+            window.renderedBuffs.push({x:bix, y:buffY, w:buffIconSize, h:buffIconSize, buff:buff, index:bi});
             // Icon background with glow
             ctx.save();
-            ctx.shadowColor=buff.color;ctx.shadowBlur=6;
+            ctx.shadowColor=buff.color;ctx.shadowBlur=5;
             ctx.fillStyle='rgba(20,20,30,0.85)';
-            ctx.fillRect(buffX,biy,buffIconSize,buffIconSize);
+            ctx.fillRect(bix,buffY,buffIconSize,buffIconSize);
             ctx.shadowBlur=0;
             ctx.strokeStyle=buff.color;ctx.lineWidth=2;
-            ctx.strokeRect(buffX,biy,buffIconSize,buffIconSize);
+            ctx.strokeRect(bix,buffY,buffIconSize,buffIconSize);
             // Symbol
-            ctx.fillStyle=buff.color;ctx.font='bold 16px monospace';ctx.textAlign='center';
-            ctx.fillText(buff.symbol,buffX+buffIconSize/2,biy+20);
-            // Timer or tier
+            ctx.fillStyle=buff.color;ctx.font='bold 14px monospace';ctx.textAlign='center';
+            ctx.fillText(buff.symbol,bix+buffIconSize/2,buffY+17);
+            // Timer or tier below icon
             if(buff.timer!==null){
-                ctx.fillStyle='#fff';ctx.font='bold 9px monospace';
-                ctx.fillText(buff.timer+'s',buffX+buffIconSize/2,biy+30);
+                ctx.fillStyle='#fff';ctx.font='bold 7px monospace';
+                ctx.fillText(buff.timer+'s',bix+buffIconSize/2,buffY+buffIconSize+8);
             } else if(buff.tier!==null){
-                ctx.fillStyle=buff.color;ctx.font='bold 8px monospace';
-                ctx.fillText('T'+buff.tier,buffX+buffIconSize/2,biy+29);
+                ctx.fillStyle=buff.color;ctx.font='bold 7px monospace';
+                ctx.fillText('T'+buff.tier,bix+buffIconSize/2,buffY+buffIconSize+8);
             }
             ctx.restore();
         }
@@ -2848,29 +2846,16 @@ function drawExpeditionHUD(){
         var rb=window.renderedBuffs.find(function(b){return b.index===buffTooltipIndex;});
         if(rb){
             var tooltipW=180,tooltipH=80;
-            var tx=rb.x+rb.w+8,ty=rb.y-10;
-            // Adjust if off-screen
-            if(tx+tooltipW>canvas.width) tx=rb.x-tooltipW-8;
-            if(ty+tooltipH>canvas.height) ty=canvas.height-tooltipH-10;
-            if(ty<10) ty=10;
+            // Tooltip appears below the icon row
+            var tx=rb.x,ty=rb.y+rb.h+12;
+            if(tx+tooltipW>canvas.width) tx=canvas.width-tooltipW-4;
+            if(tx<4) tx=4;
+            if(ty+tooltipH>canvas.height) ty=rb.y-tooltipH-6;
             // Background
             ctx.fillStyle='rgba(10,10,20,0.95)';
             ctx.fillRect(tx,ty,tooltipW,tooltipH);
             ctx.strokeStyle=rb.buff.color;ctx.lineWidth=2;
             ctx.strokeRect(tx,ty,tooltipW,tooltipH);
-            // Arrow pointer
-            ctx.fillStyle='rgba(10,10,20,0.95)';
-            ctx.beginPath();
-            if(tx>rb.x){ // Arrow on left
-                ctx.moveTo(tx,ty+tooltipH/2-6);
-                ctx.lineTo(tx-6,ty+tooltipH/2);
-                ctx.lineTo(tx,ty+tooltipH/2+6);
-            } else { // Arrow on right
-                ctx.moveTo(tx+tooltipW,ty+tooltipH/2-6);
-                ctx.lineTo(tx+tooltipW+6,ty+tooltipH/2);
-                ctx.lineTo(tx+tooltipW,ty+tooltipH/2+6);
-            }
-            ctx.fill();
             // Content
             ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.textAlign='left';
             var cy=ty+18;
@@ -3661,14 +3646,11 @@ function handleExpeditionPopupClick(cx,cy){
         // Click outside
         if(cx<px2||cx>px2+pw2||cy<py2||cy>py2+ph2){merchantPopup=null;merchantScrollY=0;playSound('click');return;}
 
-        // Apply scroll offset for content clicks
-        cy = cy - merchantScrollY;
-
-        // Buy items
+        // Buy items (add scrollY because render uses ctx.translate)
         var iy=py2+65,itemH=50;
         for(var i=0;i<shopStock.length;i++){
             var item=shopStock[i];
-            var y2=iy+i*(itemH+4);
+            var y2=iy+merchantScrollY+i*(itemH+4);
             var btnW2=70,btnH2=28,btnX=px2+pw2-btnW2-20,btnY=y2+10;
             if(cx>=btnX&&cx<=btnX+btnW2&&cy>=btnY&&cy<=btnY+btnH2){
                 if(gold<item.price){
