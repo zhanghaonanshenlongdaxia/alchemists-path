@@ -5,7 +5,7 @@ const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 var pixelRatio = window.devicePixelRatio || 1;
 var qualityLevel = 2; // 0=low, 1=medium, 2=high
 var sfxVolume = 1.0;
-var godMode = false; // Invincibility for testing
+var godMode = true; // Invincibility for testing (default ON)
 var showSettings = false;
 function applyQuality(){
     if(qualityLevel===0) pixelRatio=1;
@@ -2102,6 +2102,20 @@ function renderExpedition(){
     } else {
         ctx.fillStyle='#44dd88';ctx.beginPath();ctx.arc(ppx,ppy,player.radius,0,Math.PI*2);ctx.fill();
     }
+    
+    // Debug: Draw semi-transparent circle overlay on player
+    ctx.save();
+    ctx.globalAlpha=0.3;
+    ctx.strokeStyle='#ff0000';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    // Larger circle, centered on player sprite
+    var debugRadius=16; // Adjust to match player sprite size
+    var debugOffsetY=0; // Adjust vertical position
+    ctx.arc(ppx,ppy+debugOffsetY,debugRadius,0,Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+    
     // Attack swing (improved arc with trail)
     if(player.attackAnim>0){
         var swingAlpha=player.attackAnim/8;
