@@ -1684,8 +1684,8 @@ function update(){
         if(playerStats.stealth>0&&!e.alert) canSee=canSee&&d<60;
         if(canSee||(e.alert&&d<200)){
             e.alert=true;e.alertTimer=180;
-            // Record to bestiary on first sight
-            if(canSee&&e.enemyTypeKey){
+            // Record to bestiary on first sight (boss/elite: record on alert too)
+            if((canSee||e.isBoss||e.isElite)&&e.enemyTypeKey){
                 var etKey=e.enemyTypeKey;
                 if(!seenEnemies[etKey]) seenEnemies[etKey]={count:0,sprite:e.sprite||null};
                 if(!e._seenRecorded){seenEnemies[etKey].count++;e._seenRecorded=true;}
