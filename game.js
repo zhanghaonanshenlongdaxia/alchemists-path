@@ -4451,12 +4451,17 @@ function drawBestiaryPage(key, data, px, py, pw, ph2, side){
 
     var spr=SPR.bestiarySprites&&SPR.bestiarySprites[key];
     if(spr){
-        // Draw sprite centered, scaled to fit
+        // Draw sprite centered, scaled to fit — disable smoothing for crisp pixel art
         var scale=Math.min(imgW/spr.width, imgH/spr.height)*0.85;
-        var dw=spr.width*scale,dh=spr.height*scale;
-        var dx=imgX+(imgW-dw)/2,dy=imgY+(imgH-dh)/2;
+        // Use integer scale for sharpest pixel art
+        var pixelScale=Math.max(1,Math.floor(scale));
+        // If pixel scale gives much smaller image, fall back to float scale
+        if(pixelScale*spr.width < imgW*0.5) pixelScale=scale;
+        var dw=Math.round(spr.width*pixelScale),dh=Math.round(spr.height*pixelScale);
+        var dx=Math.round(imgX+(imgW-dw)/2),dy=Math.round(imgY+(imgH-dh)/2);
         ctx.save();
-        ctx.shadowColor=et.color||accentColor;ctx.shadowBlur=12;
+        ctx.imageSmoothingEnabled=false;
+        ctx.shadowColor=et.color||accentColor;ctx.shadowBlur=10;
         ctx.drawImage(spr,dx,dy,dw,dh);
         ctx.restore();
     } else {
@@ -4480,6 +4485,7 @@ function drawBestiaryPage(key, data, px, py, pw, ph2, side){
     }
 
     // Info area (bottom ~45% of page)
+    var pad=14; // horizontal padding inside page
     var infoY=imgY+imgH+10;
     var nameStr=lang==='zh'?(et.nameZh||et.name):et.name;
     ctx.fillStyle=accentColor;ctx.font='bold 13px monospace';ctx.textAlign='center';
@@ -4495,45 +4501,41 @@ function drawBestiaryPage(key, data, px, py, pw, ph2, side){
         {k:'ATK',v:et.atk.toFixed(1),c:'#ff9944'},
         {k:'SPD',v:et.spd.toFixed(1),c:'#44ddff'},
     ];
-    var sw=(pw-20)/3;
+    var sw=(pw-pad*2)/3;
     for(var si=0;si<3;si++){
-        var sx=px+10+si*sw+sw/2;
+        var sx=px+pad+si*sw+sw/2;
         ctx.fillStyle='#555';ctx.font='8px monospace';ctx.textAlign='center';
         ctx.fillText(stats[si].k,sx,infoY);
         ctx.fillStyle=stats[si].c;ctx.font='bold 11px monospace';
         ctx.fillText(stats[si].v,sx,infoY+12);
     }
-    infoY+=26;
+    infoY+=28;
 
     // Description (word-wrap)
     var desc=lang==='zh'?(et.descZh||et.desc):et.desc;
     ctx.fillStyle='#ccbbee';ctx.font='9px monospace';ctx.textAlign='left';
-    var maxW=pw-20,lh=13,lx=px+10;
+    var maxW=pw-pad*2-4,lh=13,lx=px+pad;
     if(lang==='zh'){
         var cl='';
         for(var ci=0;ci<desc.length;ci++){
             var t2=cl+desc[ci];
-            if(ctx.measureText(t2).width>maxW&&cl){ctx.fillText(cl,lx,infoY);infoY+=lh;cl=desc[ci];if(infoY>py+ph2-22)break;}
+            if(ctx.measureText(t2).width>maxW&&cl){ctx.fillText(cl,lx,infoY);infoY+=lh;cl=desc[ci];if(infoY>py+ph2-20)break;}
             else cl=t2;
         }
-        if(cl&&infoY<=py+ph2-22) ctx.fillText(cl,lx,infoY); infoY+=lh;
+        if(cl&&infoY<=py+ph2-20) ctx.fillText(cl,lx,infoY); infoY+=lh;
     } else {
         var wl='',ws2=desc.split(' ');
         for(var wi=0;wi<ws2.length;wi++){
             var tl2=wl+(wl?' ':'')+ws2[wi];
-            if(ctx.measureText(tl2).width>maxW&&wl){ctx.fillText(wl,lx,infoY);infoY+=lh;wl=ws2[wi];if(infoY>py+ph2-22)break;}
+            if(ctx.measureText(tl2).width>maxW&&wl){ctx.fillText(wl,lx,infoY);infoY+=lh;wl=ws2[wi];if(infoY>py+ph2-20)break;}
             else wl=tl2;
         }
-        if(wl&&infoY<=py+ph2-22) ctx.fillText(wl,lx,infoY); infoY+=lh;
+        if(wl&&infoY<=py+ph2-20) ctx.fillText(wl,lx,infoY); infoY+=lh;
     }
 
     // Skills
-    if(et.skills&&et.skills.length>0&&infoY<=py+ph2-14){
-        var skillColorMap={charge:'#ff9944',poison:'#aa44dd',slam:'#ff6666',shoot:'#44aaff',
-            summon:'#ffcc44',rage:'#ff4444',leech:'#aa44aa',teleport:'#44ffcc',split:'#88ff44',shield:'#44aaff'};
-        ctx.font='9px monospace';ctx.textAlign='left';
-        var skStr=et.skills.map(function(s){return skillColorMap[s]?s:s;}).join(' · ');
-        ctx.fillStyle='#ffcc44';
+    if(et.skills&&et.skills.length>0&&infoY<=py+ph2-12){
+        ctx.fillStyle='#ffcc44';ctx.font='9px monospace';ctx.textAlign='left';
         ctx.fillText('['+et.skills.join(' · ')+']',lx,infoY);
     }
 }
