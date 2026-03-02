@@ -2852,9 +2852,19 @@ function drawExpeditionHUD(){
             ctx.shadowBlur=0;
             ctx.strokeStyle=buff.color;ctx.lineWidth=2;
             ctx.strokeRect(bix,buffY,buffIconSize,buffIconSize);
-            // Symbol
-            ctx.fillStyle=buff.color;ctx.font='bold 14px monospace';ctx.textAlign='center';
-            ctx.fillText(buff.symbol,bix+buffIconSize/2,buffY+17);
+            // Symbol: use relic sprite if available, else fallback emoji
+            if(buff.type==='relic'&&buff.relicId&&SPR.relicSprites&&SPR.relicSprites[buff.relicId]){
+                var rspr=SPR.relicSprites[buff.relicId];
+                var pad=3,iw=buffIconSize-pad*2,ih=buffIconSize-pad*2;
+                var sc2=Math.min(iw/rspr.width,ih/rspr.height);
+                var dw2=Math.round(rspr.width*sc2),dh2=Math.round(rspr.height*sc2);
+                ctx.imageSmoothingEnabled=false;
+                ctx.shadowColor=buff.color;ctx.shadowBlur=4;
+                ctx.drawImage(rspr,bix+pad+(iw-dw2)/2,buffY+pad+(ih-dh2)/2,dw2,dh2);
+            } else {
+                ctx.fillStyle=buff.color;ctx.font='bold 14px monospace';ctx.textAlign='center';
+                ctx.fillText(buff.symbol,bix+buffIconSize/2,buffY+17);
+            }
             // Timer or tier below icon
             if(buff.timer!==null){
                 ctx.fillStyle='#fff';ctx.font='bold 7px monospace';
