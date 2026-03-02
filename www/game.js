@@ -3639,7 +3639,8 @@ function handleExpeditionPopupClick(cx,cy){
         return;
     }
     if(merchantPopup){
-        var pw2=Math.min(W-40,420),ph2=Math.min(H-60,400),px2=(W-pw2)/2,py2=(H-ph2)/2;
+        // Use EXACT same coordinates as drawMerchantPopup
+        var pw2=Math.min(W-40,420),ph2=Math.min(H-40,650),px2=(W-pw2)/2,py2=(H-ph2)/2;
         // Close button (not affected by scroll)
         var cbS=28,cbX=px2+pw2-cbS-6,cbY=py2+6;
         if(cx>=cbX&&cx<=cbX+cbS&&cy>=cbY&&cy<=cbY+cbS){merchantPopup=null;merchantScrollY=0;playSound('click');return;}
@@ -3672,7 +3673,7 @@ function handleExpeditionPopupClick(cx,cy){
         }
 
         // Sell herbs
-        var sellY=iy+shopStock.length*(itemH+4)+28;
+        var sellY=iy+shopStock.length*(itemH+4)+28+merchantScrollY;
         var herbKeys=Object.keys(inventory.herbs).filter(function(k){return inventory.herbs[k]>0;});
         for(var i=0;i<Math.min(herbKeys.length,3);i++){
             var k=herbKeys[i];
@@ -4647,7 +4648,7 @@ function drawBestiaryPage(key, data, px, py, pw, ph2, side){
     }
 
     // Info area (bottom ~45% of page)
-    var pad=14; // horizontal padding inside page
+    var pad=18; // horizontal padding inside page
     var infoY=imgY+imgH+10;
     var nameStr=lang==='zh'?(et.nameZh||et.name):et.name;
     ctx.fillStyle=accentColor;ctx.font='bold 13px monospace';ctx.textAlign='center';
@@ -4705,7 +4706,7 @@ function drawBestiaryPage(key, data, px, py, pw, ph2, side){
 function drawLabBestiary(cy){
     var W=canvas.width,H=canvas.height;
     var ph=Math.min(H-60,500),ppy=(H-ph)/2;
-    var navH=24;
+    var navH=36;
     // Book: two pages side by side inside panel content area
     var bookW=Math.min(W-24,560),bookH=ph-(cy-ppy)-navH-14;
     var bookX=(W-bookW)/2,bookY=cy-4;
