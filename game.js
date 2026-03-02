@@ -4456,6 +4456,8 @@ function drawLabWeapons(cy){
 // ============ ALCHEMY FORGE PANEL ============
 // Selected potions for forging (indices into inventory.potions)
 var forgeSelected = [];
+var forgePotionListY = 0; // rendered y-start of potion list, for click detection
+var forgeButtonY = 0;    // rendered y of forge button
 
 function drawLabForge(cy){
     var W=canvas.width;
@@ -4482,6 +4484,7 @@ function drawLabForge(cy){
     // Potion selection list
     ctx.fillStyle='#cc8844';ctx.font='bold 11px monospace';
     ctx.fillText(lang==='zh'?'选择药水（已选：'+forgeSelected.length+'/3）':'Select potions ('+forgeSelected.length+'/3 selected)',W/2,cy);cy+=16;
+    forgePotionListY = cy; // record for click detection
 
     var startX=W/2-160;
     if(inventory.potions.length===0){
@@ -4513,6 +4516,7 @@ function drawLabForge(cy){
     cy+=8;
     var canForge=forgeSelected.length===3;
     var fbW=160,fbH=36,fbX=W/2-fbW/2,fbY=cy;
+    forgeButtonY = fbY; // record for click detection
     ctx.fillStyle=canForge?'#ff8844':'#333';ctx.fillRect(fbX,fbY,fbW,fbH);
     ctx.fillStyle=canForge?'#000':'#555';ctx.font='bold 12px monospace';ctx.textAlign='center';
     ctx.fillText(lang==='zh'?'⚒ 锻造武器':'⚒ Forge Weapon',fbX+fbW/2,fbY+fbH/2+4);
@@ -4700,6 +4704,11 @@ function drawLabRelics(cy){
             ctx.fillText('???',cx2+cellW/2,cy2+60);
         }
     }
+    // Update dynamic scroll max
+    var rows2=Math.ceil(COLLECTIBLES.length/cols);
+    var contentEnd=cy+rows2*(cellH+8)+20;
+    var H2=canvas.height,ph2=Math.min(H2-60,500);
+    labScrollMax=Math.max(0, contentEnd-(ph2+50));
 }
 
 function drawLabSkills(cy){
@@ -5432,7 +5441,8 @@ function handleLabClick(cx,cy){
             }
         } else if(labTab==='forge'){
             var startX=W/2-160;
-            var fgCy=contentY+88+(forgedWeapon?48:18)+8+16; // after header/forgedWeapon/label
+            // Use recorded Y from render (adjusted for scroll offset)
+            var fgCy=forgePotionListY+labScrollY;
             // Potion select buttons
             for(var i=0;i<inventory.potions.length;i++){
                 var iy=fgCy+i*36;
@@ -5445,8 +5455,7 @@ function handleLabClick(cx,cy){
                 }
             }
             // Forge button
-            var fgPotionListH=inventory.potions.length>0?inventory.potions.length*36+8:30;
-            var fbY=fgCy+fgPotionListH+8;
+            var fbY=forgeButtonY+labScrollY;
             var fbW=160,fbH=36,fbX=W/2-fbW/2;
             if(forgeSelected.length===3&&cx>=fbX&&cx<=fbX+fbW&&cy>=fbY&&cy<=fbY+fbH){
                 // Determine quality from avg potion tier
