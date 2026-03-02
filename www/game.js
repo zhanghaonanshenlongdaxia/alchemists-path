@@ -2103,69 +2103,54 @@ function renderExpedition(){
         ctx.fillStyle='#44dd88';ctx.beginPath();ctx.arc(ppx,ppy,player.radius,0,Math.PI*2);ctx.fill();
     }
     
-    // Debug: Draw semi-transparent circle overlay on player
-    ctx.save();
-    ctx.globalAlpha=0.3;
-    ctx.strokeStyle='#ff0000';
-    ctx.lineWidth=2;
-    ctx.beginPath();
-    // Larger circle, centered on player sprite
-    var debugRadius=16; // Adjust to match player sprite size
-    var debugOffsetY=0; // Adjust vertical position
-    ctx.arc(ppx,ppy+debugOffsetY,debugRadius,0,Math.PI*2);
-    ctx.stroke();
-    ctx.restore();
-    
-    // Attack swing (improved arc with trail)
+    // Attack: Circle of rotating weapons
     if(player.attackAnim>0){
         var swingAlpha=player.attackAnim/8;
-        ctx.save();ctx.translate(ppx,ppy);
         var wc=equippedWeapon?equippedWeapon.color:'#fff';
         var wRange=equippedWeapon?equippedWeapon.range:30;
-        var wType=equippedWeapon?equippedWeapon.type:'sword';
         var wName=equippedWeapon?equippedWeapon.name:'';
         
-        // Draw weapon sprite at swing position if available
+        // Draw circle of rotating weapons if sprite available
         var hasWeaponSprite=SPR.weapons&&SPR.weapons[wName];
         if(hasWeaponSprite){
-            // Swing direction based on player facing (left = counter-clockwise, right = clockwise)
-            var swingDir=(player.angle>Math.PI/2||player.angle<-Math.PI/2)?-1:1;
-            // Swing progress: 0 to 1, then calculate angle offset from center
-            var swingProgress=player.attackAnim/8;
-            var swingOffset=(swingProgress*2-1)*Math.PI*0.5*swingDir; // -0.5 to 0.5 radians, direction-aware
-            var currentAngle=player.angle+swingOffset;
+            var weaponCount=8; // Number of weapons in the circle
+            var rotationSpeed=player.attackAnim*0.3; // Rotation animation
+            var circleRadius=wRange*0.7; // Radius of weapon circle
             
-            // Handle position on player circle edge, perpendicular to attack direction
-            var handleDist=player.radius+2;
-            var handleX=Math.cos(currentAngle)*handleDist;
-            var handleY=Math.sin(currentAngle)*handleDist;
+            for(var i=0;i<weaponCount;i++){
+                var angle=i*Math.PI*2/weaponCount+rotationSpeed;
+                var wx=ppx+Math.cos(angle)*circleRadius;
+                var wy=ppy+Math.sin(angle)*circleRadius;
+                
+                ctx.save();
+                ctx.translate(wx,wy);
+                ctx.rotate(angle+Math.PI*3/4); // Weapon orientation
+                ctx.globalAlpha=swingAlpha*0.9;
+                var wSize=24;
+                ctx.drawImage(SPR.weapons[wName],0,-wSize/2,wSize,wSize);
+                ctx.restore();
+            }
             
+            // Motion blur trail (arc effect)
             ctx.save();
-            ctx.translate(handleX,handleY);
-            ctx.rotate(currentAngle);
-            ctx.globalAlpha=swingAlpha;
-            var wSize=28;
-            // Draw weapon with handle at current position, blade pointing outward
-            ctx.drawImage(SPR.weapons[wName],0,-wSize/2,wSize,wSize);
-            ctx.restore();
-            
-            // Motion blur trail (arc effect centered on attack direction)
-            ctx.globalAlpha=swingAlpha*0.25;
+            ctx.translate(ppx,ppy);
+            ctx.globalAlpha=swingAlpha*0.2;
             ctx.strokeStyle=wc;
-            ctx.lineWidth=6;
+            ctx.lineWidth=8;
             ctx.beginPath();
-            var arcStart=player.angle-Math.PI*0.5*swingDir;
-            var arcEnd=player.angle+Math.PI*0.5*swingDir;
-            ctx.arc(0,0,wRange,arcStart,arcEnd,swingDir<0);
+            ctx.arc(0,0,circleRadius,0,Math.PI*2);
             ctx.stroke();
-            ctx.globalAlpha=swingAlpha*0.15;
-            ctx.lineWidth=12;
+            ctx.globalAlpha=swingAlpha*0.1;
+            ctx.lineWidth=16;
             ctx.beginPath();
-            ctx.arc(0,0,wRange,arcStart,arcEnd,swingDir<0);
+            ctx.arc(0,0,circleRadius,0,Math.PI*2);
             ctx.stroke();
+            ctx.restore();
         }
         
         // Weapon-specific rendering (fallback if no sprite)
+        ctx.save();ctx.translate(ppx,ppy);ctx.rotate(player.angle);
+        var wType=equippedWeapon?equippedWeapon.type:'sword';
         if(!hasWeaponSprite&&wType==='sword'){
             // Sword: Arc slash with blade trail
             ctx.globalAlpha=swingAlpha*0.3;
