@@ -211,6 +211,26 @@ function loadCustomEnemySprites() {
     });
 }
 
+// Load relic/collectible sprites (driven by COLLECTIBLES sprite field)
+function loadRelicSprites() {
+    SPR.relicSprites = {};
+    return new Promise(function(resolve) {
+        if (typeof COLLECTIBLES === 'undefined') { resolve(); return; }
+        var toLoad = [];
+        COLLECTIBLES.forEach(function(c) {
+            if (c.sprite) toLoad.push({ id: c.id, path: c.sprite });
+        });
+        var loaded = 0, total = toLoad.length;
+        if (total === 0) { resolve(); return; }
+        toLoad.forEach(function(item) {
+            var img = new Image();
+            img.onload = function() { SPR.relicSprites[item.id] = img; loaded++; if(loaded===total) resolve(); };
+            img.onerror = function() { loaded++; if(loaded===total) resolve(); };
+            img.src = item.path;
+        });
+    });
+}
+
 // Load bestiary enemy sprites (driven by ENEMY_TYPES sprite field)
 function loadBestiarySprites() {
     SPR.bestiarySprites = {};

@@ -567,40 +567,87 @@ function getResearchBonus(stat){
 
 // ============ COLLECTIBLES (relics) ============
 const COLLECTIBLES = [
-    { id:'ancient_coin',   name:'Ancient Coin',   nameZh:'远古金币',   color:'#ffd700', desc:'A coin from a forgotten age', descZh:'来自遗忘时代的金币', 
+    { id:'ancient_coin',   name:'Ancient Coin',   nameZh:'远古金币',   color:'#ffd700', sprite:'res/item/misc/gold_pile.png',
       skill:'passive', skillName:'Golden Fortune', skillNameZh:'黄金财运', skillDesc:'+15% gold from all sources', skillDescZh:'所有来源的金币+15%', effect:{goldBonus:0.15} },
-    { id:'crystal_skull',  name:'Crystal Skull',  nameZh:'水晶头骨',   color:'#88ccff', desc:'Glows faintly in the dark', descZh:'在黑暗中微微发光',
+    { id:'crystal_skull',  name:'Crystal Skull',  nameZh:'水晶头骨',   color:'#88ccff', sprite:'res/item/misc/misc_crystal.png',
       skill:'passive', skillName:'Mind\'s Eye', skillNameZh:'心灵之眼', skillDesc:'Reveals enemy HP bars', skillDescZh:'显示敌人血量条', effect:{showEnemyHP:true} },
-    { id:'dragon_scale',   name:'Dragon Scale',   nameZh:'龙鳞',       color:'#ff6622', desc:'Warm to the touch', descZh:'触感温热',
+    { id:'dragon_scale',   name:'Dragon Scale',   nameZh:'龙鳞',       color:'#ff6622', sprite:'res/item/amulet/celtic_red.png',
       skill:'passive', skillName:'Dragon Hide', skillNameZh:'龙之甲', skillDesc:'+3 Defense', skillDescZh:'防御+3', effect:{defenseBonus:3} },
-    { id:'shadow_gem',     name:'Shadow Gem',     nameZh:'暗影宝石',   color:'#6644aa', desc:'Absorbs light around it', descZh:'吸收周围的光线',
+    { id:'shadow_gem',     name:'Shadow Gem',     nameZh:'暗影宝石',   color:'#6644aa', sprite:'res/item/amulet/stone2_blue.png',
       skill:'passive', skillName:'Shadow Step', skillNameZh:'暗影步', skillDesc:'+20% movement speed', skillDescZh:'移动速度+20%', effect:{speedBonus:0.5} },
-    { id:'phoenix_feather',name:'Phoenix Feather', nameZh:'凤凰羽',    color:'#ffaa00', desc:'Never stops smoldering', descZh:'永远在燃烧',
+    { id:'phoenix_feather',name:'Phoenix Feather', nameZh:'凤凰羽',    color:'#ffaa00', sprite:'res/item/amulet/i-rage.png',
       skill:'passive', skillName:'Rebirth', skillNameZh:'重生', skillDesc:'Revive once per expedition with 50% HP', skillDescZh:'每次探险复活一次，恢复50%血量', effect:{autoRevive:true} },
-    { id:'frost_heart',    name:'Frost Heart',    nameZh:'霜之心',     color:'#44ddff', desc:'Cold as the void', descZh:'冰冷如虚空',
+    { id:'frost_heart',    name:'Frost Heart',    nameZh:'霜之心',     color:'#44ddff', sprite:'res/item/amulet/crystal_white.png',
       skill:'passive', skillName:'Frost Aura', skillNameZh:'霜冻光环', skillDesc:'Slow nearby enemies by 30%', skillDescZh:'减缓附近敌人30%速度', effect:{enemySlow:0.3} },
-    { id:'earth_rune',     name:'Earth Rune',     nameZh:'大地符文',   color:'#ddaa22', desc:'Hums with deep energy', descZh:'嗡嗡作响的深层能量',
+    { id:'earth_rune',     name:'Earth Rune',     nameZh:'大地符文',   color:'#ddaa22', sprite:'res/item/misc/misc_rune.png',
       skill:'passive', skillName:'Stone Skin', skillNameZh:'石肤', skillDesc:'+5 Max HP', skillDescZh:'最大生命+5', effect:{maxHpBonus:5} },
-    { id:'void_shard',     name:'Void Shard',     nameZh:'虚空碎片',   color:'#aa44dd', desc:'Seems to bend space', descZh:'似乎在扭曲空间',
+    { id:'void_shard',     name:'Void Shard',     nameZh:'虚空碎片',   color:'#aa44dd', sprite:'res/item/misc/misc_stone.png',
       skill:'passive', skillName:'Void Walk', skillNameZh:'虚空行走', skillDesc:'15% chance to dodge attacks', skillDescZh:'15%几率闪避攻击', effect:{dodgeChance:0.15} },
-    { id:'star_fragment',  name:'Star Fragment',  nameZh:'星辰碎片',   color:'#ddddff', desc:'Fallen from the sky', descZh:'从天而降',
+    { id:'star_fragment',  name:'Star Fragment',  nameZh:'星辰碎片',   color:'#ddddff', sprite:'res/item/amulet/eye_cyan.png',
       skill:'passive', skillName:'Star Light', skillNameZh:'星光', skillDesc:'+25% potion effectiveness', skillDescZh:'药剂效果+25%', effect:{potionBonus:0.25} },
-    { id:'blood_ruby',     name:'Blood Ruby',     nameZh:'血红宝石',   color:'#ee4444', desc:'Pulses like a heartbeat', descZh:'像心跳一样脉动',
+    { id:'blood_ruby',     name:'Blood Ruby',     nameZh:'血红宝石',   color:'#ee4444', sprite:'res/item/amulet/crystal_red.png',
       skill:'passive', skillName:'Blood Thirst', skillNameZh:'嗜血', skillDesc:'Heal 1 HP per kill', skillDescZh:'每次击杀回复1生命', effect:{lifeSteal:1} },
-    { id:'moss_agate',     name:'Moss Agate',     nameZh:'苔藓玛瑙',   color:'#44dd88', desc:'Living stone', descZh:'活着的石头',
+    { id:'moss_agate',     name:'Moss Agate',     nameZh:'苔藓玛瑙',   color:'#44dd88', sprite:'res/item/amulet/stone1_green.png',
       skill:'passive', skillName:'Nature\'s Blessing', skillNameZh:'自然祝福', skillDesc:'+1 HP regen per 5s', skillDescZh:'每5秒回复1生命', effect:{regenBonus:1} },
-    { id:'thunder_pearl',  name:'Thunder Pearl',  nameZh:'雷霆珍珠',   color:'#ffdd44', desc:'Crackles with static', descZh:'噼啪作响的静电',
+    { id:'thunder_pearl',  name:'Thunder Pearl',  nameZh:'雷霆珍珠',   color:'#ffdd44', sprite:'res/item/amulet/eye_magenta.png',
       skill:'passive', skillName:'Lightning Strike', skillNameZh:'雷击', skillDesc:'10% chance to deal double damage', skillDescZh:'10%几率造成双倍伤害', effect:{critChance:0.1} },
+    // New relics
+    { id:'iron_ring',      name:'Iron Ring',      nameZh:'铁环',       color:'#aaaaaa', sprite:'res/item/ring/iron.png',
+      skill:'passive', skillName:'Iron Will', skillNameZh:'铁意志', skillDesc:'+2 Attack', skillDescZh:'攻击+2', effect:{atkBonus:2} },
+    { id:'jade_amulet',    name:'Jade Amulet',    nameZh:'翡翠护符',   color:'#44dd88', sprite:'res/item/ring/jade.png',
+      skill:'passive', skillName:'Jade Barrier', skillNameZh:'翡翠屏障', skillDesc:'Absorb first hit each floor', skillDescZh:'每层第一次攻击免伤', effect:{absorbFirst:true} },
+    { id:'void_orb',       name:'Void Orb',       nameZh:'虚空法球',   color:'#7744ff', sprite:'res/item/misc/misc_orb.png',
+      skill:'passive', skillName:'Arcane Echo', skillNameZh:'奥术回响', skillDesc:'+20% weapon range', skillDescZh:'武器范围+20%', effect:{rangeBonus:0.2} },
+    { id:'mystic_lamp',    name:'Mystic Lamp',    nameZh:'神秘灯',      color:'#ffee88', sprite:'res/item/misc/misc_lamp.png',
+      skill:'passive', skillName:'Light the Way', skillNameZh:'照亮前路', skillDesc:'Increase vision radius by 2', skillDescZh:'视野范围+2格', effect:{visionBonus:2} },
+    { id:'war_horn',       name:'War Horn',       nameZh:'战争号角',    color:'#ff8844', sprite:'res/item/misc/misc_horn.png',
+      skill:'passive', skillName:'Battle Cry', skillNameZh:'战吼', skillDesc:'+15% attack speed', skillDescZh:'攻击速度+15%', effect:{atkSpeedBonus:0.15} },
+    { id:'emerald_ring',   name:'Emerald Ring',   nameZh:'翡翠戒指',   color:'#44ff88', sprite:'res/item/ring/emerald.png',
+      skill:'passive', skillName:'Emerald Fortune', skillNameZh:'翡翠幸运', skillDesc:'+10% herb yield', skillDescZh:'草药产量+10%', effect:{herbBonus:0.1} },
+    { id:'silver_ring',    name:'Silver Ring',    nameZh:'银戒指',     color:'#ccccff', sprite:'res/item/ring/silver.png',
+      skill:'passive', skillName:'Silver Tongue', skillNameZh:'银舌', skillDesc:'-15% shop prices', skillDescZh:'商店价格-15%', effect:{shopDiscount:0.15} },
+    { id:'pearl_ring',     name:'Pearl Ring',     nameZh:'珍珠戒指',   color:'#eeeeff', sprite:'res/item/ring/pearl.png',
+      skill:'passive', skillName:'Ocean\'s Grace', skillNameZh:'海洋恩典', skillDesc:'+2 HP regen per 10s', skillDescZh:'每10秒回复2生命', effect:{regenBonus:2} },
+    { id:'chaos_fan',      name:'Chaos Fan',      nameZh:'混沌扇',     color:'#ff44aa', sprite:'res/item/misc/misc_fan.png',
+      skill:'passive', skillName:'Chaos Burst', skillNameZh:'混沌爆发', skillDesc:'5% chance to stun on hit', skillDescZh:'攻击5%几率眩晕', effect:{stunChance:0.05} },
+    { id:'rune_disc',      name:'Rune Disc',      nameZh:'符文圆盘',   color:'#44aaff', sprite:'res/item/misc/misc_disc.png',
+      skill:'passive', skillName:'Runic Shield', skillNameZh:'符文护盾', skillDesc:'+1 Defense per 3 floors', skillDescZh:'每3层+1防御', effect:{defPerFloor:true} },
 ];
 let foundCollectibles = []; // array of collectible ids (all-time)
 let expeditionFoundRelics = []; // relics found in current expedition only
 function collectibleName(c){ return lang==='zh'?c.nameZh:c.name; }
 function collectibleDesc(c){ return lang==='zh'?c.descZh:c.desc; }
+function openRelicChoice(source){
+    // Pick 3 distinct random relics (prefer unfound)
+    var pool=COLLECTIBLES.filter(function(c){return expeditionFoundRelics.indexOf(c.id)<0;});
+    if(pool.length<3) pool=COLLECTIBLES.slice();
+    var choices=[];
+    var tmp=pool.slice();
+    while(choices.length<3&&tmp.length>0){
+        var idx=randInt(0,tmp.length-1);
+        choices.push(tmp.splice(idx,1)[0]);
+    }
+    relicChoicePopup={choices:choices,source:source};
+}
+function applyRelicEffect(c){
+    if(foundCollectibles.indexOf(c.id)<0) foundCollectibles.push(c.id);
+    if(expeditionFoundRelics.indexOf(c.id)<0) expeditionFoundRelics.push(c.id);
+    var e=c.effect||{};
+    if(e.maxHpBonus){ playerStats.maxHp+=e.maxHpBonus; playerStats.hp=Math.min(playerStats.hp+e.maxHpBonus,playerStats.maxHp); }
+    if(e.defenseBonus) playerStats.def+=e.defenseBonus;
+    if(e.atkBonus) playerStats.atk+=e.atkBonus;
+    if(e.regenBonus) playerStats.regen+=e.regenBonus;
+    if(e.autoRevive) playerStats.revive=true;
+    spawnFloat(player.x,player.y-20,lang==='zh'?('获得 '+collectibleName(c)):('Got '+collectibleName(c)),'#ffdd44');
+    spawnParticles(player.x,player.y,'#ffdd44',12);
+    playSound('craft');
+}
 
 // ============ KEYS & LOCKED ROOMS ============
 let playerKeys = 0;
 let lockedDoors = []; // {x,y,roomIdx,unlocked}
 let collectibleDrops = []; // {x,y,collectibleId,collected}
+let relicChoicePopup = null; // {choices:[collectible,collectible,collectible], source:'chest'|'boss'|'elite'}
 
 // ============ SKILL TREE ============
 const SKILL_BRANCHES = [
@@ -1057,7 +1104,7 @@ function setupFloor(biomeIdx, floor){
         }
     }
 
-    // Spawn chests (weapon/gold drops)
+    // Spawn chests (weapon/gold drops, 20% chance relic choice)
     var chestCount = randInt(1,2+floor);
     for(var i=0;i<chestCount;i++){
         var cr = rooms[randInt(1,rooms.length-1)];
@@ -1065,9 +1112,10 @@ function setupFloor(biomeIdx, floor){
         var pool = getWeaponDropPool(floor, false);
         var hasWeapon = Math.random()<0.4;
         chests.push({
-            x:cp.x, y:cp.y, opened:false,
+            x:cp.x, y:cp.y, opened:false, type:'normal',
             goldReward: randInt(3+floor*2, 8+floor*5),
-            weaponReward: hasWeapon&&pool.length>0 ? makeWeapon(pool[randInt(0,pool.length-1)]) : null
+            weaponReward: hasWeapon&&pool.length>0 ? makeWeapon(pool[randInt(0,pool.length-1)]) : null,
+            relicChance: Math.random()<0.2 // 20% chance relic choice
         });
     }
 
@@ -1112,14 +1160,10 @@ function setupFloor(biomeIdx, floor){
             }
         }
         if(doorPlaced){
-            // Place collectible inside locked room
+            // Key chest inside locked room — guaranteed relic choice on open
             var cp = findOpenTile(lr);
-            var available = COLLECTIBLES.filter(function(c){ return foundCollectibles.indexOf(c.id)<0; });
-            if(available.length===0) available = COLLECTIBLES; // all found, allow duplicates
-            var coll = available[randInt(0,available.length-1)];
-            collectibleDrops.push({x:cp.x,y:cp.y,collectibleId:coll.id,collected:false});
-            // Also add extra gold chest
-            chests.push({x:cp.x+TILE,y:cp.y,opened:false,goldReward:randInt(10+floor*5,25+floor*10),weaponReward:null});
+            chests.push({x:cp.x,y:cp.y,opened:false,type:'key_chest',
+                goldReward:randInt(8+floor*3,18+floor*6),weaponReward:null,relicGuaranteed:true});
         }
     }
     } // end if(!isBossFloor)
@@ -1226,6 +1270,7 @@ canvas.addEventListener('touchstart',function(e){
     if(state!=='expedition') return;
     if(showSettings){handleSettingsClick(t0.clientX,t0.clientY);return;}
     if(tutorialPhase==='expedition'){handleTutorialClick(t0.clientX,t0.clientY);return;}
+    if(relicChoicePopup){handleRelicChoiceClick(t0.clientX,t0.clientY);return;}
     // Handle popups first
     if(weaponPopup||merchantPopup||buffPopup){
         if(buffPopup){
@@ -1344,7 +1389,7 @@ function update(){
         if(em.temp>=95||em.temp<=5) em.quality-=0.3;
     }
     if(state!=='expedition') return;
-    if(weaponPopup||merchantPopup||buffPopup) return; // pause while popup open
+    if(weaponPopup||merchantPopup||buffPopup||relicChoicePopup) return; // pause while popup open
     frameCount++;
     if(currentFloor<MAX_FLOORS-1&&!godMode) missionTimer--; // no timer on boss floor or in god mode
     if(missionTimer<=0&&!godMode){endExpedition();return;}
@@ -1474,8 +1519,14 @@ function update(){
                         spawnFloat(player.x,player.y-30,T('bossDefeated'),'#ffdd44');
                         spawnParticles(e.x,e.y,'#ffdd44',20);
                         playSound('levelUp');
+                        // Spawn boss chest at boss location — guaranteed relic
+                        chests.push({x:e.x,y:e.y,opened:false,type:'boss_chest',
+                            goldReward:randInt(20+currentFloor*5,40+currentFloor*8),
+                            weaponReward:null,relicGuaranteed:true});
                     } else if(e.isElite){
                         spawnFloat(e.x,e.y-25,T('eliteSlain'),'#ffaa00');
+                        // 30% chance relic choice
+                        if(Math.random()<0.3) openRelicChoice('elite');
                     }
                     enemies.splice(i,1);
                 }
@@ -1689,6 +1740,12 @@ function update(){
             playSound('pickup');
             if(ch.weaponReward){
                 weaponPopup={weapon:ch.weaponReward,x:ch.x,y:ch.y};
+            }
+            // Relic choice
+            if(ch.relicGuaranteed || ch.type==='boss_chest'){
+                openRelicChoice(ch.type||'chest');
+            } else if(ch.relicChance){
+                openRelicChoice('chest');
             }
         }
     }
@@ -2118,20 +2175,36 @@ function renderExpedition(){
             ctx.fillStyle='#3a3020';ctx.fillRect(cx2-10,cy2-4,20,3);
             ctx.strokeStyle='#444';ctx.lineWidth=1;ctx.strokeRect(cx2-10,cy2-4,20,12);
         } else {
+            var isBossC=ch.type==='boss_chest',isKeyC=ch.type==='key_chest';
+            var bodyColor=isBossC?'#882222':(isKeyC?'#224488':'#8a6622');
+            var lidColor=isBossC?'#aa3333':(isKeyC?'#3355aa':'#bb9933');
+            var lidTop=isBossC?'#cc4444':(isKeyC?'#5577cc':'#ddbb44');
+            var glowColor=isBossC?'#ff4444':(isKeyC?'#44aaff':'#ffd700');
             // Chest body
-            ctx.fillStyle='#8a6622';ctx.fillRect(cx2-10,cy2-4,20,14);
+            ctx.fillStyle=bodyColor;ctx.fillRect(cx2-10,cy2-4,20,14);
             // Lid
-            ctx.fillStyle='#bb9933';ctx.fillRect(cx2-11,cy2-8,22,8);
-            ctx.fillStyle='#ddbb44';ctx.fillRect(cx2-11,cy2-8,22,2);
+            ctx.fillStyle=lidColor;ctx.fillRect(cx2-11,cy2-8,22,8);
+            ctx.fillStyle=lidTop;ctx.fillRect(cx2-11,cy2-8,22,2);
             // Metal bands
             ctx.fillStyle='#665522';ctx.fillRect(cx2-11,cy2-2,22,2);
-            // Lock
-            ctx.fillStyle='#ffd700';ctx.fillRect(cx2-2,cy2-3,4,4);
+            // Lock / icon
+            if(isKeyC){
+                // Key icon over lock
+                ctx.fillStyle='#ffd700';ctx.fillRect(cx2-2,cy2-3,4,4);
+                ctx.fillStyle='#ffee44';ctx.font='bold 8px monospace';ctx.textAlign='center';
+                ctx.fillText('🔑',cx2,cy2+10);
+            } else if(isBossC){
+                ctx.fillStyle='#ff4444';ctx.fillRect(cx2-2,cy2-3,4,4);
+                ctx.fillStyle='#ffdd44';ctx.font='bold 8px monospace';ctx.textAlign='center';
+                ctx.fillText('★',cx2,cy2+10);
+            } else {
+                ctx.fillStyle='#ffd700';ctx.fillRect(cx2-2,cy2-3,4,4);
+            }
             ctx.strokeStyle='#775511';ctx.lineWidth=1;ctx.strokeRect(cx2-10,cy2-8,20,20);
             // Glow
-            ctx.save();ctx.globalAlpha=0.1+Math.sin(frameCount*0.08)*0.06;
+            ctx.save();ctx.globalAlpha=0.12+Math.sin(frameCount*0.08)*0.07;
             var chGlow=ctx.createRadialGradient(cx2,cy2,3,cx2,cy2,22);
-            chGlow.addColorStop(0,'#ffd700');chGlow.addColorStop(1,'rgba(0,0,0,0)');
+            chGlow.addColorStop(0,glowColor);chGlow.addColorStop(1,'rgba(0,0,0,0)');
             ctx.fillStyle=chGlow;ctx.fillRect(cx2-22,cy2-22,44,44);ctx.restore();
         }
     }
@@ -2167,35 +2240,39 @@ function renderExpedition(){
         }
     }
 
-    // Collectible drops (improved sparkle)
+    // Collectible drops — sprite icon with glow + bob
     for(var cd of collectibleDrops){
         if(cd.collected) continue;
         var coll=COLLECTIBLES.find(function(c){return c.id===cd.collectibleId;});
-        var bob=Math.sin(frameCount*0.08)*4;
-        var rot=frameCount*0.03;
+        var bob=Math.sin(frameCount*0.08)*3;
         // Ground shadow
-        ctx.save();ctx.globalAlpha=0.2;ctx.fillStyle='#000';
-        ctx.beginPath();ctx.ellipse(cd.x,cd.y+12,7,3,0,0,Math.PI*2);ctx.fill();ctx.restore();
-        // Outer glow
-        ctx.save();ctx.globalAlpha=0.12+Math.sin(frameCount*0.06)*0.06;
-        var cdGlow=ctx.createRadialGradient(cd.x,cd.y+bob,2,cd.x,cd.y+bob,20);
+        ctx.save();ctx.globalAlpha=0.22;ctx.fillStyle='#000';
+        ctx.beginPath();ctx.ellipse(cd.x,cd.y+13,8,3,0,0,Math.PI*2);ctx.fill();ctx.restore();
+        // Outer glow pulse
+        ctx.save();ctx.globalAlpha=0.15+Math.sin(frameCount*0.06)*0.07;
+        var cdGlow=ctx.createRadialGradient(cd.x,cd.y+bob,2,cd.x,cd.y+bob,22);
         cdGlow.addColorStop(0,coll.color);cdGlow.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.fillStyle=cdGlow;ctx.fillRect(cd.x-20,cd.y+bob-20,40,40);ctx.restore();
-        // Diamond shape with rotation
-        ctx.save();ctx.translate(cd.x,cd.y+bob);ctx.rotate(rot);
-        ctx.fillStyle=coll.color;
-        ctx.beginPath();ctx.moveTo(0,-10);ctx.lineTo(8,0);ctx.lineTo(0,10);ctx.lineTo(-8,0);ctx.closePath();ctx.fill();
-        // Inner highlight
-        ctx.fillStyle='rgba(255,255,255,0.3)';
-        ctx.beginPath();ctx.moveTo(0,-7);ctx.lineTo(4,0);ctx.lineTo(0,2);ctx.lineTo(-4,0);ctx.closePath();ctx.fill();
-        ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1;
-        ctx.beginPath();ctx.moveTo(0,-10);ctx.lineTo(8,0);ctx.lineTo(0,10);ctx.lineTo(-8,0);ctx.closePath();ctx.stroke();
-        ctx.restore();
+        ctx.fillStyle=cdGlow;ctx.fillRect(cd.x-22,cd.y+bob-22,44,44);ctx.restore();
+        // Sprite or fallback
+        var cdSpr=SPR.relicSprites&&SPR.relicSprites[cd.collectibleId];
+        if(cdSpr){
+            var iSz=24;
+            ctx.save();ctx.imageSmoothingEnabled=false;
+            ctx.shadowColor=coll.color;ctx.shadowBlur=8;
+            var sc2=Math.min(iSz/cdSpr.width,iSz/cdSpr.height);
+            var dw2=Math.round(cdSpr.width*sc2),dh2=Math.round(cdSpr.height*sc2);
+            ctx.drawImage(cdSpr,Math.round(cd.x-dw2/2),Math.round(cd.y+bob-dh2/2),dw2,dh2);
+            ctx.restore();
+        } else {
+            // Fallback: small colored circle
+            ctx.save();ctx.fillStyle=coll.color;ctx.shadowColor=coll.color;ctx.shadowBlur=8;
+            ctx.beginPath();ctx.arc(cd.x,cd.y+bob,8,0,Math.PI*2);ctx.fill();ctx.restore();
+        }
         // Sparkle particles
         for(var si=0;si<3;si++){
-            var sa=frameCount*0.05+si*2.1, sr=12+Math.sin(frameCount*0.03+si)*4;
+            var sa=frameCount*0.05+si*2.1, sr=14+Math.sin(frameCount*0.03+si)*4;
             var spx=cd.x+Math.cos(sa)*sr, spy=cd.y+bob+Math.sin(sa)*sr;
-            ctx.save();ctx.globalAlpha=0.4+Math.sin(frameCount*0.1+si)*0.3;
+            ctx.save();ctx.globalAlpha=0.35+Math.sin(frameCount*0.1+si)*0.25;
             ctx.fillStyle='#fff';ctx.fillRect(spx-1,spy-1,2,2);ctx.restore();
         }
     }
@@ -2527,6 +2604,7 @@ function renderExpedition(){
     if(weaponPopup) drawWeaponPopup();
     if(merchantPopup) drawMerchantPopup();
     if(buffPopup) drawBuffPopup();
+    if(relicChoicePopup) drawRelicChoicePopup();
 
     // Minimap
     drawMinimap();
@@ -3216,6 +3294,86 @@ function drawBestiary(){
     ctx.fillText((lang==='zh'?'已发现: ':'Discovered: ')+seenKeys.length+'/'+Object.keys(ENEMY_TYPES).length,px+10,py+ph-14);
 }
 
+function drawRelicChoicePopup(){
+    var W=canvas.width,H=canvas.height;
+    ctx.fillStyle='rgba(0,0,0,0.78)';ctx.fillRect(0,0,W,H);
+    var pop=relicChoicePopup;
+    var isBoss=pop.source==='boss_chest';
+    var titleColor=isBoss?'#ff4444':(pop.source==='elite'?'#cc44ff':'#ffd700');
+    var titleStr=isBoss?(lang==='zh'?'Boss宝箱！':'Boss Chest!'):(pop.source==='elite'?(lang==='zh'?'精英掉落！':'Elite Drop!'):(lang==='zh'?'宝箱开启！':'Chest Opened!'));
+    // Title
+    ctx.fillStyle=titleColor;ctx.font='bold 16px monospace';ctx.textAlign='center';
+    ctx.fillText(titleStr,W/2,H/2-130);
+    ctx.fillStyle='#aaa';ctx.font='11px monospace';
+    ctx.fillText(lang==='zh'?'选择一件遗物 (1/3)':'Choose one relic',W/2,H/2-110);
+
+    var choices=pop.choices;
+    var cardW=Math.min(140,(W-60)/3),cardH=200;
+    var gap=12;
+    var totalW=cardW*3+gap*2;
+    var startX=(W-totalW)/2;
+    var cardY=H/2-95;
+
+    for(var ci=0;ci<choices.length;ci++){
+        var c=choices[ci];
+        var cx2=startX+ci*(cardW+gap);
+        var isHover=false;
+        // Card background
+        ctx.fillStyle='rgba(20,14,40,0.97)';ctx.fillRect(cx2,cardY,cardW,cardH);
+        ctx.strokeStyle=c.color;ctx.lineWidth=2;ctx.strokeRect(cx2,cardY,cardW,cardH);
+        // Sprite icon
+        var spr=SPR.relicSprites&&SPR.relicSprites[c.id];
+        var iconSize=52;
+        var iconX=cx2+cardW/2-iconSize/2,iconY=cardY+10;
+        ctx.fillStyle='rgba(0,0,0,0.4)';ctx.fillRect(iconX,iconY,iconSize,iconSize);
+        if(spr){
+            ctx.save();ctx.imageSmoothingEnabled=false;
+            var sc=Math.min(iconSize/spr.width,iconSize/spr.height);
+            var dw=Math.round(spr.width*sc),dh=Math.round(spr.height*sc);
+            ctx.drawImage(spr,cx2+cardW/2-dw/2,iconY+(iconSize-dh)/2,dw,dh);
+            ctx.restore();
+        } else {
+            ctx.fillStyle=c.color;ctx.beginPath();ctx.arc(cx2+cardW/2,iconY+iconSize/2,iconSize/3,0,Math.PI*2);ctx.fill();
+        }
+        ctx.strokeStyle=c.color;ctx.lineWidth=1;ctx.globalAlpha=0.5;ctx.strokeRect(iconX,iconY,iconSize,iconSize);ctx.globalAlpha=1;
+        // Name
+        var nameStr=lang==='zh'?c.nameZh:c.name;
+        ctx.fillStyle=c.color;ctx.font='bold 10px monospace';ctx.textAlign='center';
+        ctx.fillText(nameStr,cx2+cardW/2,iconY+iconSize+16);
+        // Skill name
+        ctx.fillStyle='#ffcc44';ctx.font='9px monospace';
+        ctx.fillText(lang==='zh'?c.skillNameZh:c.skillName,cx2+cardW/2,iconY+iconSize+30);
+        // Effect desc (word wrap)
+        var desc=lang==='zh'?c.skillDescZh:c.skillDesc;
+        ctx.fillStyle='#ccbbee';ctx.font='8px monospace';ctx.textAlign='left';
+        var maxW2=cardW-12,lh2=12,lx2=cx2+6,ly2=iconY+iconSize+45;
+        var ws3=desc.split(lang==='zh'?'':' ');
+        if(lang==='zh'){
+            var cl3='';
+            for(var chi=0;chi<desc.length;chi++){
+                var t3=cl3+desc[chi];
+                if(ctx.measureText(t3).width>maxW2&&cl3){ctx.fillText(cl3,lx2,ly2);ly2+=lh2;cl3=desc[chi];if(ly2>cardY+cardH-30)break;}
+                else cl3=t3;
+            }
+            if(cl3&&ly2<=cardY+cardH-30) ctx.fillText(cl3,lx2,ly2);
+        } else {
+            var wl3='';
+            for(var wi3=0;wi3<ws3.length;wi3++){
+                var tl3=wl3+(wl3?' ':'')+ws3[wi3];
+                if(ctx.measureText(tl3).width>maxW2&&wl3){ctx.fillText(wl3,lx2,ly2);ly2+=lh2;wl3=ws3[wi3];if(ly2>cardY+cardH-30)break;}
+                else wl3=tl3;
+            }
+            if(wl3&&ly2<=cardY+cardH-30) ctx.fillText(wl3,lx2,ly2);
+        }
+        // Pick button
+        var btnY=cardY+cardH-28,btnW2=cardW-16;
+        ctx.fillStyle=c.color;ctx.globalAlpha=0.85;
+        ctx.fillRect(cx2+8,btnY,btnW2,22);ctx.globalAlpha=1;
+        ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='center';
+        ctx.fillText(lang==='zh'?'选择':'Pick',cx2+cardW/2,btnY+15);
+    }
+}
+
 function drawWeaponPopup(){
     var W=canvas.width,H=canvas.height;
     ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
@@ -3432,6 +3590,28 @@ function drawBuffPopup(){
     ctx.fillStyle='#dd4444';ctx.fillRect(rmBtnX,rmBtnY,rmBtnW,rmBtnH);
     ctx.fillStyle='#fff';ctx.font='bold 11px monospace';
     ctx.fillText(lang==='zh'?'移除增益':'Remove Buff',rmBtnX+rmBtnW/2,rmBtnY+rmBtnH/2+4);
+}
+
+function handleRelicChoiceClick(cx,cy){
+    var W=canvas.width,H=canvas.height;
+    var pop=relicChoicePopup;
+    var choices=pop.choices;
+    var cardW=Math.min(140,(W-60)/3),cardH=200;
+    var gap=12;
+    var totalW=cardW*3+gap*2;
+    var startX=(W-totalW)/2;
+    var cardY=H/2-95;
+    for(var ci=0;ci<choices.length;ci++){
+        var cx2=startX+ci*(cardW+gap);
+        var btnY=cardY+cardH-28;
+        // Click anywhere on card or on button picks this relic
+        if(cx>=cx2&&cx<=cx2+cardW&&cy>=cardY&&cy<=cardY+cardH){
+            applyRelicEffect(choices[ci]);
+            relicChoicePopup=null;
+            playSound('craft');
+            return;
+        }
+    }
 }
 
 function handleExpeditionPopupClick(cx,cy){
@@ -5307,6 +5487,7 @@ canvas.addEventListener('click',function(e){
             }
             return;
         }
+        if(relicChoicePopup){handleRelicChoiceClick(cx,cy);return;}
         if(weaponPopup||merchantPopup||buffPopup){handleExpeditionPopupClick(cx,cy);return;}
         // Settings gear
         var W=canvas.width;
@@ -5534,4 +5715,4 @@ function render(){
     else if(state==='gameover') drawGameOver();
 }
 function gameLoop(){update();render();requestAnimationFrame(gameLoop);}
-(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();await loadBestiarySprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
+(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();await loadBestiarySprites();await loadRelicSprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
