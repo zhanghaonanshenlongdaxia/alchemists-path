@@ -263,7 +263,7 @@ const WEAPONS = [
     { name:'Worn Axe',          rarity:0, tier:0, dmg:2,  speed:0.7, range:40, color:RARITY_COLORS[0], type:'axe',    sprite:'hand_axe1.png' },
     { name:'Hunting Knife',     rarity:0, tier:0, dmg:1,  speed:1.3, range:38, color:RARITY_COLORS[0], type:'dagger', sprite:'knife.png' },
     { name:'Plain Club',        rarity:0, tier:0, dmg:2,  speed:0.7, range:36, color:RARITY_COLORS[0], type:'mace',   sprite:'giant_club.png' },
-    { name:'Broken Spear',      rarity:0, tier:0, dmg:1,  speed:1.1, range:50, color:RARITY_COLORS[0], type:'spear',  sprite:'spear1.png' },
+    { name:'Broken Spear',      rarity:0, tier:0, dmg:1,  speed:1.1, range:50, color:RARITY_COLORS[0], type:'spear',  sprite:'spear2.png' },
     { name:'Stone Hammer',      rarity:0, tier:0, dmg:3,  speed:0.6, range:36, color:RARITY_COLORS[0], type:'mace',   sprite:'hammer1.png' },
 
     // === TIER 1 — Green (Uncommon) ===
