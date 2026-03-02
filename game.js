@@ -2103,49 +2103,37 @@ function renderExpedition(){
         ctx.fillStyle='#44dd88';ctx.beginPath();ctx.arc(ppx,ppy,player.radius,0,Math.PI*2);ctx.fill();
     }
     
-    // Attack: Circle of rotating weapons
+    // Auto-rotating weapon circle (always active)
+    if(equippedWeapon&&SPR.weapons&&SPR.weapons[equippedWeapon.name]){
+        var wRange=equippedWeapon.range;
+        var weaponCount=8; // Number of weapons in the circle
+        var rotationSpeed=frameCount*0.05; // Continuous rotation
+        var circleRadius=wRange*0.7; // Radius of weapon circle
+        
+        for(var i=0;i<weaponCount;i++){
+            var angle=i*Math.PI*2/weaponCount+rotationSpeed;
+            var wx=ppx+Math.cos(angle)*circleRadius;
+            var wy=ppy+Math.sin(angle)*circleRadius;
+            
+            ctx.save();
+            ctx.translate(wx,wy);
+            ctx.rotate(angle+Math.PI*3/4); // Weapon orientation
+            ctx.globalAlpha=0.9;
+            var wSize=24;
+            ctx.drawImage(SPR.weapons[equippedWeapon.name],0,-wSize/2,wSize,wSize);
+            ctx.restore();
+        }
+    }
+    
+    // Attack animation (for damage dealing, no visual change)
     if(player.attackAnim>0){
         var swingAlpha=player.attackAnim/8;
         var wc=equippedWeapon?equippedWeapon.color:'#fff';
         var wRange=equippedWeapon?equippedWeapon.range:30;
         var wName=equippedWeapon?equippedWeapon.name:'';
-        
-        // Draw circle of rotating weapons if sprite available
         var hasWeaponSprite=SPR.weapons&&SPR.weapons[wName];
         if(hasWeaponSprite){
-            var weaponCount=8; // Number of weapons in the circle
-            var rotationSpeed=player.attackAnim*0.3; // Rotation animation
-            var circleRadius=wRange*0.7; // Radius of weapon circle
-            
-            for(var i=0;i<weaponCount;i++){
-                var angle=i*Math.PI*2/weaponCount+rotationSpeed;
-                var wx=ppx+Math.cos(angle)*circleRadius;
-                var wy=ppy+Math.sin(angle)*circleRadius;
-                
-                ctx.save();
-                ctx.translate(wx,wy);
-                ctx.rotate(angle+Math.PI*3/4); // Weapon orientation
-                ctx.globalAlpha=swingAlpha*0.9;
-                var wSize=24;
-                ctx.drawImage(SPR.weapons[wName],0,-wSize/2,wSize,wSize);
-                ctx.restore();
-            }
-            
-            // Motion blur trail (arc effect)
-            ctx.save();
-            ctx.translate(ppx,ppy);
-            ctx.globalAlpha=swingAlpha*0.2;
-            ctx.strokeStyle=wc;
-            ctx.lineWidth=8;
-            ctx.beginPath();
-            ctx.arc(0,0,circleRadius,0,Math.PI*2);
-            ctx.stroke();
-            ctx.globalAlpha=swingAlpha*0.1;
-            ctx.lineWidth=16;
-            ctx.beginPath();
-            ctx.arc(0,0,circleRadius,0,Math.PI*2);
-            ctx.stroke();
-            ctx.restore();
+            // Weapon sprites already drawn above, no additional visual needed
         }
         
         // Weapon-specific rendering (fallback if no sprite)
@@ -3185,18 +3173,7 @@ function drawMobileStick(){
         ctx.save();ctx.globalAlpha=0.5;ctx.fillStyle='#fff';
         ctx.beginPath();ctx.arc(lx+dx,ly+dy,18,0,Math.PI*2);ctx.fill();ctx.restore();
     }
-    var rx=canvas.width-80,ry=canvas.height-100,rr=40;
-    ctx.save();ctx.globalAlpha=0.25;ctx.fillStyle='#ee4444';
-    ctx.beginPath();ctx.arc(rx,ry,rr,0,Math.PI*2);ctx.fill();ctx.restore();
-    if(mobileAimStick.active){
-        var adx=mobileAimStick.cx-mobileAimStick.sx,ady=mobileAimStick.cy-mobileAimStick.sy;
-        var ad=Math.sqrt(adx*adx+ady*ady);if(ad>rr){adx=adx/ad*rr;ady=ady/ad*rr;}
-        ctx.save();ctx.globalAlpha=0.5;ctx.fillStyle='#ee4444';
-        ctx.beginPath();ctx.arc(rx+adx,ry+ady,16,0,Math.PI*2);ctx.fill();ctx.restore();
-    }
-    ctx.save();ctx.globalAlpha=0.7;ctx.fillStyle='#fff';ctx.font='bold 12px monospace';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('ATK',rx,ry);ctx.restore();
+    // Attack button removed - weapons auto-rotate now
 }
 
 // ============ LAB UI ============
