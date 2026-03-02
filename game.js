@@ -653,22 +653,22 @@ let relicChoicePopup = null; // {choices:[collectible,collectible,collectible], 
 // ============ SKILL TREE ============
 const SKILL_BRANCHES = [
     { id:'combat', key:'skCombat', color:'#ee4444', skills:[
-        { id:'powerStrike', key:'skPowerStrike', descKey:'skPowerStrikeD', cost:25 },
-        { id:'lifeSteal',   key:'skLifeSteal',   descKey:'skLifeStealD',  cost:50 },
-        { id:'berserker',   key:'skBerserker',   descKey:'skBerserkerD',  cost:80 },
-        { id:'execute',     key:'skExecute',     descKey:'skExecuteD',    cost:120 },
+        { id:'powerStrike', key:'skPowerStrike', descKey:'skPowerStrikeD', cost:25,  icon:'⚔' },
+        { id:'lifeSteal',   key:'skLifeSteal',   descKey:'skLifeStealD',  cost:50,  icon:'🩸' },
+        { id:'berserker',   key:'skBerserker',   descKey:'skBerserkerD',  cost:80,  icon:'🔥' },
+        { id:'execute',     key:'skExecute',     descKey:'skExecuteD',    cost:120, icon:'💀' },
     ]},
     { id:'alchemy', key:'skAlchemy', color:'#44dd88', skills:[
-        { id:'doubleYield',  key:'skDoubleYield',  descKey:'skDoubleYieldD',  cost:25 },
-        { id:'potionMaster', key:'skPotionMaster', descKey:'skPotionMasterD', cost:50 },
-        { id:'transmute',    key:'skTransmute',    descKey:'skTransmuteD',    cost:80 },
-        { id:'philoStone',   key:'skPhiloStone',   descKey:'skPhiloStoneD',   cost:120 },
+        { id:'doubleYield',  key:'skDoubleYield',  descKey:'skDoubleYieldD',  cost:25,  icon:'🌿' },
+        { id:'potionMaster', key:'skPotionMaster', descKey:'skPotionMasterD', cost:50,  icon:'⚗' },
+        { id:'transmute',    key:'skTransmute',    descKey:'skTransmuteD',    cost:80,  icon:'🔄' },
+        { id:'philoStone',   key:'skPhiloStone',   descKey:'skPhiloStoneD',   cost:120, icon:'💎' },
     ]},
     { id:'survival', key:'skSurvival', color:'#4488ee', skills:[
-        { id:'thickSkin',  key:'skThickSkin',  descKey:'skThickSkinD',  cost:25 },
-        { id:'scavenger',  key:'skScavenger',  descKey:'skScavengerD',  cost:50 },
-        { id:'dodge',      key:'skDodge',      descKey:'skDodgeD',      cost:80 },
-        { id:'secondWind', key:'skSecondWind', descKey:'skSecondWindD', cost:120 },
+        { id:'thickSkin',  key:'skThickSkin',  descKey:'skThickSkinD',  cost:25,  icon:'🛡' },
+        { id:'scavenger',  key:'skScavenger',  descKey:'skScavengerD',  cost:50,  icon:'💰' },
+        { id:'dodge',      key:'skDodge',      descKey:'skDodgeD',      cost:80,  icon:'💨' },
+        { id:'secondWind', key:'skSecondWind', descKey:'skSecondWindD', cost:120, icon:'💫' },
     ]}
 ];
 let unlockedSkills = {}; // {skillId: true}
@@ -4736,9 +4736,9 @@ function drawLabSkills(cy){
             ctx.beginPath();ctx.arc(nodeCx,nodeCy,nodeR,0,Math.PI*2);
             ctx.fillStyle=unlocked?branch.color:(canBuy?'#1a1a2a':'#0e0e16');ctx.fill();
             ctx.strokeStyle=unlocked?branch.color:(canBuy?'#666':'#333');ctx.lineWidth=unlocked?2:1;ctx.stroke();
-            // Icon
-            ctx.fillStyle=unlocked?'#fff':(canBuy?'#ccc':'#555');ctx.font='bold 10px monospace';ctx.textAlign='center';
-            ctx.fillText(T(skill.key),nodeCx,nodeCy+3);
+            // Icon (emoji)
+            ctx.font='bold 16px sans-serif';ctx.textAlign='center';
+            ctx.fillText(skill.icon||'?',nodeCx,nodeCy+5);
             // Desc + cost below
             ctx.fillStyle=unlocked?'#888':'#666';ctx.font='9px monospace';
             ctx.fillText(T(skill.descKey),nodeCx,nodeCy+nodeR+12);
