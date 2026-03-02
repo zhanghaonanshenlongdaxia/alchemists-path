@@ -2105,7 +2105,7 @@ function renderExpedition(){
     // Attack swing (improved arc with trail)
     if(player.attackAnim>0){
         var swingAlpha=player.attackAnim/8;
-        ctx.save();ctx.translate(ppx,ppy);ctx.rotate(player.angle);
+        ctx.save();ctx.translate(ppx,ppy);
         var wc=equippedWeapon?equippedWeapon.color:'#fff';
         var wRange=equippedWeapon?equippedWeapon.range:30;
         var wType=equippedWeapon?equippedWeapon.type:'sword';
@@ -2114,25 +2114,40 @@ function renderExpedition(){
         // Draw weapon sprite at swing position if available
         var hasWeaponSprite=SPR.weapons&&SPR.weapons[wName];
         if(hasWeaponSprite){
-            var swingAngle=player.attackAnim/8*Math.PI*0.8-Math.PI*0.4; // -0.4 to 0.4 radians swing arc
+            // Swing direction based on player facing (left = counter-clockwise, right = clockwise)
+            var swingDir=(player.angle>Math.PI/2||player.angle<-Math.PI/2)?-1:1;
+            // Swing progress: 0 to 1, then calculate angle offset from center
+            var swingProgress=player.attackAnim/8;
+            var swingOffset=(swingProgress*2-1)*Math.PI*0.5*swingDir; // -0.5 to 0.5 radians, direction-aware
+            var currentAngle=player.angle+swingOffset;
+            
+            // Handle position on player circle edge, perpendicular to attack direction
+            var handleDist=player.radius+2;
+            var handleX=Math.cos(currentAngle)*handleDist;
+            var handleY=Math.sin(currentAngle)*handleDist;
+            
             ctx.save();
-            ctx.rotate(swingAngle);
+            ctx.translate(handleX,handleY);
+            ctx.rotate(currentAngle);
             ctx.globalAlpha=swingAlpha;
-            var wSize=32;
-            // Draw weapon with handle at origin (player hand), blade pointing outward
+            var wSize=28;
+            // Draw weapon with handle at current position, blade pointing outward
             ctx.drawImage(SPR.weapons[wName],0,-wSize/2,wSize,wSize);
             ctx.restore();
-            // Motion blur trail (arc effect)
+            
+            // Motion blur trail (arc effect centered on attack direction)
             ctx.globalAlpha=swingAlpha*0.25;
             ctx.strokeStyle=wc;
             ctx.lineWidth=6;
             ctx.beginPath();
-            ctx.arc(0,0,wRange,swingAngle-0.2,swingAngle+0.2);
+            var arcStart=player.angle-Math.PI*0.5*swingDir;
+            var arcEnd=player.angle+Math.PI*0.5*swingDir;
+            ctx.arc(0,0,wRange,arcStart,arcEnd,swingDir<0);
             ctx.stroke();
             ctx.globalAlpha=swingAlpha*0.15;
             ctx.lineWidth=12;
             ctx.beginPath();
-            ctx.arc(0,0,wRange,swingAngle-0.3,swingAngle+0.3);
+            ctx.arc(0,0,wRange,arcStart,arcEnd,swingDir<0);
             ctx.stroke();
         }
         
