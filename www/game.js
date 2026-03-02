@@ -340,43 +340,43 @@ const BIOMES = [
 // skill types: charge, poison, split, leech, shield, summon, rage, teleport, slam, shoot
 const ENEMY_TYPES = {
     // === Forest ===
-    rat:      { name:'Rat',       nameZh:'老鼠',     hp:1.0, atk:0.8, spd:1.1, color:'#996644', desc:'A common pest, weak but numerous.',     descZh:'常见害虫，弱但数量众多。', skills:[] },
-    wolf:     { name:'Wolf',      nameZh:'狼',       hp:1.5, atk:1.3, spd:1.2, color:'#888888', desc:'Hunts in packs, fast and fierce.',       descZh:'成群狩猎，速度极快。', skills:['charge'] },
-    bear:     { name:'Bear',      nameZh:'熊',       hp:3.0, atk:1.8, spd:0.7, color:'#885533', desc:'A massive beast with thunderous swipes.', descZh:'体型巨大，横扫一切。', skills:['slam'] },
-    bee:      { name:'Giant Bee', nameZh:'巨蜂',    hp:0.8, atk:1.0, spd:1.4, color:'#ffcc00', desc:'Stings and leaves venom behind.',         descZh:'蜂刺留下毒素。', skills:['poison'] },
-    hound:    { name:'Hound',     nameZh:'猎犬',    hp:1.2, atk:1.2, spd:1.3, color:'#aa6633', desc:'Trained for war, charges without fear.',  descZh:'受训战犬，无惧冲锋。', skills:['charge'] },
+    rat:      { name:'Rat',       nameZh:'老鼠',     hp:1.0, atk:0.8, spd:1.1, color:'#996644', sprite:'grey_rat.png',       desc:'A common pest, weak but numerous.',     descZh:'常见害虫，弱但数量众多。', skills:[] },
+    wolf:     { name:'Wolf',      nameZh:'狼',       hp:1.5, atk:1.3, spd:1.2, color:'#888888', sprite:'wolf.png',            desc:'Hunts in packs, fast and fierce.',       descZh:'成群狩猎，速度极快。', skills:['charge'] },
+    bear:     { name:'Bear',      nameZh:'熊',       hp:3.0, atk:1.8, spd:0.7, color:'#885533', sprite:'bear.png',            desc:'A massive beast with thunderous swipes.', descZh:'体型巨大，横扫一切。', skills:['slam'] },
+    bee:      { name:'Giant Bee', nameZh:'巨蜂',    hp:0.8, atk:1.0, spd:1.4, color:'#ffcc00', sprite:'killer_bee.png',      desc:'Stings and leaves venom behind.',         descZh:'蜂刺留下毒素。', skills:['poison'] },
+    hound:    { name:'Hound',     nameZh:'猎犬',    hp:1.2, atk:1.2, spd:1.3, color:'#aa6633', sprite:'hound.png',           desc:'Trained for war, charges without fear.',  descZh:'受训战犬，无惧冲锋。', skills:['charge'] },
     // Forest Elites
-    wolf_pack:{ name:'Wolf Pack Alpha', nameZh:'狼群首领', hp:2.5, atk:1.8, spd:1.2, color:'#aaaaaa', isEliteType:true,
+    wolf_pack:{ name:'Wolf Pack Alpha', nameZh:'狼群首领', hp:2.5, atk:1.8, spd:1.2, color:'#aaaaaa', sprite:'jackal.png', isEliteType:true,
                 desc:'The alpha of the pack. Summons wolves and charges from afar.', descZh:'狼群首领，召唤狼群并从远处冲锋。',
                 skills:['charge','summon'] },
     // Forest Boss
-    grizzly:  { name:'Ancient Grizzly', nameZh:'远古灰熊', hp:8.0, atk:2.5, spd:0.8, color:'#885533', isBossType:true,
+    grizzly:  { name:'Ancient Grizzly', nameZh:'远古灰熊', hp:8.0, atk:2.5, spd:0.8, color:'#885533', sprite:'grizzly_bear.png', isBossType:true,
                 desc:'An ancient bear awakened from centuries of slumber. Its roar shakes the earth.', descZh:'沉睡数百年的远古灰熊，怒吼使大地颤抖。',
                 skills:['slam','charge','rage'], skillDescs:['Ground Slam: deals AoE damage','Furious Charge: rushes the player','Enrage: doubles speed below 40% HP'] },
     // === Cave ===
-    bat:      { name:'Giant Bat',    nameZh:'巨蝙蝠',  hp:0.7, atk:0.9, spd:1.5, color:'#664488', desc:'Swoops from the darkness without warning.', descZh:'从黑暗中突然俯冲。', skills:[] },
-    spider:   { name:'Wolf Spider',  nameZh:'狼蛛',    hp:1.0, atk:1.1, spd:1.1, color:'#886644', desc:'Weaves webs to slow prey.',                 descZh:'结网减缓猎物。', skills:['poison'] },
-    centipede:{ name:'Centipede',    nameZh:'蜈蚣',    hp:1.3, atk:1.0, spd:1.0, color:'#447744', desc:'Coils around victims, hard to shake off.',   descZh:'缠绕猎物，难以摆脱。', skills:['poison'] },
-    beetle:   { name:'Boulder Beetle',nameZh:'磐石甲虫',hp:2.5, atk:1.4, spd:0.6, color:'#557733', desc:'Armored shell deflects weak blows.',        descZh:'装甲外壳偏转弱攻击。', skills:['shield'] },
+    bat:      { name:'Giant Bat',    nameZh:'巨蝙蝠',  hp:0.7, atk:0.9, spd:1.5, color:'#664488', sprite:'giant_bat.png',      desc:'Swoops from the darkness without warning.', descZh:'从黑暗中突然俯冲。', skills:[] },
+    spider:   { name:'Wolf Spider',  nameZh:'狼蛛',    hp:1.0, atk:1.1, spd:1.1, color:'#886644', sprite:'wolf_spider.png',    desc:'Weaves webs to slow prey.',                 descZh:'结网减缓猎物。', skills:['poison'] },
+    centipede:{ name:'Centipede',    nameZh:'蜈蚣',    hp:1.3, atk:1.0, spd:1.0, color:'#447744', sprite:'giant_centipede.png',desc:'Coils around victims, hard to shake off.',   descZh:'缠绕猎物，难以摆脱。', skills:['poison'] },
+    beetle:   { name:'Boulder Beetle',nameZh:'磐石甲虫',hp:2.5, atk:1.4, spd:0.6, color:'#557733', sprite:'boulder_beetle.png',desc:'Armored shell deflects weak blows.',        descZh:'装甲外壳偏转弱攻击。', skills:['shield'] },
     // Cave Elites
-    tarantella:{ name:'Tarantella',  nameZh:'毒舞蜘蛛', hp:2.0, atk:1.6, spd:1.3, color:'#aa4488', isEliteType:true,
+    tarantella:{ name:'Tarantella',  nameZh:'毒舞蜘蛛', hp:2.0, atk:1.6, spd:1.3, color:'#aa4488', sprite:'tarantella.png', isEliteType:true,
                 desc:'A venomous dance spider that poisons and teleports.', descZh:'有毒的舞蹈蜘蛛，下毒并瞬移。',
                 skills:['poison','teleport'] },
     // Cave Boss
-    kraken:   { name:'Cave Kraken',  nameZh:'洞穴克拉肯', hp:10.0, atk:2.2, spd:0.6, color:'#224488', isBossType:true,
+    kraken:   { name:'Cave Kraken',  nameZh:'洞穴克拉肯', hp:10.0, atk:2.2, spd:0.6, color:'#224488', sprite:'kraken_head.png', isBossType:true,
                 desc:'A tentacled horror from the deep cave. Its ink blinds, its grip crushes.', descZh:'来自深洞的触手恐魔，墨汁致盲，握力粉碎一切。',
                 skills:['slam','shoot','summon'], skillDescs:['Ink Blast: blinds player briefly','Tentacle Slam: crushes nearby enemies','Summon Spawn: calls small tentacles'] },
     // === Swamp ===
-    frog:     { name:'Giant Frog',   nameZh:'巨蛙',    hp:1.0, atk:1.0, spd:0.9, color:'#448833', desc:'Leaps unexpectedly at prey.',              descZh:'出人意料地跳向猎物。', skills:[] },
-    lizard:   { name:'Komodo Dragon',nameZh:'科莫多龙', hp:2.0, atk:1.5, spd:0.8, color:'#668833', desc:'Venomous bite causes lasting damage.',      descZh:'毒性咬伤造成持续伤害。', skills:['poison'] },
-    leech:    { name:'Giant Leech',  nameZh:'巨蚂蟥',  hp:1.5, atk:0.9, spd:0.7, color:'#884433', desc:'Drains life force from its victim.',        descZh:'吸取受害者的生命力。', skills:['leech'] },
-    croc:     { name:'Crocodile',    nameZh:'鳄鱼',    hp:2.5, atk:1.6, spd:0.7, color:'#446633', desc:'Lurks in water, ambushes from close range.', descZh:'潜伏水中，近距离伏击。', skills:['charge'] },
+    frog:     { name:'Giant Frog',   nameZh:'巨蛙',    hp:1.0, atk:1.0, spd:0.9, color:'#448833', sprite:'giant_frog.png',    desc:'Leaps unexpectedly at prey.',              descZh:'出人意料地跳向猎物。', skills:[] },
+    lizard:   { name:'Komodo Dragon',nameZh:'科莫多龙', hp:2.0, atk:1.5, spd:0.8, color:'#668833', sprite:'komodo_dragon.png', desc:'Venomous bite causes lasting damage.',      descZh:'毒性咬伤造成持续伤害。', skills:['poison'] },
+    leech:    { name:'Giant Leech',  nameZh:'巨蚂蟥',  hp:1.5, atk:0.9, spd:0.7, color:'#884433', sprite:'giant_leech.png',   desc:'Drains life force from its victim.',        descZh:'吸取受害者的生命力。', skills:['leech'] },
+    croc:     { name:'Crocodile',    nameZh:'鳄鱼',    hp:2.5, atk:1.6, spd:0.7, color:'#446633', sprite:'crocodile.png',     desc:'Lurks in water, ambushes from close range.', descZh:'潜伏水中，近距离伏击。', skills:['charge'] },
     // Swamp Elites
-    anaconda: { name:'Anaconda',     nameZh:'水蟒',    hp:3.0, atk:1.7, spd:0.9, color:'#336644', isEliteType:true,
+    anaconda: { name:'Anaconda',     nameZh:'水蟒',    hp:3.0, atk:1.7, spd:0.9, color:'#336644', sprite:'anaconda.png', isEliteType:true,
                 desc:'A massive serpent that squeezes the life from prey.', descZh:'巨型蛇类，将猎物活活压死。',
                 skills:['leech','charge'] },
     // Swamp Boss
-    dragon:   { name:'Swamp Dragon', nameZh:'沼泽龙',  hp:12.0, atk:3.0, spd:0.9, color:'#228844', isBossType:true,
+    dragon:   { name:'Swamp Dragon', nameZh:'沼泽龙',  hp:12.0, atk:3.0, spd:0.9, color:'#228844', sprite:'komodo_dragon.png', isBossType:true,
                 desc:'An ancient dragon that has claimed the swamp as its domain. Breathes acid, summons minions, and enrages when wounded.', descZh:'古老的龙，以沼泽为领地。喷射酸液，召唤仆从，受伤后狂怒。',
                 skills:['shoot','summon','rage'], skillDescs:['Acid Breath: deals poison damage in cone','Call Minions: summons lizards and frogs','Blood Rage: +50% ATK below 30% HP'] },
 };
@@ -4427,179 +4427,171 @@ function drawLabSkills(cy){
     }
 }
 
+// Draw one enemy entry on a book page
+function drawBestiaryPage(key, data, px, py, pw, ph2, side){
+    var et=ENEMY_TYPES[key];
+    if(!et) return;
+    var isBoss=et.isBossType,isElite=et.isEliteType;
+    var accentColor=isBoss?'#ff4444':(isElite?'#cc44ff':'#88bbdd');
+    var cx2=px+pw/2;
+
+    // Page background
+    ctx.fillStyle=side==='left'?'#1a1428':'#12101e';
+    ctx.fillRect(px,py,pw,ph2);
+    ctx.strokeStyle=accentColor;ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph2);
+
+    // Sprite portrait area (top ~55% of page)
+    var imgH=Math.floor(ph2*0.52);
+    var imgW=pw-20;
+    var imgX=px+10,imgY=py+10;
+    // Background for portrait
+    ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fillRect(imgX,imgY,imgW,imgH);
+    ctx.strokeStyle=accentColor;ctx.lineWidth=1;ctx.globalAlpha=0.5;
+    ctx.strokeRect(imgX,imgY,imgW,imgH);ctx.globalAlpha=1;
+
+    var spr=SPR.bestiarySprites&&SPR.bestiarySprites[key];
+    if(spr){
+        // Draw sprite centered, scaled to fit
+        var scale=Math.min(imgW/spr.width, imgH/spr.height)*0.85;
+        var dw=spr.width*scale,dh=spr.height*scale;
+        var dx=imgX+(imgW-dw)/2,dy=imgY+(imgH-dh)/2;
+        ctx.save();
+        ctx.shadowColor=et.color||accentColor;ctx.shadowBlur=12;
+        ctx.drawImage(spr,dx,dy,dw,dh);
+        ctx.restore();
+    } else {
+        // Fallback: colored circle with glow
+        ctx.save();
+        ctx.shadowColor=et.color||'#888';ctx.shadowBlur=20;
+        ctx.fillStyle=et.color||'#888';
+        ctx.beginPath();ctx.arc(imgX+imgW/2,imgY+imgH/2,Math.min(imgW,imgH)/3,0,Math.PI*2);ctx.fill();
+        ctx.restore();
+    }
+
+    // Type badge over portrait
+    if(isBoss){
+        ctx.fillStyle='rgba(255,0,0,0.85)';ctx.fillRect(imgX,imgY+imgH-18,imgW,18);
+        ctx.fillStyle='#fff';ctx.font='bold 10px monospace';ctx.textAlign='center';
+        ctx.fillText('★ BOSS ★',imgX+imgW/2,imgY+imgH-5);
+    } else if(isElite){
+        ctx.fillStyle='rgba(180,0,255,0.85)';ctx.fillRect(imgX,imgY+imgH-18,imgW,18);
+        ctx.fillStyle='#fff';ctx.font='bold 10px monospace';ctx.textAlign='center';
+        ctx.fillText('◆ ELITE ◆',imgX+imgW/2,imgY+imgH-5);
+    }
+
+    // Info area (bottom ~45% of page)
+    var infoY=imgY+imgH+10;
+    var nameStr=lang==='zh'?(et.nameZh||et.name):et.name;
+    ctx.fillStyle=accentColor;ctx.font='bold 13px monospace';ctx.textAlign='center';
+    ctx.fillText(nameStr,cx2,infoY);infoY+=16;
+
+    // Seen count
+    ctx.fillStyle='#888';ctx.font='9px monospace';
+    ctx.fillText((lang==='zh'?'遭遇 ':'Seen ')+data.count+'x',cx2,infoY);infoY+=14;
+
+    // Stats
+    var stats=[
+        {k:'HP', v:et.hp.toFixed(1), c:'#ff6666'},
+        {k:'ATK',v:et.atk.toFixed(1),c:'#ff9944'},
+        {k:'SPD',v:et.spd.toFixed(1),c:'#44ddff'},
+    ];
+    var sw=(pw-20)/3;
+    for(var si=0;si<3;si++){
+        var sx=px+10+si*sw+sw/2;
+        ctx.fillStyle='#555';ctx.font='8px monospace';ctx.textAlign='center';
+        ctx.fillText(stats[si].k,sx,infoY);
+        ctx.fillStyle=stats[si].c;ctx.font='bold 11px monospace';
+        ctx.fillText(stats[si].v,sx,infoY+12);
+    }
+    infoY+=26;
+
+    // Description (word-wrap)
+    var desc=lang==='zh'?(et.descZh||et.desc):et.desc;
+    ctx.fillStyle='#ccbbee';ctx.font='9px monospace';ctx.textAlign='left';
+    var maxW=pw-20,lh=13,lx=px+10;
+    if(lang==='zh'){
+        var cl='';
+        for(var ci=0;ci<desc.length;ci++){
+            var t2=cl+desc[ci];
+            if(ctx.measureText(t2).width>maxW&&cl){ctx.fillText(cl,lx,infoY);infoY+=lh;cl=desc[ci];if(infoY>py+ph2-22)break;}
+            else cl=t2;
+        }
+        if(cl&&infoY<=py+ph2-22) ctx.fillText(cl,lx,infoY); infoY+=lh;
+    } else {
+        var wl='',ws2=desc.split(' ');
+        for(var wi=0;wi<ws2.length;wi++){
+            var tl2=wl+(wl?' ':'')+ws2[wi];
+            if(ctx.measureText(tl2).width>maxW&&wl){ctx.fillText(wl,lx,infoY);infoY+=lh;wl=ws2[wi];if(infoY>py+ph2-22)break;}
+            else wl=tl2;
+        }
+        if(wl&&infoY<=py+ph2-22) ctx.fillText(wl,lx,infoY); infoY+=lh;
+    }
+
+    // Skills
+    if(et.skills&&et.skills.length>0&&infoY<=py+ph2-14){
+        var skillColorMap={charge:'#ff9944',poison:'#aa44dd',slam:'#ff6666',shoot:'#44aaff',
+            summon:'#ffcc44',rage:'#ff4444',leech:'#aa44aa',teleport:'#44ffcc',split:'#88ff44',shield:'#44aaff'};
+        ctx.font='9px monospace';ctx.textAlign='left';
+        var skStr=et.skills.map(function(s){return skillColorMap[s]?s:s;}).join(' · ');
+        ctx.fillStyle='#ffcc44';
+        ctx.fillText('['+et.skills.join(' · ')+']',lx,infoY);
+    }
+}
+
 function drawLabBestiary(cy){
-    // Book-style bestiary: one enemy per spread, left page = portrait, right page = stats+desc
     var W=canvas.width,H=canvas.height;
     var ph=Math.min(H-60,500),ppy=(H-ph)/2;
-    var navRowH=28;
-    var bW=Math.min(W-20,560),bH=Math.min(Math.min(H-80,400),ph-(cy-ppy)-navRowH-10);
-    var bX=(W-bW)/2,bY=cy-10;
+    var navH=24;
+    // Book: two pages side by side inside panel content area
+    var bookW=Math.min(W-24,560),bookH=ph-(cy-ppy)-navH-14;
+    var bookX=(W-bookW)/2,bookY=cy-4;
     var seenKeys=Object.keys(seenEnemies);
     var total=seenKeys.length;
-    bestiaryPage=Math.max(0,Math.min(bestiaryPage,total-1));
+    // page = pair index (0 = entries 0&1, 1 = entries 2&3 ...)
+    var maxPage=Math.max(0,Math.ceil(total/2)-1);
+    bestiaryPage=Math.max(0,Math.min(bestiaryPage,maxPage));
 
     // Discovered counter
     ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
-    ctx.fillText((lang==='zh'?'已发现: ':'Discovered: ')+total+'/'+Object.keys(ENEMY_TYPES).length,W/2,bY-4);
+    ctx.fillText((lang==='zh'?'已发现: ':'Discovered: ')+total+'/'+Object.keys(ENEMY_TYPES).length,W/2,bookY-2);
 
     if(total===0){
+        ctx.fillStyle='#1a1428';ctx.fillRect(bookX,bookY,bookW,bookH);
         ctx.fillStyle='#666';ctx.font='12px monospace';ctx.textAlign='center';
-        ctx.fillText(lang==='zh'?'尚未遇到任何敌人':'No enemies encountered yet',W/2,bY+bH/2);
-        return;
-    }
-
-    var key=seenKeys[bestiaryPage];
-    var data=seenEnemies[key];
-    var et=ENEMY_TYPES[key];
-    if(!et) return;
-
-    var isBoss=et.isBossType,isElite=et.isEliteType;
-    var accentColor=isBoss?'#ff4444':(isElite?'#cc44ff':'#88bbdd');
-    var midX=bX+bW/2;
-
-    // ---- Book background ----
-    // Left page
-    ctx.fillStyle='#1a1428';ctx.fillRect(bX,bY,bW/2,bH);
-    ctx.strokeStyle=accentColor;ctx.lineWidth=2;ctx.strokeRect(bX,bY,bW/2,bH);
-    // Right page
-    ctx.fillStyle='#12101e';ctx.fillRect(midX,bY,bW/2,bH);
-    ctx.strokeStyle=accentColor;ctx.lineWidth=2;ctx.strokeRect(midX,bY,bW/2,bH);
-    // Spine
-    ctx.fillStyle='#2a2040';ctx.fillRect(midX-3,bY,6,bH);
-    ctx.strokeStyle=accentColor;ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(midX,bY);ctx.lineTo(midX,bY+bH);ctx.stroke();
-
-    // ---- LEFT PAGE: portrait ----
-    var lCx=bX+bW/4, lCy=bY+bH/2-20;
-    // Large circle portrait
-    var circR=Math.min(bW/6,60);
-    ctx.save();
-    ctx.shadowColor=et.color||'#888';ctx.shadowBlur=18;
-    ctx.fillStyle=et.color||'#888';
-    ctx.beginPath();ctx.arc(lCx,lCy,circR,0,Math.PI*2);ctx.fill();
-    ctx.restore();
-    // Glow ring
-    ctx.strokeStyle=accentColor;ctx.lineWidth=3;
-    ctx.beginPath();ctx.arc(lCx,lCy,circR+4,0,Math.PI*2);ctx.stroke();
-    // Type badge
-    if(isBoss){
-        ctx.fillStyle='#ff4444';ctx.fillRect(lCx-22,lCy+circR+8,44,16);
-        ctx.fillStyle='#fff';ctx.font='bold 9px monospace';ctx.textAlign='center';
-        ctx.fillText('BOSS',lCx,lCy+circR+19);
-    } else if(isElite){
-        ctx.fillStyle='#cc44ff';ctx.fillRect(lCx-22,lCy+circR+8,44,16);
-        ctx.fillStyle='#fff';ctx.font='bold 9px monospace';ctx.textAlign='center';
-        ctx.fillText('ELITE',lCx,lCy+circR+19);
-    }
-    // Name (left page bottom)
-    var nameStr=lang==='zh'?(et.nameZh||et.name):et.name;
-    ctx.fillStyle=accentColor;ctx.font='bold 14px monospace';ctx.textAlign='center';
-    ctx.fillText(nameStr,lCx,bY+bH-40);
-    // Seen count
-    ctx.fillStyle='#888';ctx.font='9px monospace';
-    ctx.fillText((lang==='zh'?'遭遇 ':'Seen ')+data.count+'x',lCx,bY+bH-26);
-    // Page number bottom-left
-    ctx.fillStyle='#555';ctx.font='9px monospace';
-    ctx.fillText((bestiaryPage+1)+'/'+total,lCx,bY+bH-10);
-
-    // ---- RIGHT PAGE: stats + desc ----
-    var rX=midX+14,rW=bW/2-28,ry=bY+18;
-    // Name header
-    ctx.fillStyle=accentColor;ctx.font='bold 13px monospace';ctx.textAlign='left';
-    ctx.fillText(nameStr,rX,ry);ry+=18;
-    // Divider
-    ctx.strokeStyle=accentColor;ctx.lineWidth=1;ctx.globalAlpha=0.4;
-    ctx.beginPath();ctx.moveTo(rX,ry);ctx.lineTo(rX+rW,ry);ctx.stroke();
-    ctx.globalAlpha=1;ry+=12;
-
-    // Stats row
-    var stats=[
-        {k:lang==='zh'?'生命':'HP', v:et.hp.toFixed(1), c:'#ff6666'},
-        {k:lang==='zh'?'攻击':'ATK',v:et.atk.toFixed(1),c:'#ff9944'},
-        {k:lang==='zh'?'速度':'SPD',v:et.spd.toFixed(1),c:'#44ddff'},
-    ];
-    var statW=rW/3;
-    for(var si=0;si<stats.length;si++){
-        var sx=rX+si*statW+statW/2;
-        ctx.fillStyle='#666';ctx.font='9px monospace';ctx.textAlign='center';
-        ctx.fillText(stats[si].k,sx,ry);
-        ctx.fillStyle=stats[si].c;ctx.font='bold 13px monospace';
-        ctx.fillText(stats[si].v,sx,ry+14);
-    }
-    ry+=34;
-
-    // Divider
-    ctx.strokeStyle='#334';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(rX,ry);ctx.lineTo(rX+rW,ry);ctx.stroke();
-    ry+=12;
-
-    // Description
-    var desc=lang==='zh'?(et.descZh||et.desc):et.desc;
-    ctx.fillStyle='#ccbbee';ctx.font='10px monospace';ctx.textAlign='left';
-    // Word-wrap description
-    var words=lang==='zh'?desc.split(''):desc.split(' ');
-    var line='',lineH=15,maxLineW=rW;
-    if(lang==='zh'){
-        var chars=desc.split(''),cLine='';
-        for(var ci=0;ci<chars.length;ci++){
-            var test=cLine+chars[ci];
-            if(ctx.measureText(test).width>maxLineW&&cLine){
-                ctx.fillText(cLine,rX,ry);ry+=lineH;cLine=chars[ci];
-                if(ry>bY+bH-70) break;
-            } else cLine=test;
-        }
-        if(cLine&&ry<=bY+bH-70){ctx.fillText(cLine,rX,ry);ry+=lineH;}
+        ctx.fillText(lang==='zh'?'尚未遇到任何敌人':'No enemies encountered yet',W/2,bookY+bookH/2);
     } else {
-        var ws=desc.split(' ');
-        for(var wi=0;wi<ws.length;wi++){
-            var tl=line+(line?' ':'')+ws[wi];
-            if(ctx.measureText(tl).width>maxLineW&&line){
-                ctx.fillText(line,rX,ry);ry+=lineH;line=ws[wi];
-                if(ry>bY+bH-70) break;
-            } else line=tl;
-        }
-        if(line&&ry<=bY+bH-70){ctx.fillText(line,rX,ry);ry+=lineH;}
-    }
-    ry+=6;
+        var pageW=bookW/2,spineW=6;
+        var leftKey=seenKeys[bestiaryPage*2];
+        var rightKey=seenKeys[bestiaryPage*2+1];
 
-    // Skills
-    if(et.skills&&et.skills.length>0){
-        ctx.strokeStyle='#334';ctx.lineWidth=1;
-        ctx.beginPath();ctx.moveTo(rX,ry);ctx.lineTo(rX+rW,ry);ctx.stroke();
-        ry+=12;
-        ctx.fillStyle='#888';ctx.font='9px monospace';ctx.textAlign='left';
-        ctx.fillText(lang==='zh'?'技能：':'Skills:',rX,ry);ry+=13;
-        var skillColorMap={charge:'#ff9944',poison:'#aa44dd',slam:'#ff6666',shoot:'#44aaff',
-            summon:'#ffcc44',rage:'#ff4444',leech:'#aa44aa',teleport:'#44ffcc',
-            split:'#88ff44',shield:'#44aaff'};
-        for(var ski=0;ski<et.skills.length;ski++){
-            var sk=et.skills[ski];
-            var skC=skillColorMap[sk]||'#aaa';
-            ctx.fillStyle=skC;ctx.font='bold 10px monospace';
-            ctx.fillText('▶ '+sk,rX+4,ry);
-            // skill desc if Boss
-            if(et.skillDescs&&et.skillDescs[ski]){
-                ctx.fillStyle='#888';ctx.font='9px monospace';
-                ctx.fillText('  '+et.skillDescs[ski].substring(0,Math.floor(rW/6)),rX+14,ry+11);
-                ry+=24;
-            } else {
-                ry+=14;
-            }
-            if(ry>bY+bH-16) break;
+        // Draw left page
+        drawBestiaryPage(leftKey,seenEnemies[leftKey],bookX,bookY,pageW,bookH,'left');
+
+        // Draw right page (may be empty on last odd page)
+        if(rightKey){
+            drawBestiaryPage(rightKey,seenEnemies[rightKey],bookX+pageW,bookY,pageW,bookH,'right');
+        } else {
+            ctx.fillStyle='#12101e';ctx.fillRect(bookX+pageW,bookY,pageW,bookH);
+            ctx.strokeStyle='#334';ctx.lineWidth=2;ctx.strokeRect(bookX+pageW,bookY,pageW,bookH);
         }
+
+        // Spine
+        ctx.fillStyle='#2a2040';ctx.fillRect(bookX+pageW-spineW/2,bookY,spineW,bookH);
+        ctx.strokeStyle='#553388';ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(bookX+pageW,bookY);ctx.lineTo(bookX+pageW,bookY+bookH);ctx.stroke();
     }
 
-    // ---- Navigation — inside panel, just below book ----
-    var navY2=bY+bH+navRowH/2+4;
-    ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
-    ctx.fillText((bestiaryPage+1)+'/'+total,W/2,navY2);
+    // Navigation row (inside panel, fixed below book)
+    var navY=bookY+bookH+navH/2+2;
+    ctx.fillStyle='#555';ctx.font='10px monospace';ctx.textAlign='center';
+    ctx.fillText((bestiaryPage+1)+'/'+(Math.ceil(total/2)||1),W/2,navY);
     if(bestiaryPage>0){
-        ctx.fillStyle='#44aaff';ctx.font='bold 13px monospace';
-        ctx.fillText(lang==='zh'?'◀ 上一个':'◀ PREV',bX+60,navY2);
+        ctx.fillStyle='#44aaff';ctx.font='bold 12px monospace';
+        ctx.fillText(lang==='zh'?'◀ 上一页':'◀ PREV',bookX+55,navY);
     }
-    if(bestiaryPage<total-1){
-        ctx.fillStyle='#44aaff';ctx.font='bold 13px monospace';
-        ctx.fillText(lang==='zh'?'下一个 ▶':'NEXT ▶',bX+bW-60,navY2);
+    if(bestiaryPage<maxPage){
+        ctx.fillStyle='#44aaff';ctx.font='bold 12px monospace';
+        ctx.fillText(lang==='zh'?'下一页 ▶':'NEXT ▶',bookX+bookW-55,navY);
     }
 }
 
@@ -4957,16 +4949,19 @@ function handleLabClick(cx,cy){
     if(labTab){
         var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
         var ppx=(W-pw)/2,ppy=(H-ph)/2;
-        // Bestiary page nav: inside panel, below book
+        // Bestiary page nav: book-style two pages, each turn shows 2 enemies
         if(labTab==='bestiary'){
-            var navRowHb=28;
-            var bWb=Math.min(W-20,560),bHb=Math.min(Math.min(H-80,400),ph-(ppy+50-ppy)-navRowHb-10);
-            var bXb=(W-bWb)/2,bYb=(ppy+50)-10;
-            var navYb=bYb+bHb+navRowHb/2+4;
+            var navHb=24;
+            var bookWb=Math.min(W-24,560);
+            var contentYb=ppy+50;
+            var bookHb=ph-(contentYb-ppy)-navHb-14;
+            var bookXb=(W-bookWb)/2,bookYb=contentYb-4;
+            var navYb=bookYb+bookHb+navHb/2+2;
             var totalB=Object.keys(seenEnemies).length;
+            var maxPageB=Math.max(0,Math.ceil(totalB/2)-1);
             if(cy>=navYb-14&&cy<=navYb+14){
-                if(cx>=bXb&&cx<W/2-20&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
-                if(cx>W/2+20&&cx<=bXb+bWb&&bestiaryPage<totalB-1){bestiaryPage++;playSound('click');return;}
+                if(cx>=bookXb&&cx<W/2-20&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
+                if(cx>W/2+20&&cx<=bookXb+bookWb&&bestiaryPage<maxPageB){bestiaryPage++;playSound('click');return;}
             }
         }
         var cbS=28,cbX=ppx+pw-cbS-6,cbY=ppy+6;
@@ -5537,4 +5532,4 @@ function render(){
     else if(state==='gameover') drawGameOver();
 }
 function gameLoop(){update();render();requestAnimationFrame(gameLoop);}
-(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
+(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();await loadBestiarySprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();

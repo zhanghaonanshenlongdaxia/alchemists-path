@@ -211,6 +211,34 @@ function loadCustomEnemySprites() {
     });
 }
 
+// Load bestiary enemy sprites (driven by ENEMY_TYPES sprite field)
+function loadBestiarySprites() {
+    SPR.bestiarySprites = {};
+    return new Promise(function(resolve) {
+        if (typeof ENEMY_TYPES === 'undefined') { resolve(); return; }
+        var toLoad = [];
+        Object.keys(ENEMY_TYPES).forEach(function(key) {
+            var et = ENEMY_TYPES[key];
+            if (et.sprite) toLoad.push({ key: key, path: 'enemy_sprites/' + et.sprite });
+        });
+        var loaded = 0, total = toLoad.length;
+        if (total === 0) { resolve(); return; }
+        toLoad.forEach(function(item) {
+            var img = new Image();
+            img.onload = function() {
+                SPR.bestiarySprites[item.key] = img;
+                loaded++;
+                if (loaded === total) resolve();
+            };
+            img.onerror = function() {
+                loaded++;
+                if (loaded === total) resolve();
+            };
+            img.src = item.path;
+        });
+    });
+}
+
 // Load weapon sprites from res/item/weapon/ (driven by WEAPONS array sprite field)
 function loadWeaponSprites() {
     console.log('[Weapon Sprites] Starting to load...');
