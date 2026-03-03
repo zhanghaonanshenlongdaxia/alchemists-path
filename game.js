@@ -798,16 +798,22 @@ canvas.addEventListener('touchstart',function(e){
                 labScrollTouchId=-1; // touch outside panel, release scroll lock
             }
         } else {
-            // No panel: left half of screen = joystick, right half / UI buttons = click
-            var W2=canvas.width,H2=canvas.height;
+            // No panel: left half = joystick (fixed position), right half = interact btn or UI
+            var W2=canvas.clientWidth,H2=canvas.clientHeight;
             var isUIArea=(t0.clientY<=45); // top bar UI buttons
-            if(!isUIArea){
-                // Activate hall joystick anywhere on screen
+            var isLeftHalf=(t0.clientX<W2/2);
+            if(!isUIArea&&isLeftHalf){
+                // Fixed joystick center at bottom-left
+                var fixedSX=W2*0.15, fixedSY=H2*0.78;
                 labHallStick.active=true;
-                labHallStick.sx=t0.clientX; labHallStick.sy=t0.clientY;
+                labHallStick.sx=fixedSX; labHallStick.sy=fixedSY;
                 labHallStick.cx=t0.clientX; labHallStick.cy=t0.clientY;
                 labHallStick.id=t0.identifier;
                 return;
+            }
+            // Right half / UI: only route to handleLabClick for button hits, ignore open-field taps
+            if(!isUIArea&&!isLeftHalf){
+                handleLabClick(t0.clientX,t0.clientY);return;
             }
         }
         handleLabClick(t0.clientX,t0.clientY);return;
@@ -5680,5 +5686,20 @@ function render(){
     else if(state==='expedition') renderExpedition();
     else if(state==='gameover') drawGameOver();
 }
-function gameLoop(){update();render();requestAnimationFrame(gameLoop);}
+var gamePaused = false;
+function gameLoop(){
+    if(!gamePaused){update();render();}
+    requestAnimationFrame(gameLoop);
+}
+document.addEventListener('visibilitychange',function(){
+    if(document.hidden){
+        gamePaused=true;
+    } else {
+        gamePaused=false;
+        // Reset touch states to avoid stuck input on resume
+        labHallStick.active=false;labHallStick.id=-1;
+        mobileStick.active=false;mobileStick.id=-1;
+        mobileAimStick.active=false;mobileAimStick.id=-1;
+    }
+});
 (async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();await loadBestiarySprites();await loadRelicSprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
