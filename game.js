@@ -5,7 +5,7 @@ const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 var pixelRatio = window.devicePixelRatio || 1;
 var qualityLevel = 2; // 0=low, 1=medium, 2=high
 var sfxVolume = 1.0;
-var godMode = true; // Invincibility for testing (default ON)
+var godMode = false;
 var showSettings = false;
 function applyQuality(){
     if(qualityLevel===0) pixelRatio=1;
@@ -4901,13 +4901,6 @@ function drawSettings(){
     ctx.fillStyle='#fff';ctx.font='bold '+(compact?10:11)+'px monospace';
     ctx.fillText(T('loadSave'),loadX+sbW/2,sbY+sbH/2+4);
     cy+=sbH+(compact?6:10);
-    // God Mode toggle (for testing)
-    var godBtnW=pw-24,godBtnH=compact?24:28,godBtnX=px+12,godBtnY=cy;
-    ctx.fillStyle=godMode?'#ffd700':'#333';ctx.fillRect(godBtnX,godBtnY,godBtnW,godBtnH);
-    ctx.strokeStyle=godMode?'#ffee88':'#666';ctx.lineWidth=1;ctx.strokeRect(godBtnX,godBtnY,godBtnW,godBtnH);
-    ctx.fillStyle=godMode?'#000':'#888';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
-    ctx.fillText('无敌模式: '+(godMode?'开启':'关闭'),godBtnX+godBtnW/2,godBtnY+godBtnH/2+4);
-    cy+=godBtnH+(compact?6:10);
     // Return to Menu button
     var menuBtnW=pw-24,menuBtnH=compact?24:28,menuBtnX=px+12,menuBtnY=cy;
     ctx.fillStyle='#dd8844';ctx.fillRect(menuBtnX,menuBtnY,menuBtnW,menuBtnH);
@@ -4957,12 +4950,6 @@ function handleSettingsClick(cx,cy){
     if(cx>=saveX2&&cx<=saveX2+sbW2&&cy>=sbY2&&cy<=sbY2+sbH2){saveGame();playSound('click');return;}
     if(cx>=loadX2&&cx<=loadX2+sbW2&&cy>=sbY2&&cy<=sbY2+sbH2){loadGame();playSound('click');return;}
     cyy+=sbH2+(compact?6:10);
-    // God Mode toggle
-    var godBtnW2=pw-24,godBtnH2=compact?24:28,godBtnX2=px+12,godBtnY2=cyy;
-    if(cx>=godBtnX2&&cx<=godBtnX2+godBtnW2&&cy>=godBtnY2&&cy<=godBtnY2+godBtnH2){
-        godMode=!godMode;playSound('click');return;
-    }
-    cyy+=godBtnH2+(compact?6:10);
     // Return to Menu button
     var menuBtnW2=pw-24,menuBtnH2=compact?24:28,menuBtnX2=px+12,menuBtnY2=cyy;
     if(cx>=menuBtnX2&&cx<=menuBtnX2+menuBtnW2&&cy>=menuBtnY2&&cy<=menuBtnY2+menuBtnH2){
