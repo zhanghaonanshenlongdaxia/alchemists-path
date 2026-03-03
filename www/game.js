@@ -559,8 +559,8 @@ function setupFloor(biomeIdx, floor){
     }
 
     // Spawn enemies (balanced: harder base, steeper scaling)
-    var baseHP = 25+Math.floor(expeditionNum*6)+floor*15;
-    var baseATK = 10+Math.floor(expeditionNum*2.5)+Math.floor(floor*6);
+    var baseHP = 15+Math.floor(expeditionNum*3.6)+floor*9;
+    var baseATK = 6+Math.floor(expeditionNum*1.5)+Math.floor(floor*3.6);
     if(!isBossFloor){
         var enemyCount = Math.min(3+expeditionNum+floor, 8);
         for(var i=1;i<rooms.length;i++){
@@ -2587,14 +2587,14 @@ function drawExpeditionHUD(){
             ctx.fillText('×'+qslot.count,sx+qbSlotW/2,qbY+40);
         }
     }
-    // Exit expedition button (bottom-right, away from joystick)
-    var exitBtnW=60,exitBtnH=26,exitBtnX=W-exitBtnW-10,exitBtnY=canvas.height-36;
+    // Settings gear in expedition (top-right)
+    drawSettingsGear(W-38,15,26);
+    // Exit expedition button (top-right, below settings gear)
+    var exitBtnW=60,exitBtnH=22,exitBtnX=W-exitBtnW-10,exitBtnY=46;
     ctx.fillStyle='rgba(120,20,20,0.7)';ctx.fillRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
     ctx.strokeStyle='#ff4444';ctx.lineWidth=1;ctx.strokeRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
     ctx.fillStyle='#ff8888';ctx.font='bold 9px monospace';ctx.textAlign='center';
     ctx.fillText('退出冒险',exitBtnX+exitBtnW/2,exitBtnY+exitBtnH/2+3);
-    // Settings gear in expedition
-    drawSettingsGear(W-38,15,26);
 }
 
 function useCarriedPotion(index){
@@ -5520,9 +5520,9 @@ canvas.addEventListener('click',function(e){
         if(cx>=W-38&&cx<=W-12&&cy>=15&&cy<=41){showSettings=true;playSound('click');return;}
         // Bestiary book button
         if(cx>=W-72&&cx<=W-46&&cy>=14&&cy<=40){showBestiary=true;bestiaryPage=0;playSound('click');return;}
-        // Exit expedition button (bottom-right)
+        // Exit expedition button (top-right, below settings gear)
         var exitBtnW3=60,exitBtnX3=canvas.width-exitBtnW3-10;
-        if(cx>=exitBtnX3&&cx<=exitBtnX3+exitBtnW3&&cy>=canvas.height-36&&cy<=canvas.height-10){
+        if(cx>=exitBtnX3&&cx<=exitBtnX3+exitBtnW3&&cy>=46&&cy<=68){
             if(confirm('确定退出本次冒险？进度将丢失。')){
                 endExpedition();
             }
