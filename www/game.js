@@ -559,8 +559,8 @@ function setupFloor(biomeIdx, floor){
     }
 
     // Spawn enemies (balanced: harder base, steeper scaling)
-    var baseHP = 50+Math.floor(expeditionNum*12)+floor*30;
-    var baseATK = 20+Math.floor(expeditionNum*5)+Math.floor(floor*12);
+    var baseHP = 25+Math.floor(expeditionNum*6)+floor*15;
+    var baseATK = 10+Math.floor(expeditionNum*2.5)+Math.floor(floor*6);
     if(!isBossFloor){
         var enemyCount = Math.min(3+expeditionNum+floor, 8);
         for(var i=1;i<rooms.length;i++){
@@ -711,10 +711,10 @@ function startExpedition(biomeIdx){
     // Generate shop stock for merchant
     generateShopStock(biomeIdx, 0);
 
-    // Process carried potions - activate buffs but keep all potions
+    // Carried potions slots: [{potion, count}] — buffs from non-heal/revive types are pre-applied
     activeBuffs=[];
     for(var i=0;i<carriedPotions.length;i++){
-        var p=carriedPotions[i];
+        var p=carriedPotions[i].potion;
         if(p.effect!=='heal'&&p.effect!=='revive'){
             var existing=activeBuffs.findIndex(function(b){return b.effect===p.effect;});
             if(existing>=0){ if(p.tier>=activeBuffs[existing].tier) activeBuffs[existing]={effect:p.effect,tier:p.tier,value:p.value,name:p.name}; }
@@ -852,9 +852,9 @@ canvas.addEventListener('touchstart',function(e){
     for(var i=0;i<e.changedTouches.length;i++){
         var t=e.changedTouches[i];
         if(carriedPotions.length>0){
-            var qbSlotW=48,qbSlotH=48,qbGap=6;
+            var qbSlotW=54,qbSlotH=52,qbGap=5;
             var qbTotalW=carriedPotions.length*(qbSlotW+qbGap)-qbGap;
-            var qbX=Math.floor((canvas.width-qbTotalW)/2),qbY=canvas.height-(isMobile?55:60);
+            var qbX=Math.floor((canvas.width-qbTotalW)/2),qbY=canvas.height-(isMobile?65:70);
             var hitSlot=false;
             for(var pi=0;pi<carriedPotions.length;pi++){
                 var sx=qbX+pi*(qbSlotW+qbGap);
@@ -2569,6 +2569,24 @@ function drawExpeditionHUD(){
             ctx.fillText(Math.ceil(db.timer/60)+'s',dx+dbIconSize/2,dbY+dbIconSize-5);
         }
     }
+    // Potion quickbelt (bottom-center, above joystick)
+    if(carriedPotions.length>0){
+        var qbSlotW=54,qbSlotH=52,qbGap=5;
+        var qbTotalW=carriedPotions.length*(qbSlotW+qbGap)-qbGap;
+        var qbX=Math.floor((W-qbTotalW)/2),qbY=canvas.height-(isMobile?65:70);
+        for(var pi=0;pi<carriedPotions.length;pi++){
+            var qslot=carriedPotions[pi],qp=qslot.potion;
+            var sx=qbX+pi*(qbSlotW+qbGap);
+            ctx.fillStyle='rgba(15,15,25,0.85)';ctx.fillRect(sx,qbY,qbSlotW,qbSlotH);
+            ctx.strokeStyle=qp.color||'#44dd88';ctx.lineWidth=1.5;ctx.strokeRect(sx,qbY,qbSlotW,qbSlotH);
+            ctx.fillStyle=qp.color||'#ddd';ctx.font='bold 9px monospace';ctx.textAlign='center';
+            ctx.fillText(recipeName(qp),sx+qbSlotW/2,qbY+14);
+            ctx.fillStyle='#888';ctx.font='8px monospace';
+            ctx.fillText(recipeDesc(qp),sx+qbSlotW/2,qbY+25);
+            ctx.fillStyle='#ffdd44';ctx.font='bold 13px monospace';
+            ctx.fillText('×'+qslot.count,sx+qbSlotW/2,qbY+40);
+        }
+    }
     // Exit expedition button (bottom-right, away from joystick)
     var exitBtnW=60,exitBtnH=26,exitBtnX=W-exitBtnW-10,exitBtnY=canvas.height-36;
     ctx.fillStyle='rgba(120,20,20,0.7)';ctx.fillRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
@@ -2581,7 +2599,8 @@ function drawExpeditionHUD(){
 
 function useCarriedPotion(index){
     if(index<0||index>=carriedPotions.length) return;
-    var p=carriedPotions[index];
+    var slot=carriedPotions[index];
+    var p=slot.potion;
     if(p.effect==='heal'){
         if(playerStats.hp>=playerStats.maxHp) return;
         var healAmt=p.value;
@@ -2601,7 +2620,8 @@ function useCarriedPotion(index){
         applyBuffs();
         spawnFloat(player.x,player.y-20,recipeName(p),p.color||'#fff');
     }
-    carriedPotions.splice(index,1);
+    slot.count--;
+    if(slot.count<=0) carriedPotions.splice(index,1);
     playSound('drink');
 }
 
@@ -3808,12 +3828,12 @@ function renderLab(){
     ctx.fillStyle='#cc9944';ctx.font='bold 9px monospace';ctx.textAlign='center';
     ctx.fillText('📚 图鉴',bkX+bkW/2,bkY+bkH/2+3);
 
-    // Carried potions belt
+    // Carried potions belt (summary)
     if(carriedPotions.length>0){
-        var beltW=carriedPotions.length*50+80;
+        var beltW=carriedPotions.length*80+20;
         ctx.fillStyle='rgba(10,10,20,0.6)';ctx.fillRect(W/2-beltW/2,H-30,beltW,22);
         ctx.fillStyle='#44dd88';ctx.font='10px monospace';ctx.textAlign='center';
-        ctx.fillText(T('carriedSlots')+': '+carriedPotions.map(function(p){return recipeName(p);}).join(', '),W/2,H-15);
+        ctx.fillText(T('carriedSlots')+': '+carriedPotions.map(function(s){return recipeName(s.potion)+'×'+s.count;}).join(', '),W/2,H-15);
     }
 
     // Lab hall player (only when no panel open)
@@ -4106,16 +4126,50 @@ function drawLabBrew(cy){
 
 function drawLabPotions(cy){
     var W=canvas.width;
+    // Belt: slots by type, each max 10
     ctx.fillStyle='#aaa';ctx.font='bold 13px monospace';ctx.textAlign='center';
-    ctx.fillText(T('carriedSlots')+' ('+carriedPotions.length+'/'+getMaxCarry()+')',W/2,cy);cy+=8;
-    var slotW=80,slotH=36,slotGap=8;
-    var slotStartX=W/2-(getMaxCarry()*(slotW+slotGap)-slotGap)/2;
-    for(var i=0;i<getMaxCarry();i++){var sx=slotStartX+i*(slotW+slotGap),sy=cy;var p=carriedPotions[i];ctx.fillStyle=p?'rgba(30,30,50,0.8)':'rgba(20,20,30,0.5)';ctx.fillRect(sx,sy,slotW,slotH);ctx.strokeStyle=p?(p.color||'#44dd88'):'#333';ctx.lineWidth=1;ctx.strokeRect(sx,sy,slotW,slotH);if(p){ctx.fillStyle=p.color||'#ddd';ctx.font='10px monospace';ctx.textAlign='center';ctx.fillText(recipeName(p),sx+slotW/2,sy+14);ctx.fillStyle='#888';ctx.font='9px monospace';ctx.fillText(recipeDesc(p),sx+slotW/2,sy+26);ctx.fillStyle='#ff6666';ctx.font='bold 10px monospace';ctx.fillText('×',sx+slotW-8,sy+12);}else{ctx.fillStyle='#444';ctx.font='10px monospace';ctx.textAlign='center';ctx.fillText(T('slotEmpty'),sx+slotW/2,sy+slotH/2+3);}}
-    cy+=slotH+15;
+    ctx.fillText(T('carriedSlots')+' ('+carriedPotions.length+'种类型)',W/2,cy);cy+=8;
+    var slotW=90,slotH=42,slotGap=8;
+    var maxCols=Math.min(4,Math.max(carriedPotions.length+1,2));
+    var slotStartX=W/2-(maxCols*(slotW+slotGap)-slotGap)/2;
+    for(var i=0;i<carriedPotions.length;i++){
+        var col=i%maxCols;
+        var row=Math.floor(i/maxCols);
+        var sx=slotStartX+col*(slotW+slotGap),sy=cy+row*(slotH+6);
+        var slot=carriedPotions[i],p=slot.potion;
+        ctx.fillStyle='rgba(30,30,50,0.8)';ctx.fillRect(sx,sy,slotW,slotH);
+        ctx.strokeStyle=p.color||'#44dd88';ctx.lineWidth=1;ctx.strokeRect(sx,sy,slotW,slotH);
+        ctx.fillStyle=p.color||'#ddd';ctx.font='10px monospace';ctx.textAlign='center';
+        ctx.fillText(recipeName(p),sx+slotW/2,sy+14);
+        ctx.fillStyle='#888';ctx.font='9px monospace';
+        ctx.fillText(recipeDesc(p),sx+slotW/2,sy+26);
+        ctx.fillStyle='#ffdd44';ctx.font='bold 11px monospace';
+        ctx.fillText('×'+slot.count,sx+slotW/2,sy+38);
+        ctx.fillStyle='#ff6666';ctx.font='bold 11px monospace';
+        ctx.fillText('✕',sx+slotW-8,sy+12);
+    }
+    var rows=carriedPotions.length>0?Math.ceil(carriedPotions.length/maxCols):0;
+    cy+=rows*(slotH+6)+15;
     ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='center';ctx.fillText(T('yourPotions'),W/2,cy);cy+=20;
     if(inventory.potions.length===0&&carriedPotions.length===0){ctx.fillStyle='#555';ctx.fillText(T('noPotions'),W/2,cy+20);return;}
     var itemH=40,startX=W/2-160;
-    for(var i=0;i<inventory.potions.length;i++){var p=inventory.potions[i];var iy=cy+i*(itemH+4);ctx.fillStyle='#111118';ctx.fillRect(startX,iy,320,itemH);ctx.strokeStyle=p.color||'#333';ctx.lineWidth=1;ctx.strokeRect(startX,iy,320,itemH);ctx.fillStyle=p.color||'#ddd';ctx.font='12px monospace';ctx.textAlign='left';ctx.fillText(recipeName(p),startX+14,iy+16);ctx.fillStyle='#888';ctx.font='10px monospace';ctx.fillText(recipeDesc(p)+' ('+T('tier')+' '+p.tier+')',startX+14,iy+32);var btnX=startX+240,btnY=iy+6,btnW=70,btnH=28;var full=carriedPotions.length>=getMaxCarry();ctx.fillStyle=full?'#555':'#44dd88';ctx.fillRect(btnX,btnY,btnW,btnH);ctx.fillStyle=full?'#888':'#000';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText(T('equip'),btnX+btnW/2,btnY+btnH/2+4);}
+    for(var i=0;i<inventory.potions.length;i++){
+        var p=inventory.potions[i];var iy=cy+i*(itemH+4);
+        ctx.fillStyle='#111118';ctx.fillRect(startX,iy,320,itemH);
+        ctx.strokeStyle=p.color||'#333';ctx.lineWidth=1;ctx.strokeRect(startX,iy,320,itemH);
+        ctx.fillStyle=p.color||'#ddd';ctx.font='12px monospace';ctx.textAlign='left';
+        ctx.fillText(recipeName(p),startX+14,iy+16);
+        ctx.fillStyle='#888';ctx.font='10px monospace';
+        ctx.fillText(recipeDesc(p)+' ('+T('tier')+' '+p.tier+')',startX+14,iy+32);
+        // Find existing slot count for this type
+        var existSlot=carriedPotions.find(function(s){return s.potion.effect===p.effect;});
+        var slotCount=existSlot?existSlot.count:0;
+        var canAdd=(slotCount<10);
+        var btnX=startX+240,btnY=iy+6,btnW=70,btnH=28;
+        ctx.fillStyle=canAdd?'#44dd88':'#555';ctx.fillRect(btnX,btnY,btnW,btnH);
+        ctx.fillStyle=canAdd?'#000':'#888';ctx.font='bold 10px monospace';ctx.textAlign='center';
+        ctx.fillText(canAdd?(T('equip')+(slotCount>0?' +1':'')):'MAX',btnX+btnW/2,btnY+btnH/2+4);
+    }
     cy+=inventory.potions.length*(itemH+4)+10;
     labScrollMax=Math.max(0, (cy-labPanelContentY)-labPanelVisH);
 }
@@ -5140,18 +5194,37 @@ function handleLabClick(cx,cy){
                 }
             }
         } else if(labTab==='potions'){
-            var slotW=80,slotH=36,slotGap=8,slotStartX=W/2-(getMaxCarry()*(slotW+slotGap)-slotGap)/2,slotY=contentY+8;
+            // Slot click: remove one from count (or remove slot)
+            var slotW2=90,slotH2=42,slotGap2=8;
+            var maxCols2=Math.min(4,Math.max(carriedPotions.length+1,2));
+            var slotStartX2=W/2-(maxCols2*(slotW2+slotGap2)-slotGap2)/2;
+            var slotY2=contentY+8;
             for(var i=0;i<carriedPotions.length;i++){
-                var sx=slotStartX+i*(slotW+slotGap);
-                if(cx>=sx&&cx<=sx+slotW&&cy>=slotY&&cy<=slotY+slotH){inventory.potions.push(carriedPotions[i]);carriedPotions.splice(i,1);playSound('click');return;}
+                var col2=i%maxCols2,row2=Math.floor(i/maxCols2);
+                var sx2=slotStartX2+col2*(slotW2+slotGap2),sy2=slotY2+row2*(slotH2+6);
+                if(cx>=sx2&&cx<=sx2+slotW2&&cy>=sy2&&cy<=sy2+slotH2){
+                    var slot2=carriedPotions[i];
+                    inventory.potions.push(slot2.potion);
+                    slot2.count--;
+                    if(slot2.count<=0) carriedPotions.splice(i,1);
+                    playSound('click');return;
+                }
             }
-            var listY=slotY+slotH+35,itemH=40,startX=W/2-160;
+            var rows2=carriedPotions.length>0?Math.ceil(carriedPotions.length/maxCols2):0;
+            var listY=slotY2+rows2*(slotH2+6)+35,itemH=40,startX=W/2-160;
             for(var i=0;i<inventory.potions.length;i++){
                 var iy=listY+i*(itemH+4);
-                var btnX=startX+240,btnY=iy+6,btnW=70,btnH=28;
-                if(cx>=btnX&&cx<=btnX+btnW&&cy>=btnY&&cy<=btnY+btnH){
-                    if(carriedPotions.length>=getMaxCarry()){labMessage=T('beltFull');labMessageTimer=90;playSound('error');return;}
-                    carriedPotions.push(inventory.potions[i]);inventory.potions.splice(i,1);playSound('click');return;
+                var btnX=startX+240,btnY2=iy+6,btnW=70,btnH=28;
+                if(cx>=btnX&&cx<=btnX+btnW&&cy>=btnY2&&cy<=btnY2+btnH){
+                    var p2=inventory.potions[i];
+                    var existIdx=carriedPotions.findIndex(function(s){return s.potion.effect===p2.effect;});
+                    if(existIdx>=0){
+                        if(carriedPotions[existIdx].count>=10){labMessage='已满10个！';labMessageTimer=90;playSound('error');return;}
+                        carriedPotions[existIdx].count++;
+                    } else {
+                        carriedPotions.push({potion:p2,count:1});
+                    }
+                    inventory.potions.splice(i,1);playSound('click');return;
                 }
             }
         } else if(labTab==='weapons'){
@@ -5480,9 +5553,9 @@ canvas.addEventListener('click',function(e){
             }
         }
         if(carriedPotions.length>0){
-            var qbSlotW=48,qbSlotH=48,qbGap=6;
+            var qbSlotW=54,qbSlotH=52,qbGap=5;
             var qbTotalW=carriedPotions.length*(qbSlotW+qbGap)-qbGap;
-            var qbX=Math.floor((canvas.width-qbTotalW)/2),qbY=canvas.height-(isMobile?55:60);
+            var qbX=Math.floor((canvas.width-qbTotalW)/2),qbY=canvas.height-(isMobile?65:70);
             for(var pi=0;pi<carriedPotions.length;pi++){
                 var sx=qbX+pi*(qbSlotW+qbGap);
                 if(cx>=sx&&cx<=sx+qbSlotW&&cy>=qbY&&cy<=qbY+qbSlotH){useCarriedPotion(pi);return;}
