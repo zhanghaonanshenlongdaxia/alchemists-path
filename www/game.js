@@ -37,478 +37,42 @@ Object.defineProperty(canvas, 'height', {
 resize(); window.addEventListener('resize', resize);
 
 // ============ LANGUAGE SYSTEM ============
-let lang = 'en';
-const LANG = {
-    en: {
-        title: "ALCHEMIST'S PATH",
-        sub: ['Explore','Gather','Brew','Conquer'],
-        enterLab: 'ENTER LAB',
-        controls: 'WASD Move • Click Attack • Brew potions to grow stronger',
-        controlsMobile: 'Tap to interact • Left stick to move • Right to attack',
-        tabExtract: 'Extract', tabBrew: 'Brew', tabPotions: 'Potions', tabExpedition: 'Expedition',
-        selectHerb: 'Select a herb to extract essences',
-        noHerbs: 'No herbs. Go on an expedition!',
-        extract: 'EXTRACT',
-        yourEssences: '— Your Essences —',
-        noneYet: 'None yet',
-        select2: 'Select 2 essences to brew a potion',
-        selectMore: 'Select one more essence...',
-        noRecipe: 'No known recipe for this combination',
-        brew: 'BREW',
-        discoveredRecipes: '— Discovered Recipes —',
-        brewToDiscover: 'Brew to discover!',
-        yourPotions: 'Your potions — use before expedition',
-        noPotions: 'No potions brewed yet.', 
-        chooseBiome: 'Choose a biome to explore',
-        activeBuffs: 'Active buffs: ',
-        explore: 'EXPLORE',
-        herbs: 'Herbs:',
-        exit: 'EXIT',
-        expFailed: 'EXPEDITION FAILED',
-        backToLab: 'BACK TO LAB',
-        score: 'Score',
-        expComplete: 'Expedition complete! Check your herbs.',
-        youFell: 'You fell... but your herbs are safe.',
-        newRecipe: 'New recipe discovered: ',
-        brewed: 'Brewed: ',
-        revived: 'REVIVED!',
-        atk: 'ATK', def: 'DEF', hp: 'HP',
-        biomeForest: 'Forest', biomeCave: 'Cave', biomeSwamp: 'Swamp',
-        tier: 'Tier',
-        step1Chop: 'Step 1: CHOP', step1Desc: 'Click rapidly to chop the herb!',
-        step2Grind: 'Step 2: GRIND', step2Desc: 'Click left and right to grind!',
-        step3Distill: 'Step 3: DISTILL', step3Desc: 'Keep temperature in the green zone!',
-        chopProgress: 'Chop', grindProgress: 'Grind', tempLabel: 'Temp', holdTime: 'Hold',
-        bonusEssence: 'BONUS essence!', extractComplete: 'Extraction complete!',
-        extracting: 'Extracting...',
-        equip: 'EQUIP', carriedSlots: 'Expedition Belt',
-        slotEmpty: 'Empty', beltFull: 'Belt is full! (max 3)',
-        quality: 'Quality', perfect: 'Perfect!', good: 'Good', poor: 'Poor',
-        // New strings
-        weapon: 'Weapon', weaponFound: 'Weapon Found!', weaponReplace: 'REPLACE', weaponKeep: 'KEEP',
-        enchant: 'ENCHANT', enchantWeapon: 'Enchant Weapon', selectPotion: 'Select potion to enchant',
-        enchanted: 'Enchanted!', noWeapon: 'No weapon equipped',
-        merchant: 'Merchant', buy: 'BUY', sell: 'SELL', gold: 'Gold',
-        notEnoughGold: 'Not enough gold!', soldItem: 'Sold!', boughtItem: 'Bought!',
-        floor: 'Floor', nextFloor: 'Next Floor', bossDefeated: 'BOSS DEFEATED!',
-        eliteSlain: 'ELITE SLAIN!', bossAppears: 'BOSS APPEARS!',
-        exitLocked: 'Defeat the boss to unlock exit',
-        tabWeapons: 'Weapons', tabShop: 'Shop',
-        enchantNone: 'No enchantment',
-        dmg: 'DMG', spd: 'Speed', rng: 'Range',
-        // Research & Collectibles
-        tabResearch: 'Research', researchDesc: 'Spend gold to permanently upgrade',
-        resHP: 'Max HP +1', resDEF: 'Base DEF +1', resATK: 'Base ATK +1', resSpeed: 'Move Speed +',
-        resLuck: 'Luck +', resCarry: 'Belt +1 Slot',
-        lvl: 'Lv', maxLvl: 'MAX',
-        key: 'Key', keys: 'Keys', needKey: 'Need a key',
-        newRelic: 'New Relic Found!',
-        relicCase: 'Relic Case', relicsFound: 'Relics Found',
-        minimap: 'Map',
-        saved: 'Saved!', loaded: 'Loaded!', saveBtn: 'Save', loadSave: 'Load Save',
-        // Skill tree
-        tabSkills: 'Skills', skillTree: 'Skill Tree', skillDesc: 'Unlock permanent abilities',
-        skillUnlocked: 'Unlocked', skillReq: 'Requires',
-        // Combat branch
-        skCombat: 'Combat', skPowerStrike: 'Power Strike', skPowerStrikeD: 'Crit chance +10%',
-        skLifeSteal: 'Life Steal', skLifeStealD: 'Heal 1 HP per 5 kills',
-        skBerserker: 'Berserker', skBerserkerD: 'ATK +20% when HP<30%',
-        skExecute: 'Execute', skExecuteD: '+50% DMG to enemies <25% HP',
-        // Alchemy branch
-        skAlchemy: 'Alchemy', skDoubleYield: 'Double Yield', skDoubleYieldD: '20% chance double essence',
-        skPotionMaster: 'Potion Master', skPotionMasterD: 'Potions +50% effect',
-        skTransmute: 'Transmute', skTransmuteD: 'Convert 3 essences to any 1',
-        skPhiloStone: 'Philosopher', skPhiloStoneD: 'Brew costs no essences 15%',
-        // Survival branch
-        skSurvival: 'Survival', skThickSkin: 'Thick Skin', skThickSkinD: 'Take -1 DMG (min 1)',
-        skScavenger: 'Scavenger', skScavengerD: '+30% gold from enemies',
-        skDodge: 'Dodge', skDodgeD: '12% chance to dodge attacks',
-        skSecondWind: 'Second Wind', skSecondWindD: 'Heal 30% HP once per floor',
-        // Settings
-        settingsTitle: 'SETTINGS', bgmVol: 'Music', sfxVol: 'Sound FX',
-        qualityLow: 'Low', qualityMed: 'Medium', qualityHigh: 'High', qualityLabel: 'Quality',
-        langLabel: 'Language', settingsClose: 'CLOSE',
-    },
-    zh: {
-        title: '炼金之路',
-        sub: ['探险','采集','炼制','征服'],
-        enterLab: '进入炼金室',
-        controls: 'WASD移动 • 点击攻击 • 炼制药剂变强',
-        controlsMobile: '点击交互 • 左摇杆移动 • 右侧攻击',
-        tabExtract: '提取', tabBrew: '酿造', tabPotions: '药剂', tabExpedition: '探险',
-        selectHerb: '选择药材提取精华', noHerbs: '没有药材，去探险吧！', extract: '提取',
-        yourEssences: '— 你的精华 —', noneYet: '暂无',
-        select2: '选择2种精华酿造药剂', selectMore: '再选一种精华...',
-        noRecipe: '没有已知配方', brew: '酿造',
-        discoveredRecipes: '— 已发现配方 —', brewToDiscover: '酿造来发现配方！',
-        yourPotions: '你的药剂 — 探险前使用', noPotions: '还没有药剂',
-        chooseBiome: '选择探险区域', activeBuffs: '当前增益：', explore: '出发',
-        herbs: '药材：', exit: '出口', expFailed: '探险失败', backToLab: '返回炼金室',
-        score: '分数', expComplete: '探险完成！查看你的药材。',
-        youFell: '你倒下了...但药材还在。',
-        newRecipe: '发现新配方：', brewed: '酿造了：',
-        revived: '复活！',
-        atk: '攻击', def: '防御', hp: '生命',
-        biomeForest: '森林', biomeCave: '洞穴', biomeSwamp: '沼泽',
-        tier: '阶',
-        step1Chop: '第一步：切碎', step1Desc: '快速点击切碎药材！',
-        step2Grind: '第二步：研磨', step2Desc: '左右交替点击研磨！',
-        step3Distill: '第三步：蒸馏', step3Desc: '保持温度在绿色区间内！',
-        chopProgress: '切碎', grindProgress: '研磨', tempLabel: '温度', holdTime: '保持',
-        bonusEssence: '额外精华！', extractComplete: '提取完成！',
-        extracting: '撤离中…',
-        equip: '装备', carriedSlots: '探险腰带', slotEmpty: '空',
-        beltFull: '腰带已满！（最多3瓶）',
-        quality: '品质', perfect: '完美！', good: '良好', poor: '较差',
-        weapon: '武器', weaponFound: '发现武器！', weaponReplace: '替换', weaponKeep: '保留',
-        enchant: '附魔', enchantWeapon: '武器附魔', selectPotion: '选择药剂附魔',
-        enchanted: '附魔成功！', noWeapon: '未装备武器',
-        merchant: '商人', buy: '购买', sell: '出售', gold: '金币',
-        notEnoughGold: '金币不足！', soldItem: '已出售！', boughtItem: '已购买！',
-        floor: '层', nextFloor: '下一层', bossDefeated: 'BOSS已击败！',
-        eliteSlain: '精英已击杀！', bossAppears: 'BOSS出现！',
-        exitLocked: '击败Boss后开启撤离点',
-        tabWeapons: '武器', tabShop: '商店',
-        enchantNone: '无附魔',
-        dmg: '伤害', spd: '速度', rng: '范围',
-        // Research & Collectibles
-        tabResearch: '研究', researchDesc: '花费金币永久升级属性',
-        resHP: '生命上限+1', resDEF: '基础防御+1', resATK: '基础攻击+1', resSpeed: '移速+',
-        resLuck: '幸运+', resCarry: '腰带+1格',
-        lvl: '级', maxLvl: '满级',
-        key: '钥匙', keys: '钥匙', needKey: '需要钥匙',
-        newRelic: '发现新遗物！',
-        relicCase: '遗物柜', relicsFound: '已发现遗物',
-        minimap: '地图',
-        saved: '已保存！', loaded: '已加载！', saveBtn: '保存', loadSave: '读取存档',
-        // Skill tree
-        tabSkills: '技能', skillTree: '技能树', skillDesc: '解锁永久能力',
-        skillUnlocked: '已解锁', skillReq: '需要',
-        skCombat: '战斗', skPowerStrike: '暴击强化', skPowerStrikeD: '暴击率+10%',
-        skLifeSteal: '生命汲取', skLifeStealD: '每5次击杀回复1HP',
-        skBerserker: '狂战', skBerserkerD: 'HP<30%时攻击+20%',
-        skExecute: '处决', skExecuteD: '对<25%HP敌人+50%伤害',
-        skAlchemy: '炼金', skDoubleYield: '双倍产出', skDoubleYieldD: '20%几率双倍精华',
-        skPotionMaster: '药剂大师', skPotionMasterD: '药剂效果+50%',
-        skTransmute: '转化', skTransmuteD: '3精华转化为任意1种',
-        skPhiloStone: '贤者', skPhiloStoneD: '15%几率酿造不消耗精华',
-        skSurvival: '生存', skThickSkin: '厚皮', skThickSkinD: '受到伤害-1(最低1)',
-        skScavenger: '拾荒', skScavengerD: '敌人掉落金币+30%',
-        skDodge: '闪避', skDodgeD: '12%几率闪避攻击',
-        skSecondWind: '回春', skSecondWindD: '每层回复30%HP一次',
-        // Settings
-        settingsTitle: '设 置', bgmVol: '音乐', sfxVol: '音效',
-        qualityLow: '低', qualityMed: '中', qualityHigh: '高', qualityLabel: '画质',
-        langLabel: '语言', settingsClose: '关闭',
-    }
-};
+let lang = 'zh';
+// 所有数据常量（LANG, WEAPONS, BIOMES, ENEMY_TYPES, HERBS, ESSENCES, RECIPES,
+// RESEARCH, COLLECTIBLES, STATUS_DEFS 等）均在 gamedata.js 中定义，请修改那里。
 function T(key) { return LANG[lang][key] || LANG.en[key] || key; }
 function getBiomeName(b) {
-    if (lang === 'zh') {
-        if (b.name === 'Forest') return T('biomeForest');
-        if (b.name === 'Cave') return T('biomeCave');
-        if (b.name === 'Swamp') return T('biomeSwamp');
-    }
+    if (b.name === 'Forest') return T('biomeForest');
+    if (b.name === 'Cave') return T('biomeCave');
+    if (b.name === 'Swamp') return T('biomeSwamp');
     return b.name;
 }
-const HERB_NAMES_ZH = { greenLeaf:'绿叶草', redBerry:'红浆果', yellowRoot:'黄根', caveCrystal:'洞穴水晶', blueMush:'蓝蘑菇', firestone:'火石', swampGoo:'沼泽粘液', purpleMoss:'紫苔藓' };
-const ESSENCE_NAMES_ZH = { vita:'生命', herba:'草木', ignis:'火焰', terra:'大地', aqua:'水灵', lux:'光明', toxin:'毒素' };
-const RECIPE_NAMES_ZH = { 'Healing Brew':'治愈药剂','Strength Elixir':'力量药水','Vitality Tonic':'活力补剂','Iron Skin':'铁皮药膏','Berserker Draft':'狂战药剂','Swift Potion':'迅捷药水','Regen Potion':'回春药水','Venom Blade':'毒刃药剂','Shadow Elixir':'暗影药水','Stone Shield':'石盾药剂','Greater Heal':'强效治愈','Phoenix Draught':'凤凰药剂' };
-const RECIPE_DESC_ZH = { '+3 HP':'生命+3','+2 ATK':'攻击+2','+2 Max HP':'生命上限+2','+2 DEF':'防御+2','+4 ATK':'攻击+4','+Speed':'速度提升','HP Regen':'生命回复','Poison ATK':'毒素攻击','Stealth':'隐身','+4 DEF':'防御+4','+5 HP':'生命+5','Auto-Revive':'自动复活' };
-function herbName(key) { return lang==='zh' ? (HERB_NAMES_ZH[key]||HERBS[key].name) : HERBS[key].name; }
-function essenceName(key) { return lang==='zh' ? (ESSENCE_NAMES_ZH[key]||ESSENCES[key].name) : ESSENCES[key].name; }
-function recipeName(r) { return lang==='zh' ? (RECIPE_NAMES_ZH[r.name]||r.name) : r.name; }
-function recipeDesc(r) { return lang==='zh' ? (RECIPE_DESC_ZH[r.desc]||r.desc) : r.desc; }
+function herbName(key) { return HERB_NAMES_ZH[key]||HERBS[key].name; }
+function essenceName(key) { return ESSENCE_NAMES_ZH[key]||ESSENCES[key].name; }
+function recipeName(r) { return RECIPE_NAMES_ZH[r.name]||r.name; }
+function recipeDesc(r) { return RECIPE_DESC_ZH[r.desc]||r.desc; }
+function weaponName(w) { return WEAPON_NAMES_ZH[w.name]||w.name; }
+function rarityName(r) { return RARITY_NAMES_ZH[r]||RARITY_NAMES[r]||''; }
+const HERBS_LIST = Object.keys(HERBS).map(function(k){ return Object.assign({key:k},HERBS[k]); });
 
-// ============ CONSTANTS ============
+// ============ GAME CONSTANTS ============
+const MAP_W = 32, MAP_H = 22;
 const TILE = 32;
-const MAP_W = 36, MAP_H = 28;
-const PLAYER_SPEED = 2.5;
-const ENEMY_SPEED = 1.0;
-const MAX_FLOORS = 6;
-
-// ============ WEAPON DATA ============
-const WEAPON_NAMES_ZH = {
-    // 白色 (Common)
-    'Rusty Dagger':'生锈匕首', 'Wooden Club':'木棍', 'Old Sword':'旧剑', 'Worn Axe':'破旧斧',
-    'Hunting Knife':'猎刀', 'Plain Club':'普通棍棒', 'Broken Spear':'断矛', 'Stone Hammer':'石锤',
-    // 绿色 (Uncommon)
-    'Iron Sword':'铁剑', 'Steel Blade':'钢刃', 'Bronze Spear':'青铜矛', 'Shadow Knife':'暗影短刀',
-    'Short Mace':'短锤', 'Elven Blade':'精灵刃', 'Hand Axe':'手斧', 'War Hammer':'战锤',
-    // 蓝色 (Rare)
-    'War Axe':'战斧', 'Crystal Staff':'水晶法杖', 'Venom Fang':'毒牙刃', 'Broad Axe':'阔斧',
-    'Battle Axe':'战斧', 'Flail':'连枷', 'Glaive':'战戟', 'Halberd':'长戟',
-    // 紫色 (Epic)
-    'Flame Sword':'烈焰剑', 'Frost Mace':'霜冻锤', 'Thunder Spear':'雷霆枪', 'Katana':'武士刀',
-    'Great Sword':'巨剑', 'Executioner Axe':'斩首斧', 'Bardiche':'大刀', 'Double Sword':'双刃剑',
-    // 金色 (Legendary)
-    'Dragon Claw':'龙爪', 'Arcane Blade':'奥术之刃', 'Holy Scourge':'神圣鞭', 'Demon Whip':'恶魔鞭',
-    'Lajatang':'两端刃', 'Blessed Blade':'祝福之刃',
-    // 红色 (Mythic)
-    'Scythe of Curses':'诅咒之镰', 'Sword of Cerebov':'赛瑞伯夫之剑', 'Wrath of Trog':'特罗格之怒',
-    'Staff of Dispater':'迪斯佩特之杖', 'Triple Sword':'三重剑',
-};
-function weaponName(w) { return lang==='zh' ? (WEAPON_NAMES_ZH[w.name]||w.name) : w.name; }
-
-// Rarity system: 0=white, 1=green, 2=blue, 3=purple, 4=gold, 5=red
-const RARITY_COLORS = ['#cccccc','#44ee44','#4488ff','#cc44ff','#ffcc00','#ff2222'];
-const RARITY_NAMES  = ['Common','Uncommon','Rare','Epic','Legendary','Mythic'];
-const RARITY_NAMES_ZH = ['普通','优秀','稀有','史诗','传说','神话'];
-
-const WEAPONS = [
-    // === TIER 0 — White (Common) ===
-    { name:'Rusty Dagger',      rarity:0, tier:0, dmg:1,  speed:1.2, range:42, color:RARITY_COLORS[0], type:'dagger', sprite:'dagger.png' },
-    { name:'Wooden Club',       rarity:0, tier:0, dmg:1,  speed:0.8, range:38, color:RARITY_COLORS[0], type:'mace',   sprite:'club.png' },
-    { name:'Old Sword',         rarity:0, tier:0, dmg:1,  speed:1.0, range:44, color:RARITY_COLORS[0], type:'sword',  sprite:'short_sword1.png' },
-    { name:'Worn Axe',          rarity:0, tier:0, dmg:2,  speed:0.7, range:40, color:RARITY_COLORS[0], type:'axe',    sprite:'hand_axe1.png' },
-    { name:'Hunting Knife',     rarity:0, tier:0, dmg:1,  speed:1.3, range:38, color:RARITY_COLORS[0], type:'dagger', sprite:'knife.png' },
-    { name:'Plain Club',        rarity:0, tier:0, dmg:2,  speed:0.7, range:36, color:RARITY_COLORS[0], type:'mace',   sprite:'giant_club.png' },
-    { name:'Broken Spear',      rarity:0, tier:0, dmg:1,  speed:1.1, range:50, color:RARITY_COLORS[0], type:'spear',  sprite:'spear2.png' },
-    { name:'Stone Hammer',      rarity:0, tier:0, dmg:3,  speed:0.6, range:36, color:RARITY_COLORS[0], type:'mace',   sprite:'hammer1.png' },
-
-    // === TIER 1 — Green (Uncommon) ===
-    { name:'Iron Sword',        rarity:1, tier:1, dmg:2,  speed:1.0, range:50, color:RARITY_COLORS[1], type:'sword',  sprite:'long_sword1.png' },
-    { name:'Steel Blade',       rarity:1, tier:1, dmg:3,  speed:0.9, range:52, color:RARITY_COLORS[1], type:'sword',  sprite:'falchion1.png' },
-    { name:'Bronze Spear',      rarity:1, tier:1, dmg:2,  speed:0.9, range:58, color:RARITY_COLORS[1], type:'spear',  sprite:'spear1_elven.png' },
-    { name:'Shadow Knife',      rarity:1, tier:1, dmg:2,  speed:1.4, range:40, color:RARITY_COLORS[1], type:'dagger', sprite:'elven_dagger.png' },
-    { name:'Short Mace',        rarity:1, tier:1, dmg:3,  speed:0.8, range:44, color:RARITY_COLORS[1], type:'mace',   sprite:'mace1.png' },
-    { name:'Elven Blade',       rarity:1, tier:1, dmg:3,  speed:1.1, range:48, color:RARITY_COLORS[1], type:'sword',  sprite:'elven_short_sword.png' },
-    { name:'Hand Axe',          rarity:1, tier:1, dmg:3,  speed:0.9, range:44, color:RARITY_COLORS[1], type:'axe',    sprite:'hand_axe2.png' },
-    { name:'War Hammer',        rarity:1, tier:1, dmg:4,  speed:0.7, range:46, color:RARITY_COLORS[1], type:'mace',   sprite:'hammer2.png' },
-
-    // === TIER 2 — Blue (Rare) ===
-    { name:'War Axe',           rarity:2, tier:2, dmg:5,  speed:0.7, range:48, color:RARITY_COLORS[2], type:'axe',    sprite:'war_axe1.png' },
-    { name:'Crystal Staff',     rarity:2, tier:2, dmg:4,  speed:1.0, range:62, color:RARITY_COLORS[2], type:'staff',  sprite:'quarterstaff.png' },
-    { name:'Venom Fang',        rarity:2, tier:2, dmg:4,  speed:1.1, range:44, color:RARITY_COLORS[2], type:'dagger', sprite:'ankus.png' },
-    { name:'Broad Axe',         rarity:2, tier:2, dmg:5,  speed:0.7, range:50, color:RARITY_COLORS[2], type:'axe',    sprite:'broad_axe1.png' },
-    { name:'Battle Axe',        rarity:2, tier:2, dmg:6,  speed:0.6, range:52, color:RARITY_COLORS[2], type:'axe',    sprite:'battle_axe1.png' },
-    { name:'Flail',             rarity:2, tier:2, dmg:5,  speed:0.8, range:50, color:RARITY_COLORS[2], type:'mace',   sprite:'flail1.png' },
-    { name:'Glaive',            rarity:2, tier:2, dmg:5,  speed:0.8, range:60, color:RARITY_COLORS[2], type:'spear',  sprite:'glaive1.png' },
-    { name:'Halberd',           rarity:2, tier:2, dmg:6,  speed:0.7, range:64, color:RARITY_COLORS[2], type:'spear',  sprite:'halberd1.png' },
-
-    // === TIER 3 — Purple (Epic) ===
-    { name:'Flame Sword',       rarity:3, tier:3, dmg:7,  speed:0.8, range:55, color:RARITY_COLORS[3], type:'sword',  sprite:'demon_blade.png' },
-    { name:'Frost Mace',        rarity:3, tier:3, dmg:6,  speed:0.7, range:50, color:RARITY_COLORS[3], type:'mace',   sprite:'great_flail1.png' },
-    { name:'Thunder Spear',     rarity:3, tier:3, dmg:8,  speed:0.6, range:68, color:RARITY_COLORS[3], type:'spear',  sprite:'demon_trident.png' },
-    { name:'Katana',            rarity:3, tier:3, dmg:7,  speed:1.0, range:56, color:RARITY_COLORS[3], type:'sword',  sprite:'katana1.png' },
-    { name:'Great Sword',       rarity:3, tier:3, dmg:9,  speed:0.6, range:58, color:RARITY_COLORS[3], type:'sword',  sprite:'greatsword1.png' },
-    { name:'Executioner Axe',   rarity:3, tier:3, dmg:10, speed:0.5, range:56, color:RARITY_COLORS[3], type:'axe',    sprite:'executioner_axe1.png' },
-    { name:'Bardiche',          rarity:3, tier:3, dmg:8,  speed:0.6, range:66, color:RARITY_COLORS[3], type:'spear',  sprite:'bardiche1.png' },
-    { name:'Double Sword',      rarity:3, tier:3, dmg:8,  speed:0.9, range:52, color:RARITY_COLORS[3], type:'sword',  sprite:'double_sword.png' },
-
-    // === TIER 4 — Gold (Legendary) ===
-    { name:'Dragon Claw',       rarity:4, tier:4, dmg:10, speed:0.9, range:58, color:RARITY_COLORS[4], type:'claw',   sprite:'triple_sword.png' },
-    { name:'Arcane Blade',      rarity:4, tier:4, dmg:12, speed:0.8, range:62, color:RARITY_COLORS[4], type:'sword',  sprite:'blessed_blade.png' },
-    { name:'Holy Scourge',      rarity:4, tier:4, dmg:11, speed:0.8, range:60, color:RARITY_COLORS[4], type:'mace',   sprite:'holy_scourge.png' },
-    { name:'Demon Whip',        rarity:4, tier:4, dmg:10, speed:1.1, range:64, color:RARITY_COLORS[4], type:'mace',   sprite:'demon_whip.png' },
-    { name:'Lajatang',          rarity:4, tier:4, dmg:11, speed:0.9, range:62, color:RARITY_COLORS[4], type:'spear',  sprite:'lajatang1.png' },
-
-    // === TIER 5 — Red (Mythic) ===
-    { name:'Scythe of Curses',  rarity:5, tier:5, dmg:15, speed:0.7, range:72, color:RARITY_COLORS[5], type:'spear',  sprite:'artefact/spwpn_scythe_of_curses.png' },
-    { name:'Sword of Cerebov',  rarity:5, tier:5, dmg:18, speed:0.8, range:68, color:RARITY_COLORS[5], type:'sword',  sprite:'artefact/spwpn_sword_of_cerebov.png' },
-    { name:'Wrath of Trog',     rarity:5, tier:5, dmg:16, speed:0.9, range:62, color:RARITY_COLORS[5], type:'mace',   sprite:'artefact/spwpn_wrath_of_trog.png' },
-    { name:'Staff of Dispater', rarity:5, tier:5, dmg:14, speed:1.0, range:76, color:RARITY_COLORS[5], type:'staff',  sprite:'artefact/spwpn_staff_of_dispater.png' },
-];
-
-function makeWeapon(template) {
-    return { name:template.name, rarity:template.rarity||0, tier:template.tier, dmg:template.dmg, speed:template.speed, range:template.range, color:template.color, type:template.type, sprite:template.sprite||null, enchant:null };
-}
-
-function getWeaponDropPool(floor, isBoss) {
-    var maxRarity = isBoss ? Math.min(5, floor+1) : Math.min(4, floor);
-    var minRarity = Math.max(0, floor-1);
-    // Boss can drop higher rarity, elite drops at current tier, normal drops lower
-    return WEAPONS.filter(function(w){ return w.rarity >= minRarity && w.rarity <= maxRarity; });
-}
-
-// ============ GAME DATA ============
-const BIOMES = [
-    { name:'Forest', color:'#0f2a0f', floorColor:'#0a1a08', wallColor:'#1e3a1a',
-      floorAccent:'rgba(40,90,30,0.08)', gridColor:'rgba(60,140,40,0.015)',
-      wallTint:'rgba(30,80,20,0.15)', wallHighlight:'rgba(80,180,60,0.06)',
-      herbs:['greenLeaf','redBerry','yellowRoot'], enemyType:'forest' },
-    { name:'Cave',   color:'#0e0e24', floorColor:'#08081a', wallColor:'#1a1a40',
-      floorAccent:'rgba(40,40,100,0.08)', gridColor:'rgba(60,60,180,0.02)',
-      wallTint:'rgba(30,30,90,0.15)', wallHighlight:'rgba(80,80,220,0.06)',
-      herbs:['caveCrystal','blueMush','firestone'], enemyType:'cave' },
-    { name:'Swamp',  color:'#1a2010', floorColor:'#0e1608', wallColor:'#2a3018',
-      floorAccent:'rgba(80,90,30,0.08)', gridColor:'rgba(100,120,40,0.015)',
-      wallTint:'rgba(60,70,20,0.15)', wallHighlight:'rgba(120,140,40,0.06)',
-      herbs:['swampGoo','purpleMoss','greenLeaf'], enemyType:'swamp' }
-];
-// ============ ENEMY TYPES ============
-// skill types: charge, poison, split, leech, shield, summon, rage, teleport, slam, shoot
-const ENEMY_TYPES = {
-    // === Forest ===
-    rat:      { name:'Rat',       nameZh:'老鼠',     hp:1.0, atk:0.8, spd:1.1, color:'#996644', sprite:'grey_rat.png',       desc:'A common pest, weak but numerous.',     descZh:'常见害虫，弱但数量众多。', skills:[] },
-    wolf:     { name:'Wolf',      nameZh:'狼',       hp:1.5, atk:1.3, spd:1.2, color:'#888888', sprite:'wolf.png',            desc:'Hunts in packs, fast and fierce.',       descZh:'成群狩猎，速度极快。', skills:['charge'] },
-    bear:     { name:'Bear',      nameZh:'熊',       hp:3.0, atk:1.8, spd:0.7, color:'#885533', sprite:'bear.png',            desc:'A massive beast with thunderous swipes.', descZh:'体型巨大，横扫一切。', skills:['slam'] },
-    bee:      { name:'Giant Bee', nameZh:'巨蜂',    hp:0.8, atk:1.0, spd:1.4, color:'#ffcc00', sprite:'killer_bee.png',      desc:'Stings and leaves venom behind.',         descZh:'蜂刺留下毒素。', skills:['poison'] },
-    hound:    { name:'Hound',     nameZh:'猎犬',    hp:1.2, atk:1.2, spd:1.3, color:'#aa6633', sprite:'hound.png',           desc:'Trained for war, charges without fear.',  descZh:'受训战犬，无惧冲锋。', skills:['charge'] },
-    // Forest Elites
-    wolf_pack:{ name:'Wolf Pack Alpha', nameZh:'狼群首领', hp:2.5, atk:1.8, spd:1.2, color:'#aaaaaa', sprite:'jackal.png', isEliteType:true,
-                desc:'The alpha of the pack. Summons wolves and charges from afar.', descZh:'狼群首领，召唤狼群并从远处冲锋。',
-                skills:['charge','summon'] },
-    // Forest Boss
-    grizzly:  { name:'Ancient Grizzly', nameZh:'远古灰熊', hp:8.0, atk:2.5, spd:0.8, color:'#885533', sprite:'grizzly_bear.png', isBossType:true,
-                desc:'An ancient bear awakened from centuries of slumber. Its roar shakes the earth.', descZh:'沉睡数百年的远古灰熊，怒吼使大地颤抖。',
-                skills:['slam','charge','rage'], skillDescs:['Ground Slam: deals AoE damage','Furious Charge: rushes the player','Enrage: doubles speed below 40% HP'] },
-    // === Cave ===
-    bat:      { name:'Giant Bat',    nameZh:'巨蝙蝠',  hp:0.7, atk:0.9, spd:1.5, color:'#664488', sprite:'giant_bat.png',      desc:'Swoops from the darkness without warning.', descZh:'从黑暗中突然俯冲。', skills:[] },
-    spider:   { name:'Wolf Spider',  nameZh:'狼蛛',    hp:1.0, atk:1.1, spd:1.1, color:'#886644', sprite:'wolf_spider.png',    desc:'Weaves webs to slow prey.',                 descZh:'结网减缓猎物。', skills:['poison'] },
-    centipede:{ name:'Centipede',    nameZh:'蜈蚣',    hp:1.3, atk:1.0, spd:1.0, color:'#447744', sprite:'giant_centipede.png',desc:'Coils around victims, hard to shake off.',   descZh:'缠绕猎物，难以摆脱。', skills:['poison'] },
-    beetle:   { name:'Boulder Beetle',nameZh:'磐石甲虫',hp:2.5, atk:1.4, spd:0.6, color:'#557733', sprite:'boulder_beetle.png',desc:'Armored shell deflects weak blows.',        descZh:'装甲外壳偏转弱攻击。', skills:['shield'] },
-    // Cave Elites
-    tarantella:{ name:'Tarantella',  nameZh:'毒舞蜘蛛', hp:2.0, atk:1.6, spd:1.3, color:'#aa4488', sprite:'tarantella.png', isEliteType:true,
-                desc:'A venomous dance spider that poisons and teleports.', descZh:'有毒的舞蹈蜘蛛，下毒并瞬移。',
-                skills:['poison','teleport'] },
-    // Cave Boss
-    kraken:   { name:'Cave Kraken',  nameZh:'洞穴克拉肯', hp:10.0, atk:2.2, spd:0.6, color:'#224488', sprite:'kraken_head.png', isBossType:true,
-                desc:'A tentacled horror from the deep cave. Its ink blinds, its grip crushes.', descZh:'来自深洞的触手恐魔，墨汁致盲，握力粉碎一切。',
-                skills:['slam','shoot','summon'], skillDescs:['Ink Blast: blinds player briefly','Tentacle Slam: crushes nearby enemies','Summon Spawn: calls small tentacles'] },
-    // === Swamp ===
-    frog:     { name:'Giant Frog',   nameZh:'巨蛙',    hp:1.0, atk:1.0, spd:0.9, color:'#448833', sprite:'giant_frog.png',    desc:'Leaps unexpectedly at prey.',              descZh:'出人意料地跳向猎物。', skills:[] },
-    lizard:   { name:'Komodo Dragon',nameZh:'科莫多龙', hp:2.0, atk:1.5, spd:0.8, color:'#668833', sprite:'komodo_dragon.png', desc:'Venomous bite causes lasting damage.',      descZh:'毒性咬伤造成持续伤害。', skills:['poison'] },
-    leech:    { name:'Giant Leech',  nameZh:'巨蚂蟥',  hp:1.5, atk:0.9, spd:0.7, color:'#884433', sprite:'giant_leech.png',   desc:'Drains life force from its victim.',        descZh:'吸取受害者的生命力。', skills:['leech'] },
-    croc:     { name:'Crocodile',    nameZh:'鳄鱼',    hp:2.5, atk:1.6, spd:0.7, color:'#446633', sprite:'crocodile.png',     desc:'Lurks in water, ambushes from close range.', descZh:'潜伏水中，近距离伏击。', skills:['charge'] },
-    // Swamp Elites
-    anaconda: { name:'Anaconda',     nameZh:'水蟒',    hp:3.0, atk:1.7, spd:0.9, color:'#336644', sprite:'anaconda.png', isEliteType:true,
-                desc:'A massive serpent that squeezes the life from prey.', descZh:'巨型蛇类，将猎物活活压死。',
-                skills:['leech','charge'] },
-    // Swamp Boss
-    dragon:   { name:'Swamp Dragon', nameZh:'沼泽龙',  hp:12.0, atk:3.0, spd:0.9, color:'#228844', sprite:'komodo_dragon.png', isBossType:true,
-                desc:'An ancient dragon that has claimed the swamp as its domain. Breathes acid, summons minions, and enrages when wounded.', descZh:'古老的龙，以沼泽为领地。喷射酸液，召唤仆从，受伤后狂怒。',
-                skills:['shoot','summon','rage'], skillDescs:['Acid Breath: deals poison damage in cone','Call Minions: summons lizards and frogs','Blood Rage: +50% ATK below 30% HP'] },
-};
-
-// Bestiary (seen enemies tracker)
-let seenEnemies = {};
-let showBestiary = false;
-let bestiaryPage = 0;
-
-// ============ STATUS EFFECTS ============
-// Effect types: poison, paralyze, sleep, dizzy, freeze, burn
-const STATUS_DEFS = {
-    poison:   { name:'Poison',   nameZh:'中毒',  color:'#aa44dd', icon:'☠', duration:180, tickDmg:1,  tickRate:60, desc:'Deals damage over time',         descZh:'持续造成伤害' },
-    paralyze: { name:'Paralyze', nameZh:'麻痹',  color:'#ffee44', icon:'⚡', duration:120, speedMul:0, desc:'Cannot move for duration',       descZh:'无法移动' },
-    sleep:    { name:'Sleep',    nameZh:'睡眠',  color:'#8888ff', icon:'💤', duration:180, speedMul:0, noAlert:true, desc:'Falls asleep, wakes on hit',     descZh:'入睡，受击醒来' },
-    dizzy:    { name:'Dizzy',    nameZh:'眩晕',  color:'#ffaa44', icon:'🌀', duration:90,  speedMul:0.3, aimPenalty:true, desc:'Confused movement, reduced accuracy', descZh:'移动混乱，命中降低' },
-    freeze:   { name:'Freeze',   nameZh:'冰冻',  color:'#44ddff', icon:'❄', duration:150, speedMul:0, defBuff:2,  desc:'Frozen solid, extra defense',    descZh:'冻结，额外防御' },
-    burn:     { name:'Burn',     nameZh:'灼烧',  color:'#ff6622', icon:'🔥', duration:150, tickDmg:2,  tickRate:40, defPenalty:1, desc:'Burning, reduces defense',      descZh:'燃烧，降低防御' },
-};
-
-// Player debuff state
-let playerDebuffs = {}; // {type: {timer, tickTimer}}
-
-// Weapon on-hit effects mapping (added to WEAPONS at runtime)
-const WEAPON_EFFECTS = {
-    // Poison weapons (daggers, venomous)
-    'Hunting Knife':  ['poison'],
-    'Venom Fang':     ['poison'],
-    'Shadow Knife':   ['poison'],
-    'Venom Fang':     ['poison','dizzy'],
-
-    // Burn weapons (fire-themed)
-    'Flame Sword':    ['burn'],
-    'Wrath of Trog':  ['burn'],
-    'Scythe of Curses':['burn','poison'],
-
-    // Freeze / ice weapons
-    'Frost Mace':     ['freeze'],
-    'Crystal Staff':  ['freeze','dizzy'],
-
-    // Paralyze (lightning)
-    'Thunder Spear':  ['paralyze'],
-    'Lajatang':       ['paralyze'],
-    'Staff of Dispater':['paralyze','freeze'],
-
-    // Dizzy / stun (heavy blunt)
-    'Stone Hammer':   ['dizzy'],
-    'War Hammer':     ['dizzy'],
-    'Frost Mace':     ['freeze','dizzy'],
-    'Executioner Axe':['dizzy'],
-    'Great Sword':    ['dizzy'],
-
-    // Sleep (arcane blades)
-    'Arcane Blade':   ['sleep'],
-    'Katana':         ['dizzy'],
-    'Blessed Blade':  ['sleep'],
-
-    // Multi-effect legendaries/mythics
-    'Dragon Claw':    ['burn','paralyze'],
-    'Holy Scourge':   ['dizzy','paralyze'],
-    'Demon Whip':     ['burn','poison'],
-    'Sword of Cerebov':['burn','paralyze'],
-    'Staff of Dispater':['paralyze','freeze'],
-};
-
-// Enemy on-hit effects
-const ENEMY_TYPE_EFFECTS = {
-    bee:       ['poison'],
-    spider:    ['poison'],
-    centipede: ['poison'],
-    lizard:    ['poison'],
-    leech:     ['poison'],
-    bat:       ['dizzy'],
-    frog:      ['sleep'],
-    croc:      ['dizzy'],
-    bear:      ['dizzy'],
-    wolf:      ['paralyze'],
-    tarantella:['poison','sleep'],
-    anaconda:  ['paralyze','dizzy'],
-    grizzly:   ['dizzy','burn'],
-    kraken:    ['paralyze','freeze'],
-    dragon:    ['burn','poison'],
-};
-
-const HERBS = {
-    greenLeaf:  { name:'Green Leaf',   yields:['vita','herba'],  biome:'Forest' },
-    redBerry:   { name:'Red Berry',    yields:['vita','ignis'],  biome:'Forest' },
-    yellowRoot: { name:'Yellow Root',  yields:['terra','herba'], biome:'Forest' },
-    caveCrystal:{ name:'Cave Crystal', yields:['aqua','lux'],    biome:'Cave' },
-    blueMush:   { name:'Blue Mushroom',yields:['aqua','toxin'],  biome:'Cave' },
-    firestone:  { name:'Firestone',    yields:['ignis','terra'], biome:'Cave' },
-    swampGoo:   { name:'Swamp Goo',    yields:['toxin','aqua'],  biome:'Swamp' },
-    purpleMoss: { name:'Purple Moss',  yields:['lux','toxin'],   biome:'Swamp' }
-};
-const ESSENCES = {
-    vita: { name:'Vita', color:'#ee4444' }, herba:{ name:'Herba', color:'#44dd88' },
-    ignis:{ name:'Ignis', color:'#ff6622' }, terra:{ name:'Terra', color:'#ddaa22' },
-    aqua: { name:'Aqua', color:'#4488ee' }, lux:  { name:'Lux', color:'#ddddff' },
-    toxin:{ name:'Toxin', color:'#aa44dd' }
-};
-const RECIPES = [
-    { ingredients:['vita','herba'],  name:'Healing Brew',    effect:'heal',   tier:1, value:2, color:'#ee4444', desc:'+3 HP' },
-    { ingredients:['vita','ignis'],  name:'Strength Elixir', effect:'attack', tier:1, value:2, color:'#ff6622', desc:'+2 ATK' },
-    { ingredients:['vita','aqua'],   name:'Vitality Tonic',  effect:'maxhp',  tier:1, value:2, color:'#44dd88', desc:'+2 Max HP' },
-    { ingredients:['herba','terra'], name:'Iron Skin',       effect:'defense',tier:1, value:2, color:'#ddaa22', desc:'+2 DEF' },
-    { ingredients:['ignis','terra'], name:'Berserker Draft', effect:'attack', tier:2, value:4, color:'#ff4400', desc:'+4 ATK' },
-    { ingredients:['aqua','lux'],    name:'Swift Potion',    effect:'speed',  tier:1, value:1, color:'#88ccff', desc:'+Speed' },
-    { ingredients:['lux','herba'],   name:'Regen Potion',    effect:'regen',  tier:1, value:1, color:'#aaffaa', desc:'HP Regen' },
-    { ingredients:['toxin','ignis'], name:'Venom Blade',     effect:'poison', tier:1, value:1, color:'#aa44dd', desc:'Poison ATK' },
-    { ingredients:['toxin','lux'],   name:'Shadow Elixir',   effect:'stealth',tier:1, value:1, color:'#6644aa', desc:'Stealth' },
-    { ingredients:['aqua','terra'],  name:'Stone Shield',    effect:'defense',tier:2, value:4, color:'#8899aa', desc:'+4 DEF' },
-    { ingredients:['vita','lux'],    name:'Greater Heal',    effect:'heal',   tier:2, value:5, color:'#ff88aa', desc:'+5 HP' },
-    { ingredients:['ignis','lux'],   name:'Phoenix Draught', effect:'revive', tier:2, value:1, color:'#ffaa00', desc:'Auto-Revive' },
-    // 3-ingredient advanced potions
-    { ingredients:['vita','herba','aqua'],  name:'Supreme Vitality', effect:'maxhp', tier:3, value:5, color:'#44ffaa', desc:'+5 Max HP' },
-    { ingredients:['ignis','terra','vita'], name:'Titan Strength',   effect:'attack',tier:3, value:6, color:'#ff3300', desc:'+6 ATK' },
-    { ingredients:['aqua','terra','lux'],   name:'Diamond Shield',   effect:'defense',tier:3, value:6, color:'#aaddff', desc:'+6 DEF' },
-    { ingredients:['vita','lux','herba'],   name:'Master Healing',   effect:'heal',  tier:3, value:8, color:'#ffaacc', desc:'+8 HP' },
-    { ingredients:['toxin','ignis','lux'],  name:'Deadly Venom',     effect:'poison',tier:2, value:2, color:'#dd44ff', desc:'Poison DMG' },
-    { ingredients:['aqua','lux','herba'],   name:'Rapid Regen',      effect:'regen', tier:2, value:2, color:'#88ffcc', desc:'Fast Regen' },
-    // 4-ingredient legendary potions
-    { ingredients:['vita','ignis','aqua','terra'], name:'Elemental Fury',  effect:'attack', tier:4, value:10, color:'#ff00ff', desc:'+10 ATK' },
-    { ingredients:['vita','herba','lux','aqua'],   name:'Divine Blessing', effect:'heal',   tier:4, value:15, color:'#ffffaa', desc:'+15 HP' },
-    { ingredients:['terra','aqua','lux','herba'],  name:'Fortress Wall',   effect:'defense',tier:4, value:10, color:'#6699ff', desc:'+10 DEF' },
-    { ingredients:['vita','ignis','lux','toxin'],  name:'Phoenix Rebirth', effect:'revive', tier:3, value:2, color:'#ffaa44', desc:'Revive+Heal' }
-];
+const MAX_FLOORS = 6; // floors per expedition (last floor is boss)
+const ENEMY_SPEED = 1.5; // base enemy movement speed (px/frame)
+const PLAYER_SPEED = 2.8; // base player movement speed (px/frame)
+const PLAYER_RADIUS = 10; // player collision radius
+const SIGHT_RANGE = 220; // enemy sight range (px)
+const ALERT_RANGE = 300; // enemy alert range after being attacked (px)
 
 // ============ GAME STATE ============
+// UI toggles
+let showBestiary = false;
 let state = 'menu';
 let expeditionNum = 0, frameCount = 0;
 let inventory = { herbs:{}, essences:{}, potions:[], weapons:[] };
 let equippedWeapon = makeWeapon(WEAPONS[0]); // start with rusty dagger
+let forgedWeapon = null; // weapon forged in alchemy lab, carried into expedition
 let gold = 0;
 let discoveredRecipes = [];
 let totalScore = 0;
@@ -542,16 +106,6 @@ let nearMerchantRef = null; // merchant NPC player is near
 let bossRef = null; // reference to boss enemy for special AI
 let bossSummonTimer = 0; // timer for boss summoning minions
 let bossPhase = 0; // 0=normal, 1=enraged
-
-// ============ RESEARCH (permanent upgrades) ============
-const RESEARCH = [
-    { id:'hp',    key:'resHP',    maxLvl:10, baseCost:15, costMul:1.6, apply:function(lv){ return {maxHp:lv}; } },
-    { id:'atk',   key:'resATK',   maxLvl:8,  baseCost:20, costMul:1.7, apply:function(lv){ return {atk:lv}; } },
-    { id:'def',   key:'resDEF',   maxLvl:8,  baseCost:20, costMul:1.7, apply:function(lv){ return {def:lv}; } },
-    { id:'speed', key:'resSpeed', maxLvl:5,  baseCost:25, costMul:2.0, apply:function(lv){ return {speed:lv*0.3}; } },
-    { id:'luck',  key:'resLuck',  maxLvl:5,  baseCost:30, costMul:2.0, apply:function(lv){ return {luck:lv}; } },
-    { id:'carry', key:'resCarry', maxLvl:2,  baseCost:50, costMul:2.5, apply:function(lv){ return {carry:lv}; } },
-];
 let researchLevels = {}; // {hp:0, atk:0, ...}
 function initResearch(){ for(var r of RESEARCH) if(!researchLevels[r.id]) researchLevels[r.id]=0; }
 function getResearchCost(r){ return Math.floor(r.baseCost*Math.pow(r.costMul, researchLevels[r.id]||0)); }
@@ -564,84 +118,10 @@ function getResearchBonus(stat){
     }
     return total;
 }
-
-// ============ COLLECTIBLES (relics) ============
-const COLLECTIBLES = [
-    { id:'ancient_coin',   name:'Ancient Coin',   nameZh:'远古金币',   color:'#ffd700', sprite:'res/item/misc/gold_pile.png',
-      skill:'passive', skillName:'Golden Fortune', skillNameZh:'黄金财运', skillDesc:'+15% gold from all sources', skillDescZh:'所有来源的金币+15%', effect:{goldBonus:0.15} },
-    { id:'crystal_skull',  name:'Crystal Skull',  nameZh:'水晶头骨',   color:'#88ccff', sprite:'res/item/misc/misc_crystal.png',
-      skill:'passive', skillName:'Mind\'s Eye', skillNameZh:'心灵之眼', skillDesc:'Reveals enemy HP bars', skillDescZh:'显示敌人血量条', effect:{showEnemyHP:true} },
-    { id:'dragon_scale',   name:'Dragon Scale',   nameZh:'龙鳞',       color:'#ff6622', sprite:'res/item/amulet/celtic_red.png',
-      skill:'passive', skillName:'Dragon Hide', skillNameZh:'龙之甲', skillDesc:'+3 Defense', skillDescZh:'防御+3', effect:{defenseBonus:3} },
-    { id:'shadow_gem',     name:'Shadow Gem',     nameZh:'暗影宝石',   color:'#6644aa', sprite:'res/item/amulet/stone2_blue.png',
-      skill:'passive', skillName:'Shadow Step', skillNameZh:'暗影步', skillDesc:'+20% movement speed', skillDescZh:'移动速度+20%', effect:{speedBonus:0.5} },
-    { id:'phoenix_feather',name:'Phoenix Feather', nameZh:'凤凰羽',    color:'#ffaa00', sprite:'res/item/amulet/i-rage.png',
-      skill:'passive', skillName:'Rebirth', skillNameZh:'重生', skillDesc:'Revive once per expedition with 50% HP', skillDescZh:'每次探险复活一次，恢复50%血量', effect:{autoRevive:true} },
-    { id:'frost_heart',    name:'Frost Heart',    nameZh:'霜之心',     color:'#44ddff', sprite:'res/item/amulet/crystal_white.png',
-      skill:'passive', skillName:'Frost Aura', skillNameZh:'霜冻光环', skillDesc:'Slow nearby enemies by 30%', skillDescZh:'减缓附近敌人30%速度', effect:{enemySlow:0.3} },
-    { id:'earth_rune',     name:'Earth Rune',     nameZh:'大地符文',   color:'#ddaa22', sprite:'res/item/misc/misc_rune.png',
-      skill:'passive', skillName:'Stone Skin', skillNameZh:'石肤', skillDesc:'+5 Max HP', skillDescZh:'最大生命+5', effect:{maxHpBonus:5} },
-    { id:'void_shard',     name:'Void Shard',     nameZh:'虚空碎片',   color:'#aa44dd', sprite:'res/item/misc/misc_stone.png',
-      skill:'passive', skillName:'Void Walk', skillNameZh:'虚空行走', skillDesc:'15% chance to dodge attacks', skillDescZh:'15%几率闪避攻击', effect:{dodgeChance:0.15} },
-    { id:'star_fragment',  name:'Star Fragment',  nameZh:'星辰碎片',   color:'#ddddff', sprite:'res/item/amulet/eye_cyan.png',
-      skill:'passive', skillName:'Star Light', skillNameZh:'星光', skillDesc:'+25% potion effectiveness', skillDescZh:'药剂效果+25%', effect:{potionBonus:0.25} },
-    { id:'blood_ruby',     name:'Blood Ruby',     nameZh:'血红宝石',   color:'#ee4444', sprite:'res/item/amulet/crystal_red.png',
-      skill:'passive', skillName:'Blood Thirst', skillNameZh:'嗜血', skillDesc:'Heal 1 HP per kill', skillDescZh:'每次击杀回复1生命', effect:{lifeSteal:1} },
-    { id:'moss_agate',     name:'Moss Agate',     nameZh:'苔藓玛瑙',   color:'#44dd88', sprite:'res/item/amulet/stone1_green.png',
-      skill:'passive', skillName:'Nature\'s Blessing', skillNameZh:'自然祝福', skillDesc:'+1 HP regen per 5s', skillDescZh:'每5秒回复1生命', effect:{regenBonus:1} },
-    { id:'thunder_pearl',  name:'Thunder Pearl',  nameZh:'雷霆珍珠',   color:'#ffdd44', sprite:'res/item/amulet/eye_magenta.png',
-      skill:'passive', skillName:'Lightning Strike', skillNameZh:'雷击', skillDesc:'10% chance to deal double damage', skillDescZh:'10%几率造成双倍伤害', effect:{critChance:0.1} },
-    // New relics
-    { id:'iron_ring',      name:'Iron Ring',      nameZh:'铁环',       color:'#aaaaaa', sprite:'res/item/ring/iron.png',
-      skill:'passive', skillName:'Iron Will', skillNameZh:'铁意志', skillDesc:'+2 Attack', skillDescZh:'攻击+2', effect:{atkBonus:2} },
-    { id:'jade_amulet',    name:'Jade Amulet',    nameZh:'翡翠护符',   color:'#44dd88', sprite:'res/item/ring/jade.png',
-      skill:'passive', skillName:'Jade Barrier', skillNameZh:'翡翠屏障', skillDesc:'Absorb first hit each floor', skillDescZh:'每层第一次攻击免伤', effect:{absorbFirst:true} },
-    { id:'void_orb',       name:'Void Orb',       nameZh:'虚空法球',   color:'#7744ff', sprite:'res/item/misc/misc_orb.png',
-      skill:'passive', skillName:'Arcane Echo', skillNameZh:'奥术回响', skillDesc:'+20% weapon range', skillDescZh:'武器范围+20%', effect:{rangeBonus:0.2} },
-    { id:'mystic_lamp',    name:'Mystic Lamp',    nameZh:'神秘灯',      color:'#ffee88', sprite:'res/item/misc/misc_lamp.png',
-      skill:'passive', skillName:'Light the Way', skillNameZh:'照亮前路', skillDesc:'Increase vision radius by 2', skillDescZh:'视野范围+2格', effect:{visionBonus:2} },
-    { id:'war_horn',       name:'War Horn',       nameZh:'战争号角',    color:'#ff8844', sprite:'res/item/misc/misc_horn.png',
-      skill:'passive', skillName:'Battle Cry', skillNameZh:'战吼', skillDesc:'+15% attack speed', skillDescZh:'攻击速度+15%', effect:{atkSpeedBonus:0.15} },
-    { id:'emerald_ring',   name:'Emerald Ring',   nameZh:'翡翠戒指',   color:'#44ff88', sprite:'res/item/ring/emerald.png',
-      skill:'passive', skillName:'Emerald Fortune', skillNameZh:'翡翠幸运', skillDesc:'+10% herb yield', skillDescZh:'草药产量+10%', effect:{herbBonus:0.1} },
-    { id:'silver_ring',    name:'Silver Ring',    nameZh:'银戒指',     color:'#ccccff', sprite:'res/item/ring/silver.png',
-      skill:'passive', skillName:'Silver Tongue', skillNameZh:'银舌', skillDesc:'-15% shop prices', skillDescZh:'商店价格-15%', effect:{shopDiscount:0.15} },
-    { id:'pearl_ring',     name:'Pearl Ring',     nameZh:'珍珠戒指',   color:'#eeeeff', sprite:'res/item/ring/pearl.png',
-      skill:'passive', skillName:'Ocean\'s Grace', skillNameZh:'海洋恩典', skillDesc:'+2 HP regen per 10s', skillDescZh:'每10秒回复2生命', effect:{regenBonus:2} },
-    { id:'chaos_fan',      name:'Chaos Fan',      nameZh:'混沌扇',     color:'#ff44aa', sprite:'res/item/misc/misc_fan.png',
-      skill:'passive', skillName:'Chaos Burst', skillNameZh:'混沌爆发', skillDesc:'5% chance to stun on hit', skillDescZh:'攻击5%几率眩晕', effect:{stunChance:0.05} },
-    { id:'rune_disc',      name:'Rune Disc',      nameZh:'符文圆盘',   color:'#44aaff', sprite:'res/item/misc/misc_disc.png',
-      skill:'passive', skillName:'Runic Shield', skillNameZh:'符文护盾', skillDesc:'+1 Defense per 3 floors', skillDescZh:'每3层+1防御', effect:{defPerFloor:true} },
-];
 let foundCollectibles = []; // array of collectible ids (all-time)
 let expeditionFoundRelics = []; // relics found in current expedition only
-function collectibleName(c){ return lang==='zh'?c.nameZh:c.name; }
-function collectibleDesc(c){ return lang==='zh'?c.descZh:c.desc; }
-function openRelicChoice(source){
-    // Pick 3 distinct random relics (prefer unfound)
-    var pool=COLLECTIBLES.filter(function(c){return expeditionFoundRelics.indexOf(c.id)<0;});
-    if(pool.length<3) pool=COLLECTIBLES.slice();
-    var choices=[];
-    var tmp=pool.slice();
-    while(choices.length<3&&tmp.length>0){
-        var idx=randInt(0,tmp.length-1);
-        choices.push(tmp.splice(idx,1)[0]);
-    }
-    relicChoicePopup={choices:choices,source:source};
-}
-function applyRelicEffect(c){
-    if(foundCollectibles.indexOf(c.id)<0) foundCollectibles.push(c.id);
-    if(expeditionFoundRelics.indexOf(c.id)<0) expeditionFoundRelics.push(c.id);
-    var e=c.effect||{};
-    if(e.maxHpBonus){ playerStats.maxHp+=e.maxHpBonus; playerStats.hp=Math.min(playerStats.hp+e.maxHpBonus,playerStats.maxHp); }
-    if(e.defenseBonus) playerStats.def+=e.defenseBonus;
-    if(e.atkBonus) playerStats.atk+=e.atkBonus;
-    if(e.regenBonus) playerStats.regen+=e.regenBonus;
-    if(e.autoRevive) playerStats.revive=true;
-    spawnFloat(player.x,player.y-20,lang==='zh'?('获得 '+collectibleName(c)):('Got '+collectibleName(c)),'#ffdd44');
-    spawnParticles(player.x,player.y,'#ffdd44',12);
-    playSound('craft');
-}
+function collectibleName(c){ return c.nameZh||c.name; }
+function collectibleDesc(c){ return c.descZh||c.desc; }
 
 // ============ KEYS & LOCKED ROOMS ============
 let playerKeys = 0;
@@ -652,27 +132,28 @@ let relicChoicePopup = null; // {choices:[collectible,collectible,collectible], 
 // ============ SKILL TREE ============
 const SKILL_BRANCHES = [
     { id:'combat', key:'skCombat', color:'#ee4444', skills:[
-        { id:'powerStrike', key:'skPowerStrike', descKey:'skPowerStrikeD', cost:25 },
-        { id:'lifeSteal',   key:'skLifeSteal',   descKey:'skLifeStealD',  cost:50 },
-        { id:'berserker',   key:'skBerserker',   descKey:'skBerserkerD',  cost:80 },
-        { id:'execute',     key:'skExecute',     descKey:'skExecuteD',    cost:120 },
+        { id:'powerStrike', key:'skPowerStrike', descKey:'skPowerStrikeD', cost:25,  icon:'⚡' },
+        { id:'lifeSteal',   key:'skLifeSteal',   descKey:'skLifeStealD',  cost:50,  icon:'❤' },
+        { id:'berserker',   key:'skBerserker',   descKey:'skBerserkerD',  cost:80,  icon:'🔥' },
+        { id:'execute',     key:'skExecute',     descKey:'skExecuteD',    cost:120, icon:'💀' },
     ]},
     { id:'alchemy', key:'skAlchemy', color:'#44dd88', skills:[
-        { id:'doubleYield',  key:'skDoubleYield',  descKey:'skDoubleYieldD',  cost:25 },
-        { id:'potionMaster', key:'skPotionMaster', descKey:'skPotionMasterD', cost:50 },
-        { id:'transmute',    key:'skTransmute',    descKey:'skTransmuteD',    cost:80 },
-        { id:'philoStone',   key:'skPhiloStone',   descKey:'skPhiloStoneD',   cost:120 },
+        { id:'doubleYield',  key:'skDoubleYield',  descKey:'skDoubleYieldD',  cost:25,  icon:'🌿' },
+        { id:'potionMaster', key:'skPotionMaster', descKey:'skPotionMasterD', cost:50,  icon:'🍀' },
+        { id:'transmute',    key:'skTransmute',    descKey:'skTransmuteD',    cost:80,  icon:'✨' },
+        { id:'philoStone',   key:'skPhiloStone',   descKey:'skPhiloStoneD',   cost:120, icon:'💎' },
     ]},
     { id:'survival', key:'skSurvival', color:'#4488ee', skills:[
-        { id:'thickSkin',  key:'skThickSkin',  descKey:'skThickSkinD',  cost:25 },
-        { id:'scavenger',  key:'skScavenger',  descKey:'skScavengerD',  cost:50 },
-        { id:'dodge',      key:'skDodge',      descKey:'skDodgeD',      cost:80 },
-        { id:'secondWind', key:'skSecondWind', descKey:'skSecondWindD', cost:120 },
+        { id:'thickSkin',  key:'skThickSkin',  descKey:'skThickSkinD',  cost:25,  icon:'🌟' },
+        { id:'scavenger',  key:'skScavenger',  descKey:'skScavengerD',  cost:50,  icon:'💰' },
+        { id:'dodge',      key:'skDodge',      descKey:'skDodgeD',      cost:80,  icon:'💨' },
+        { id:'secondWind', key:'skSecondWind', descKey:'skSecondWindD', cost:120, icon:'💫' },
     ]}
 ];
 let unlockedSkills = {}; // {skillId: true}
 let killCounter = 0; // for lifeSteal tracking
 let secondWindUsed = false; // reset per floor
+let playerDebuffs = {}; // {type: {timer, tickTimer}}
 function hasSkill(id){ return !!unlockedSkills[id]; }
 
 // ===== STATUS EFFECT FUNCTIONS =====
@@ -690,7 +171,7 @@ function applyDebuffToPlayer(type){
     if(!sdef) return;
     if(playerDebuffs[type]&&playerDebuffs[type].timer>0) return; // already active
     playerDebuffs[type]={timer:sdef.duration, tickTimer:sdef.tickRate||60};
-    spawnFloat(player.x,player.y-20,sdef.icon+(lang==='zh'?sdef.nameZh:sdef.name),sdef.color);
+    spawnFloat(player.x,player.y-20,sdef.icon+sdef.nameZh,sdef.color);
 }
 
 function updateStatusEffects(){
@@ -755,11 +236,11 @@ function playerSpeedMul(){
 
 function applyDamageToPlayer(dmg){
     // God Mode: invincibility for testing
-    if(godMode){spawnFloat(player.x,player.y-20,lang==='zh'?'无敌！':'GOD MODE!','#ffd700');return false;}
+    if(godMode){spawnFloat(player.x,player.y-20,'无敌！','#ffd700');return false;}
     // Skill: dodge (12% chance)
-    if(hasSkill('dodge')&&Math.random()<0.12){spawnFloat(player.x,player.y-20,lang==='zh'?'闪避！':'DODGE!','#4488ee');return false;}
+    if(hasSkill('dodge')&&Math.random()<0.12){spawnFloat(player.x,player.y-20,'闪避！','#4488ee');return false;}
     // Relic: Void Shard (15% dodge)
-    if(foundCollectibles.indexOf('void_shard')>=0&&Math.random()<0.15){spawnFloat(player.x,player.y-20,lang==='zh'?'虚空闪避！':'VOID DODGE!','#aa44dd');return false;}
+    if(foundCollectibles.indexOf('void_shard')>=0&&Math.random()<0.15){spawnFloat(player.x,player.y-20,'虚空闪避！','#aa44dd');return false;}
     // Skill: thickSkin (-1 damage, min 1)
     if(hasSkill('thickSkin')) dmg=Math.max(1,dmg-1);
     playerStats.hp-=dmg;
@@ -767,7 +248,7 @@ function applyDamageToPlayer(dmg){
     if(playerStats.hp<=0&&hasSkill('secondWind')&&!secondWindUsed){
         secondWindUsed=true;
         playerStats.hp=Math.floor(playerStats.maxHp*0.3);
-        spawnFloat(player.x,player.y-20,lang==='zh'?'绝处逢生！':'SECOND WIND!','#4488ee');
+        spawnFloat(player.x,player.y-20,'绝处逢生！','#4488ee');
         spawnParticles(player.x,player.y,'#4488ee',12);
         return dmg;
     }
@@ -792,32 +273,70 @@ let explored = []; // 2D array same size as map
 let labTab = null;
 let selectedEssences = [];
 let labScrollY = 0, labScrollTouchId = -1, labScrollLastY = 0, labScrollMoved = false;
+let labScrollMax = 0; // dynamic, updated each frame by content height
+let labPanelContentY = 0, labPanelVisH = 445; // set each frame by renderLab
 let merchantScrollY = 0, merchantScrollTouchId = -1, merchantScrollLastY = 0, merchantScrollMoved = false;
 let labMessage = '', labMessageTimer = 0;
 let extractMini = null;
 let labShopStock = []; // lab merchant stock
+
+// Lab hall player character
+var labPlayer = { x:0, y:0, vx:0, vy:0, facing:1, animFrame:0, animTimer:0, initialized:false };
+var labNearFurniture = null; // key of nearest interactable furniture
+var labHallStick = { active:false, sx:0, sy:0, cx:0, cy:0, id:-1 }; // mobile joystick for lab hall
+var labInteractPromptAlpha = 0;
 
 // ============ TUTORIAL SYSTEM ============
 var tutorialDone = false;
 var tutorialStep = 0; // 0=not started
 var tutorialPhase = ''; // 'lab' or 'expedition'
 var tutorialBlink = 0;
-var TUTORIAL_LAB = [
-    {key:'bench', en:'This is the Extraction Bench.\nPlace herbs here to extract essences.', zh:'这是提取台。\n把药材放在这里提取精华。'},
-    {key:'cauldron', en:'This is the Cauldron.\nCombine 2 essences to brew potions.', zh:'这是炼金锅。\n将2种精华组合酿造药剂。'},
-    {key:'shelf', en:'This is the Potion Shelf.\nEquip potions to your belt before expeditions.', zh:'这是药剂架。\n出发前把药剂装到腰带上。'},
-    {key:'rack', en:'This is the Weapon Rack.\nManage and enchant your weapons here.', zh:'这是武器架。\n在这里管理和附魔武器。'},
-    {key:'merch', en:'This is the Shop.\nBuy and sell items with gold.', zh:'这是商店。\n用金币买卖物品。'},
-    {key:'research', en:'This is the Research Desk.\nSpend gold to permanently upgrade stats.', zh:'这是研究台。\n花费金币永久升级属性。'},
-    {key:'door', en:'This is the Exit Door.\nChoose a biome and start an expedition!\nLet\'s go explore!', zh:'这是出口大门。\n选择区域开始探险！\n我们去探险吧！'},
-];
-var TUTORIAL_EXP = [
-    {en:'Welcome to the expedition!\n'+('ontouchstart' in window?'Use the LEFT joystick to move.':'Use WASD keys to move around.'), zh:'欢迎来到探险！\n'+('ontouchstart' in window?'用左侧摇杆移动角色。':'用WASD键移动角色。')},
-    {en:('ontouchstart' in window?'Use the RIGHT joystick to aim and attack.\nDrag it to change facing direction.':'Click to attack in the mouse direction.\nHold to keep attacking.'), zh:('ontouchstart' in window?'用右侧摇杆瞄准和攻击。\n拖动改变朝向。':'点击鼠标攻击。\n按住持续攻击。')},
-    {en:'Defeat enemies to earn gold and find herbs.\nCollect herbs to bring back to the lab.', zh:'击败敌人获得金币和药材。\n收集药材带回炼金室。'},
-    {en:'The minimap is in the top-right corner.\nFind the exit (green) to go to the next floor.\nDefeat the boss on the final floor!', zh:'小地图在右上角。\n找到出口（绿色）前往下一层。\n在最后一层击败Boss！'},
-    {en:'Good luck, Alchemist!\nBrew potions to grow stronger.', zh:'祝你好运，炼金术士！\n酿造药剂让自己变强。'},
-];
+// TUTORIAL_LAB and TUTORIAL_EXP are defined in gamedata.js
+
+// ============ WEAPON DROP POOL ============
+function getWeaponDropPool(floor, isBoss){
+    // tier ranges by floor: 0-1→tier0-1, 2-3→tier1-2, 4-5→tier2-3, boss→+1 tier
+    var minTier=Math.floor(floor/2);
+    var maxTier=minTier+1;
+    if(isBoss){ minTier+=1; maxTier+=2; }
+    minTier=Math.max(0,Math.min(5,minTier));
+    maxTier=Math.max(0,Math.min(5,maxTier));
+    return WEAPONS.filter(function(w){ return w.tier>=minTier && w.tier<=maxTier; });
+}
+
+// ============ WEAPON INSTANCE ============
+function makeWeapon(template){
+    var w = Object.assign({}, template);
+    w._enchant = null; // enchantment applied via forge
+    w._defBonus = 0;
+    return w;
+}
+
+// ============ RELIC HELPERS ============
+function openRelicChoice(source){
+    var pool=COLLECTIBLES.filter(function(c){return expeditionFoundRelics.indexOf(c.id)<0;});
+    if(pool.length<3) pool=COLLECTIBLES.slice();
+    var choices=[];
+    var tmp=pool.slice();
+    while(choices.length<3&&tmp.length>0){
+        var idx=randInt(0,tmp.length-1);
+        choices.push(tmp.splice(idx,1)[0]);
+    }
+    relicChoicePopup={choices:choices,source:source};
+}
+function applyRelicEffect(c){
+    if(foundCollectibles.indexOf(c.id)<0) foundCollectibles.push(c.id);
+    if(expeditionFoundRelics.indexOf(c.id)<0) expeditionFoundRelics.push(c.id);
+    var e=c.effect||{};
+    if(e.maxHpBonus){ playerStats.maxHp+=e.maxHpBonus; playerStats.hp=Math.min(playerStats.hp+e.maxHpBonus,playerStats.maxHp); }
+    if(e.defenseBonus) playerStats.def+=e.defenseBonus;
+    if(e.atkBonus) playerStats.atk+=e.atkBonus;
+    if(e.regenBonus) playerStats.regen+=e.regenBonus;
+    if(e.autoRevive) playerStats.revive=true;
+    spawnFloat(player.x,player.y-20,'获得 '+collectibleName(c),'#ffdd44');
+    spawnParticles(player.x,player.y,'#ffdd44',12);
+    playSound('craft');
+}
 
 // ============ HELPERS ============
 function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
@@ -873,6 +392,8 @@ function applyBuffs(){
         else if(eff==='stealth') playerStats.stealth+=b.value;
         else if(eff==='revive') playerStats.revive=true;
     }
+    // Apply weapon enchant defense bonus
+    if(equippedWeapon&&equippedWeapon._defBonus) playerStats.def+=equippedWeapon._defBonus;
 }
 function spawnParticles(x,y,color,count){
     for(var i=0;i<count;i++){ var a=Math.random()*Math.PI*2,sp=Math.random()*3+1;
@@ -1097,7 +618,8 @@ function setupFloor(biomeIdx, floor){
     if(!isBossFloor){
     var biomeHerbs = currentBiome.herbs;
     for(var i=1;i<rooms.length;i++){
-        var r=rooms[i], hCount=randInt(1,3);
+        if(Math.random()>0.5) continue; // ~50% rooms have herbs
+        var r=rooms[i], hCount=randInt(1,2);
         for(var h=0;h<hCount;h++){
             var pos=findOpenTile(r);
             herbDrops.push({x:pos.x,y:pos.y,herbKey:biomeHerbs[randInt(0,biomeHerbs.length-1)],bobOffset:Math.random()*6.28,collected:false});
@@ -1115,7 +637,7 @@ function setupFloor(biomeIdx, floor){
             x:cp.x, y:cp.y, opened:false, type:'normal',
             goldReward: randInt(3+floor*2, 8+floor*5),
             weaponReward: hasWeapon&&pool.length>0 ? makeWeapon(pool[randInt(0,pool.length-1)]) : null,
-            relicChance: Math.random()<0.2 // 20% chance relic choice
+            relicChance: Math.random()<0.08 // 8% chance relic choice
         });
     }
 
@@ -1160,10 +682,9 @@ function setupFloor(biomeIdx, floor){
             }
         }
         if(doorPlaced){
-            // Key chest inside locked room — guaranteed relic choice on open
-            var cp = findOpenTile(lr);
-            chests.push({x:cp.x,y:cp.y,opened:false,type:'key_chest',
-                goldReward:randInt(8+floor*3,18+floor*6),weaponReward:null,relicGuaranteed:true});
+            // Store gold reward and relic trigger on the locked door itself
+            lockedDoors[lockedDoors.length-1].goldReward = randInt(8+floor*3,18+floor*6);
+            lockedDoors[lockedDoors.length-1].relicOnUnlock = true;
         }
     }
     } // end if(!isBossFloor)
@@ -1179,6 +700,8 @@ function startExpedition(biomeIdx){
     attackCooldown=0; regenTimer=0; screenShake=0; extracting=0;
     killCounter=0; // reset for lifeSteal tracking
     expeditionFoundRelics = []; // reset expedition relics
+    // Equip forged weapon for this expedition (returns to forgedWeapon after)
+    equippedWeapon = forgedWeapon || makeWeapon(WEAPONS[0]);
     missionTimer = 90*60; // 90 seconds total
 
     // Generate shop stock for merchant
@@ -1215,6 +738,11 @@ function goNextFloor(){
 // ============ INPUT ============
 window.addEventListener('keydown',function(e){
     keys[e.code]=true;
+    if(state==='lab'&&!labTab&&!showSettings){
+        if(e.code==='KeyE'&&labNearFurniture){
+            openLabFurniture(labNearFurniture);
+        }
+    }
     if(state==='expedition'){
         if(e.code==='Digit1') useCarriedPotion(0);
         else if(e.code==='Digit2') useCarriedPotion(1);
@@ -1235,7 +763,7 @@ canvas.addEventListener('wheel',function(e){
     if(state==='lab'&&labTab){
         labScrollY-=e.deltaY;
         if(labScrollY>0) labScrollY=0;
-        if(labScrollY<-600) labScrollY=-600;
+        if(labScrollY<-labScrollMax) labScrollY=-labScrollMax;
         e.preventDefault();
     }
     if(state==='expedition'&&merchantPopup){
@@ -1259,7 +787,22 @@ canvas.addEventListener('touchstart',function(e){
             var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
             var ppx=(W-pw)/2,ppy=(H-ph)/2;
             if(t0.clientX>=ppx&&t0.clientX<=ppx+pw&&t0.clientY>=ppy&&t0.clientY<=ppy+ph){
+                labScrollTouchId=-1; // reset first to avoid stale id
                 labScrollTouchId=t0.identifier;labScrollLastY=t0.clientY;labScrollMoved=false;
+                return;
+            } else {
+                labScrollTouchId=-1; // touch outside panel, release scroll lock
+            }
+        } else {
+            // No panel: left half of screen = joystick, right half / UI buttons = click
+            var W2=canvas.width,H2=canvas.height;
+            var isUIArea=(t0.clientY<=45); // top bar UI buttons
+            if(!isUIArea){
+                // Activate hall joystick anywhere on screen
+                labHallStick.active=true;
+                labHallStick.sx=t0.clientX; labHallStick.sy=t0.clientY;
+                labHallStick.cx=t0.clientX; labHallStick.cy=t0.clientY;
+                labHallStick.id=t0.identifier;
                 return;
             }
         }
@@ -1309,6 +852,19 @@ canvas.addEventListener('touchstart',function(e){
             }
             if(hitSlot) continue;
         }
+        // Check buff icon tap before activating joystick
+        var hitBuff=false;
+        if(window.renderedBuffs&&window.renderedBuffs.length>0){
+            for(var rbi=0;rbi<window.renderedBuffs.length;rbi++){
+                var rb2=window.renderedBuffs[rbi];
+                if(t.clientX>=rb2.x&&t.clientX<=rb2.x+rb2.w&&t.clientY>=rb2.y&&t.clientY<=rb2.y+rb2.h){
+                    if(buffTooltipIndex===rb2.index) buffTooltipIndex=null;
+                    else buffTooltipIndex=rb2.index;
+                    playSound('click');hitBuff=true;break;
+                }
+            }
+        }
+        if(hitBuff) continue;
         if(t.clientX<canvas.width/2){
             mobileStick.active=true;mobileStick.sx=t.clientX;mobileStick.sy=t.clientY;
             mobileStick.cx=t.clientX;mobileStick.cy=t.clientY;mobileStick.id=t.identifier;
@@ -1328,7 +884,7 @@ canvas.addEventListener('touchmove',function(e){
             if(Math.abs(dy)>3) labScrollMoved=true;
             labScrollY+=dy;
             if(labScrollY>0) labScrollY=0;
-            if(labScrollY<-600) labScrollY=-600;
+            if(labScrollY<-labScrollMax) labScrollY=-labScrollMax;
             labScrollLastY=t.clientY;
             continue;
         }
@@ -1340,6 +896,9 @@ canvas.addEventListener('touchmove',function(e){
             if(merchantScrollY<-600) merchantScrollY=-600;
             merchantScrollLastY=t.clientY;
             continue;
+        }
+        if(state==='lab'&&!labTab&&t.identifier===labHallStick.id){
+            labHallStick.cx=t.clientX;labHallStick.cy=t.clientY;continue;
         }
         if(t.identifier===mobileStick.id){mobileStick.cx=t.clientX;mobileStick.cy=t.clientY;}
         else if(t.identifier===mobileAimStick.id){mobileAimStick.cx=t.clientX;mobileAimStick.cy=t.clientY;}
@@ -1361,6 +920,15 @@ canvas.addEventListener('touchend',function(e){
             merchantScrollTouchId=-1;
             if(!merchantScrollMoved){
                 handleExpeditionPopupClick(t.clientX, t.clientY);
+            }
+            continue;
+        }
+        if(state==='lab'&&t.identifier===labHallStick.id){
+            labHallStick.active=false;labHallStick.id=-1;
+            var dx2=t.clientX-labHallStick.sx,dy2=t.clientY-labHallStick.sy;
+            if(Math.sqrt(dx2*dx2+dy2*dy2)<10){
+                // Tap: always route through handleLabClick (handles furniture hitbox + UI buttons)
+                handleLabClick(t.clientX, t.clientY);
             }
             continue;
         }
@@ -1404,6 +972,17 @@ function update(){
             var gdrop=de.isBoss?randInt(15,30):(de.isElite?randInt(5,12):randInt(1,4));
             gold+=gdrop; spawnFloat(de.x,de.y-10,'+'+gdrop+' G','#ffd700');
             totalScore+=de.isBoss?50:(de.isElite?25:10);
+            if(de.isBoss){
+                bossDefeated=true; bossRef=null;
+                exitZone={x:Math.floor(MAP_W/2)*TILE+TILE/2,y:Math.floor(MAP_H/2)*TILE+TILE/2};
+                spawnFloat(player.x,player.y-30,T('bossDefeated'),'#ffdd44');
+                playSound('levelUp');
+                chests.push({x:de.x,y:de.y,opened:false,type:'boss_chest',
+                    goldReward:randInt(20+currentFloor*5,40+currentFloor*8),
+                    weaponReward:null,relicGuaranteed:true});
+            } else if(de.isElite){
+                if(Math.random()<0.3) openRelicChoice('elite');
+            }
             enemies.splice(dei,1);
         }
     }
@@ -1460,13 +1039,11 @@ function update(){
                 if(hasSkill('berserker')&&playerStats.hp<playerStats.maxHp*0.3) dmg=Math.floor(dmg*1.2);
                 // Skill: execute (+50% DMG to enemies <25% HP)
                 if(hasSkill('execute')&&e.hp<e.maxHp*0.25) dmg=Math.floor(dmg*1.5);
-                // Enchant bonus
-                if(equippedWeapon&&equippedWeapon.enchant){
-                    var ench=equippedWeapon.enchant;
-                    if(ench.effect==='attack') dmg+=ench.value;
-                    else if(ench.effect==='poison') dmg+=2;
-                }
                 e.hp-=dmg;
+                // Poison enchant: apply poison on-hit
+                if(equippedWeapon&&equippedWeapon.enchant&&equippedWeapon.enchant.effect==='poison'){
+                    if(Math.random()<0.4) applyStatusToEnemy(e,'poison',STATUS_DEFS['poison']);
+                }
                 // Apply weapon on-hit status effect
                 if(equippedWeapon){
                     var wfx=WEAPON_EFFECTS[equippedWeapon.name];
@@ -1488,7 +1065,7 @@ function update(){
                 if(e.hp<=0){
                     spawnParticles(e.x,e.y,'#ffd700',8);
                     var luckBonus = getResearchBonus('luck');
-                    var goldDrop = e.isBoss?randInt(15,30+luckBonus*3):(e.isElite?randInt(5,12+luckBonus*2):randInt(1,4+luckBonus));
+                    var goldDrop = e.isBoss?randInt(30,55+luckBonus*5):(e.isElite?randInt(10,20+luckBonus*3):randInt(2,7+luckBonus));
                     // Skill: scavenger (+30% gold)
                     if(hasSkill('scavenger')) goldDrop=Math.floor(goldDrop*1.3);
                     // Relic: Ancient Coin (+15% gold)
@@ -1547,7 +1124,7 @@ function update(){
             // Phase check: enrage below 40% HP
             if(bossPhase===0&&e.hp<e.maxHp*0.4){
                 bossPhase=1;
-                spawnFloat(e.x,e.y-30,lang==='zh'?'狂暴！':'ENRAGED!','#ff0000');
+                spawnFloat(e.x,e.y-30,'狂暴！','#ff0000');
                 spawnParticles(e.x,e.y,'#ff0000',15);
                 screenShake=8;playSound('levelUp');
             }
@@ -1592,7 +1169,7 @@ function update(){
                 if(e.chargeCD<=0&&d>100&&d<300){
                     e.charging=true;e.chargeAngle=e.angle;e.chargeTimer=30;
                     e.chargeCD=bossPhase===1?120:200;
-                    spawnFloat(e.x,e.y-20,lang==='zh'?'冲锋！':'CHARGE!','#ff8800');
+                    spawnFloat(e.x,e.y-20,'冲锋！','#ff8800');
                     playSound('swing');
                 }
                 // Ground slam (AoE) when close
@@ -1611,7 +1188,7 @@ function update(){
                     }
                     // Visual slam ring
                     for(var si=0;si<20;si++){var sa=Math.PI*2*si/20;particles.push({x:e.x+Math.cos(sa)*40,y:e.y+Math.sin(sa)*40,vx:Math.cos(sa)*2,vy:Math.sin(sa)*2,life:20,maxLife:20,size:3,color:bossPhase===1?'#ff4400':'#ff8844'});}
-                    spawnFloat(e.x,e.y-20,lang==='zh'?'震地！':'SLAM!','#ff6644');
+                    spawnFloat(e.x,e.y-20,'震地！','#ff6644');
                 }
             }
             if(e.chargeCD>0) e.chargeCD--;
@@ -1641,7 +1218,7 @@ function update(){
                         spawnParticles(sx2,sy2,'#aa44dd',6);
                     }
                 }
-                spawnFloat(e.x,e.y-25,lang==='zh'?'召唤！':'SUMMON!','#aa44dd');
+                spawnFloat(e.x,e.y-25,'召唤！','#aa44dd');
                 playSound('craft');
             }
             if(e.attackCD>0) e.attackCD--;
@@ -1669,8 +1246,8 @@ function update(){
         if(playerStats.stealth>0&&!e.alert) canSee=canSee&&d<60;
         if(canSee||(e.alert&&d<200)){
             e.alert=true;e.alertTimer=180;
-            // Record to bestiary on first sight
-            if(canSee&&e.enemyTypeKey){
+            // Record to bestiary on first sight (boss/elite: record on alert too)
+            if((canSee||e.isBoss||e.isElite)&&e.enemyTypeKey){
                 var etKey=e.enemyTypeKey;
                 if(!seenEnemies[etKey]) seenEnemies[etKey]={count:0,sprite:e.sprite||null};
                 if(!e._seenRecorded){seenEnemies[etKey].count++;e._seenRecorded=true;}
@@ -1767,6 +1344,14 @@ function update(){
                 spawnFloat(ldx,ldy-10,T('key')+' -1','#ffcc44');
                 spawnParticles(ldx,ldy,'#ffcc44',8);
                 playSound('craft');
+                // Gold + guaranteed relic choice
+                if(ld.goldReward){
+                    gold+=ld.goldReward;
+                    spawnFloat(ldx,ldy-26,'+'+ld.goldReward+'G','#ffd700');
+                }
+                if(ld.relicOnUnlock){
+                    openRelicChoice('key_chest');
+                }
             } else {
                 // Show hint (only once per second)
                 if(frameCount%60===0) spawnFloat(ldx,ldy-10,T('needKey'),'#ff4444');
@@ -1801,7 +1386,7 @@ function update(){
         if(dist(player,stairsZone)<24){
             if(enemies.length>0){
                 // Show locked message
-                if(frameCount%60===0) spawnFloat(stairsZone.x,stairsZone.y-20,lang==='zh'?'消灭所有敌人!':'Defeat all enemies!','#ff6644');
+                if(frameCount%60===0) spawnFloat(stairsZone.x,stairsZone.y-20,'消灭所有敌人!','#ff6644');
                 extracting=0;
             } else {
                 extracting++;
@@ -1864,6 +1449,8 @@ function update(){
 function endExpedition(){
     activeBuffs=[];
     carriedPotions=[]; // Clear used potions after expedition
+    // Restore pre-expedition weapon (expedition weapons are single-use)
+    equippedWeapon = forgedWeapon || makeWeapon(WEAPONS[0]);
     state='lab'; labTab=null;
     labMessage=T('expComplete');
     labMessageTimer=180;
@@ -2306,7 +1893,7 @@ function renderExpedition(){
             var pulse=0.6+Math.sin(frameCount*0.1)*0.3;
             ctx.save();ctx.globalAlpha=pulse;
             // Background pill for prompt
-            var promptText=isMobile?(lang==='zh'?'点击交互':'TAP'):(lang==='zh'?'按E交互':'Press E');
+            var promptText=isMobile?'点击交互':'按E交互';
             ctx.font='bold 11px monospace';
             var ptW=ctx.measureText(promptText).width+12;
             ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(mx2-ptW/2,promptY-10,ptW,16);
@@ -2739,7 +2326,7 @@ function drawExpeditionHUD(){
 
     // Boss HP bar (big bar at top of screen)
     if(bossRef&&!bossDefeated){
-        var bhpW=Math.min(300,W*0.5),bhpH=12,bhpX=W/2-bhpW/2,bhpY=62;
+        var bhpW=Math.min(300,W*0.5),bhpH=12,bhpX=W/2-bhpW/2,bhpY=78;
         var bRatio=bossRef.hp/bossRef.maxHp;
         // Background
         ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(bhpX-2,bhpY-2,bhpW+4,bhpH+4);
@@ -2752,10 +2339,10 @@ function drawExpeditionHUD(){
             ctx.fillStyle='rgba(255,255,255,0.12)';ctx.fillRect(bhpX,bhpY,bhpW*bRatio,bhpH/2);
         }
         ctx.strokeStyle=bossPhase===1?'#ff4400':'rgba(255,100,100,0.5)';ctx.lineWidth=1;ctx.strokeRect(bhpX-2,bhpY-2,bhpW+4,bhpH+4);
-        // Boss name
+        // Boss name (above bar)
         ctx.fillStyle=bossPhase===1?'#ff4400':'#ff6666';ctx.font='bold 10px monospace';ctx.textAlign='center';
-        ctx.fillText('BOSS'+(bossPhase===1?(lang==='zh'?' [狂暴]':' [ENRAGED]'):''),W/2,bhpY-4);
-        // HP text
+        ctx.fillText('BOSS'+(bossPhase===1?' [狂暴]':''),W/2,bhpY-6);
+        // HP text (below bar)
         ctx.fillStyle='#fff';ctx.font='9px monospace';
         ctx.fillText(bossRef.hp+'/'+bossRef.maxHp,W/2,bhpY+bhpH+10);
     }
@@ -2803,7 +2390,8 @@ function drawExpeditionHUD(){
             else if(coll.effect.regenBonus) relicSymbol='💚';
             allBuffs.push({
                 color:coll.color, symbol:relicSymbol, tier:null,
-                timer:null, type:'relic', name:lang==='zh'?coll.nameZh:coll.name
+                timer:null, type:'relic', name:coll.nameZh,
+                relicId:coll.id
             });
         }
     }
@@ -2826,9 +2414,19 @@ function drawExpeditionHUD(){
             ctx.shadowBlur=0;
             ctx.strokeStyle=buff.color;ctx.lineWidth=2;
             ctx.strokeRect(bix,buffY,buffIconSize,buffIconSize);
-            // Symbol
-            ctx.fillStyle=buff.color;ctx.font='bold 14px monospace';ctx.textAlign='center';
-            ctx.fillText(buff.symbol,bix+buffIconSize/2,buffY+17);
+            // Symbol: use relic sprite if available, else fallback emoji
+            if(buff.type==='relic'&&buff.relicId&&SPR.relicSprites&&SPR.relicSprites[buff.relicId]){
+                var rspr=SPR.relicSprites[buff.relicId];
+                var pad=3,iw=buffIconSize-pad*2,ih=buffIconSize-pad*2;
+                var sc2=Math.min(iw/rspr.width,ih/rspr.height);
+                var dw2=Math.round(rspr.width*sc2),dh2=Math.round(rspr.height*sc2);
+                ctx.imageSmoothingEnabled=false;
+                ctx.shadowColor=buff.color;ctx.shadowBlur=4;
+                ctx.drawImage(rspr,bix+pad+(iw-dw2)/2,buffY+pad+(ih-dh2)/2,dw2,dh2);
+            } else {
+                ctx.fillStyle=buff.color;ctx.font='bold 14px monospace';ctx.textAlign='center';
+                ctx.fillText(buff.symbol,bix+buffIconSize/2,buffY+17);
+            }
             // Timer or tier below icon
             if(buff.timer!==null){
                 ctx.fillStyle='#fff';ctx.font='bold 7px monospace';
@@ -2845,7 +2443,7 @@ function drawExpeditionHUD(){
     if(buffTooltipIndex!==null&&window.renderedBuffs){
         var rb=window.renderedBuffs.find(function(b){return b.index===buffTooltipIndex;});
         if(rb){
-            var tooltipW=180,tooltipH=80;
+            var tooltipW=190,tooltipH=rb.buff.type==='relic'?100:80;
             // Tooltip appears below the icon row
             var tx=rb.x,ty=rb.y+rb.h+12;
             if(tx+tooltipW>canvas.width) tx=canvas.width-tooltipW-4;
@@ -2862,11 +2460,11 @@ function drawExpeditionHUD(){
             if(rb.buff.type==='potion'){
                 // Potion buff details
                 var effectName='';
-                if(rb.buff.symbol==='⚔') effectName=lang==='zh'?'攻击':'Attack';
-                else if(rb.buff.symbol==='🛡') effectName=lang==='zh'?'防御':'Defense';
-                else if(rb.buff.symbol==='⚡') effectName=lang==='zh'?'速度':'Speed';
-                else if(rb.buff.symbol==='❤') effectName=lang==='zh'?'回血':'Regen';
-                else if(rb.buff.symbol==='♥') effectName=lang==='zh'?'最大生命':'Max HP';
+                if(rb.buff.symbol==='⚔') effectName='攻击';
+                else if(rb.buff.symbol==='🛡') effectName='防御';
+                else if(rb.buff.symbol==='⚡') effectName='速度';
+                else if(rb.buff.symbol==='❤') effectName='回血';
+                else if(rb.buff.symbol==='♥') effectName='最大生命';
                 ctx.fillText(effectName+' T'+rb.buff.tier,tx+10,cy);cy+=16;
                 ctx.fillStyle='#aaa';ctx.font='10px monospace';
                 var bonus='';
@@ -2881,20 +2479,38 @@ function drawExpeditionHUD(){
                 ctx.fillText(bonus,tx+10,cy);cy+=14;
                 ctx.fillText(T('duration')+': '+rb.buff.timer+'s',tx+10,cy);
             } else if(rb.buff.type==='relic'){
-                // Relic buff details
-                ctx.fillText(rb.buff.name,tx+10,cy);cy+=16;
-                ctx.fillStyle='#aaa';ctx.font='10px monospace';
-                var coll=COLLECTIBLES.find(function(c){return(lang==='zh'?c.nameZh:c.name)===rb.buff.name;});
+                // Relic buff details — show name + skillDesc
+                ctx.fillStyle=rb.buff.color;ctx.font='bold 10px monospace';
+                ctx.fillText(rb.buff.name,tx+10,cy);cy+=15;
+                var coll=COLLECTIBLES.find(function(c){return c.id===rb.buff.relicId;});
                 if(coll){
-                    if(coll.effect.attackBonus) ctx.fillText('+'+coll.effect.attackBonus+' '+T('atk'),tx+10,cy),cy+=12;
-                    if(coll.effect.defenseBonus) ctx.fillText('+'+coll.effect.defenseBonus+' '+T('def'),tx+10,cy),cy+=12;
-                    if(coll.effect.maxHpBonus) ctx.fillText('+'+coll.effect.maxHpBonus+' Max HP',tx+10,cy),cy+=12;
-                    if(coll.effect.speedBonus) ctx.fillText('+'+coll.effect.speedBonus+'% '+T('spd'),tx+10,cy),cy+=12;
-                    if(coll.effect.goldBonus) ctx.fillText('+'+coll.effect.goldBonus+'% Gold',tx+10,cy),cy+=12;
-                    if(coll.effect.dodgeChance) ctx.fillText((coll.effect.dodgeChance*100).toFixed(0)+'% Dodge',tx+10,cy),cy+=12;
-                    if(coll.effect.critChance) ctx.fillText((coll.effect.critChance*100).toFixed(0)+'% Crit',tx+10,cy),cy+=12;
-                    if(coll.effect.lifeSteal) ctx.fillText('+'+coll.effect.lifeSteal+' HP/kill',tx+10,cy),cy+=12;
-                    if(coll.effect.regenBonus) ctx.fillText('+'+coll.effect.regenBonus+' HP/5s',tx+10,cy),cy+=12;
+                    var sd=coll.skillDescZh||coll.skillDesc;
+                    ctx.fillStyle='#ccbbee';ctx.font='9px monospace';
+                    // word wrap description
+                    var sdW=tooltipW-20,sdLines=[];
+                    if(lang==='zh'){
+                        var sdCl='';
+                        for(var sdi=0;sdi<sd.length;sdi++){
+                            var sdT=sdCl+sd[sdi];
+                            if(ctx.measureText(sdT).width>sdW&&sdCl){sdLines.push(sdCl);sdCl=sd[sdi];}
+                            else sdCl=sdT;
+                        }
+                        if(sdCl) sdLines.push(sdCl);
+                    } else {
+                        var sdWl='',sdWs=sd.split(' ');
+                        for(var swi=0;swi<sdWs.length;swi++){
+                            var sdTl=sdWl+(sdWl?' ':'')+sdWs[swi];
+                            if(ctx.measureText(sdTl).width>sdW&&sdWl){sdLines.push(sdWl);sdWl=sdWs[swi];}
+                            else sdWl=sdTl;
+                        }
+                        if(sdWl) sdLines.push(sdWl);
+                    }
+                    for(var sli=0;sli<Math.min(sdLines.length,4);sli++){ctx.fillText(sdLines[sli],tx+10,cy);cy+=12;}
+                    // Skill name
+                    if(coll.skillName){
+                        ctx.fillStyle='#ffcc44';ctx.font='bold 8px monospace';
+                        ctx.fillText('['+(coll.skillNameZh||coll.skillName)+']',tx+10,cy);cy+=12;
+                    }
                 }
             }
         }
@@ -2907,7 +2523,7 @@ function drawExpeditionHUD(){
     ctx.fillText('\uD83D\uDCDA',bookX+bookS/2,bookY+bookS/2+5);
     // Enemy count on floor
     if(enemies.length>0&&stairsZone){
-        var remStr=(lang==='zh'?'剩余: ':'Left: ')+enemies.length;
+        var remStr='剩余: '+enemies.length;
         ctx.fillStyle='rgba(0,0,0,0.5)';ctx.font='10px monospace';ctx.textAlign='center';
         var remW=ctx.measureText(remStr).width+12;
         ctx.fillRect(W/2-remW/2,56,remW,14);
@@ -2945,7 +2561,7 @@ function drawExpeditionHUD(){
     ctx.fillStyle='rgba(120,20,20,0.7)';ctx.fillRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
     ctx.strokeStyle='#ff4444';ctx.lineWidth=1;ctx.strokeRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
     ctx.fillStyle='#ff8888';ctx.font='bold 9px monospace';ctx.textAlign='center';
-    ctx.fillText(lang==='zh'?'退出冒险':'Exit Run',exitBtnX+exitBtnW/2,exitBtnY+exitBtnH/2+3);
+    ctx.fillText('退出冒险',exitBtnX+exitBtnW/2,exitBtnY+exitBtnH/2+3);
     // Settings gear in expedition
     drawSettingsGear(W-38,15,26);
 }
@@ -3193,7 +2809,7 @@ function drawBestiary(){
 
     // Title
     ctx.fillStyle='#cc9944';ctx.font='bold 16px monospace';ctx.textAlign='center';
-    ctx.fillText(lang==='zh'?'\uD83D\uDCDA 图鉴':'\uD83D\uDCDA Bestiary',W/2,py+26);
+    ctx.fillText('📚 图鉴',W/2,py+26);
 
     // Close button
     var cbX=px+pw-32,cbY=py+6,cbS=24;
@@ -3205,7 +2821,7 @@ function drawBestiary(){
     var seenKeys=Object.keys(seenEnemies);
     if(seenKeys.length===0){
         ctx.fillStyle='#666';ctx.font='12px monospace';ctx.textAlign='center';
-        ctx.fillText(lang==='zh'?'尚未遇到任何敌人':'No enemies encountered yet',W/2,py+ph/2);
+        ctx.fillText('尚未遇到任何敌人',W/2,py+ph/2);
     } else {
         // Paged list
         var perPage=5;
@@ -3239,14 +2855,14 @@ function drawBestiary(){
             if(isBoss){ ctx.fillStyle='#ff4444';ctx.font='bold 8px monospace';ctx.textAlign='center';ctx.fillText('BOSS',sprX,iy+eh-4); }
             else if(isElite){ ctx.fillStyle='#cc44ff';ctx.font='bold 8px monospace';ctx.textAlign='center';ctx.fillText('ELITE',sprX,iy+eh-4); }
             // Name
-            var nameStr=lang==='zh'?(et.nameZh||et.name):et.name;
+            var nameStr=et.nameZh||et.name;
             ctx.fillStyle=frameColor;ctx.font='bold 12px monospace';ctx.textAlign='left';
             ctx.fillText(nameStr,ex+70,iy+16);
             // Seen count
             ctx.fillStyle='#888';ctx.font='9px monospace';
-            ctx.fillText((lang==='zh'?'遇到 ':'Seen ')+data.count+'x',ex+70,iy+29);
+            ctx.fillText('遇到 '+data.count+'x',ex+70,iy+29);
             // Description
-            var desc=lang==='zh'?(et.descZh||et.desc):et.desc;
+            var desc=et.descZh||et.desc;
             ctx.fillStyle='#aaa';ctx.font='10px monospace';
             // Word wrap
             var words=desc.split(' '),line='',descY=iy+43;
@@ -3270,13 +2886,13 @@ function drawBestiary(){
             ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
             ctx.fillText((bestiaryPage+1)+'/'+totalPages,W/2,py+ph-14);
             // Prev/Next buttons
-            if(bestiaryPage>0){ctx.fillStyle='#44aaff';ctx.fillText('< PREV',px+70,py+ph-14);}
-            if(bestiaryPage<totalPages-1){ctx.fillStyle='#44aaff';ctx.fillText('NEXT >',px+pw-70,py+ph-14);}
+            if(bestiaryPage>0){ctx.fillStyle='#44aaff';ctx.fillText('◀ 上页',px+70,py+ph-14);}
+            if(bestiaryPage<totalPages-1){ctx.fillStyle='#44aaff';ctx.fillText('下页 ▶',px+pw-70,py+ph-14);}
         }
     }
     // Seen count summary
     ctx.fillStyle='#666';ctx.font='9px monospace';ctx.textAlign='left';
-    ctx.fillText((lang==='zh'?'已发现: ':'Discovered: ')+seenKeys.length+'/'+Object.keys(ENEMY_TYPES).length,px+10,py+ph-14);
+    ctx.fillText('已发现: '+seenKeys.length+'/'+Object.keys(ENEMY_TYPES).length,px+10,py+ph-14);
 }
 
 function drawRelicChoicePopup(){
@@ -3285,12 +2901,12 @@ function drawRelicChoicePopup(){
     var pop=relicChoicePopup;
     var isBoss=pop.source==='boss_chest';
     var titleColor=isBoss?'#ff4444':(pop.source==='elite'?'#cc44ff':'#ffd700');
-    var titleStr=isBoss?(lang==='zh'?'Boss宝箱！':'Boss Chest!'):(pop.source==='elite'?(lang==='zh'?'精英掉落！':'Elite Drop!'):(lang==='zh'?'宝箱开启！':'Chest Opened!'));
+    var titleStr=isBoss?'Boss宝箱！':(pop.source==='elite'?'精英掉落！':'宝箱开启！');
     // Title
     ctx.fillStyle=titleColor;ctx.font='bold 16px monospace';ctx.textAlign='center';
     ctx.fillText(titleStr,W/2,H/2-130);
     ctx.fillStyle='#aaa';ctx.font='11px monospace';
-    ctx.fillText(lang==='zh'?'选择一件遗物 (1/3)':'Choose one relic',W/2,H/2-110);
+    ctx.fillText('选择一件遗物 (1/3)',W/2,H/2-110);
 
     var choices=pop.choices;
     var cardW=Math.min(140,(W-60)/3),cardH=200;
@@ -3322,18 +2938,18 @@ function drawRelicChoicePopup(){
         }
         ctx.strokeStyle=c.color;ctx.lineWidth=1;ctx.globalAlpha=0.5;ctx.strokeRect(iconX,iconY,iconSize,iconSize);ctx.globalAlpha=1;
         // Name
-        var nameStr=lang==='zh'?c.nameZh:c.name;
+        var nameStr=c.nameZh;
         ctx.fillStyle=c.color;ctx.font='bold 10px monospace';ctx.textAlign='center';
         ctx.fillText(nameStr,cx2+cardW/2,iconY+iconSize+16);
         // Skill name
         ctx.fillStyle='#ffcc44';ctx.font='9px monospace';
-        ctx.fillText(lang==='zh'?c.skillNameZh:c.skillName,cx2+cardW/2,iconY+iconSize+30);
+        ctx.fillText(c.skillNameZh||c.skillName,cx2+cardW/2,iconY+iconSize+30);
         // Effect desc (word wrap)
-        var desc=lang==='zh'?c.skillDescZh:c.skillDesc;
+        var desc=c.skillDescZh||c.skillDesc;
         ctx.fillStyle='#ccbbee';ctx.font='8px monospace';ctx.textAlign='left';
         var maxW2=cardW-12,lh2=12,lx2=cx2+6,ly2=iconY+iconSize+45;
-        var ws3=desc.split(lang==='zh'?'':' ');
-        if(lang==='zh'){
+        var ws3=desc.split('');
+        if(true){
             var cl3='';
             for(var chi=0;chi<desc.length;chi++){
                 var t3=cl3+desc[chi];
@@ -3355,7 +2971,7 @@ function drawRelicChoicePopup(){
         ctx.fillStyle=c.color;ctx.globalAlpha=0.85;
         ctx.fillRect(cx2+8,btnY,btnW2,22);ctx.globalAlpha=1;
         ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='center';
-        ctx.fillText(lang==='zh'?'选择':'Pick',cx2+cardW/2,btnY+15);
+        ctx.fillText('选择',cx2+cardW/2,btnY+15);
     }
 }
 
@@ -3368,7 +2984,7 @@ function drawWeaponPopup(){
 
     var w=weaponPopup.weapon;
     var rarityColor=RARITY_COLORS[w.rarity||0];
-    var rarityName=lang==='zh'?RARITY_NAMES_ZH[w.rarity||0]:RARITY_NAMES[w.rarity||0];
+    var rarityName=RARITY_NAMES_ZH[w.rarity||0];
     ctx.strokeStyle=rarityColor;ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
     ctx.fillStyle='#ffd700';ctx.font='bold 16px monospace';ctx.textAlign='center';
     ctx.fillText(T('weaponFound'),W/2,py+28);
@@ -3466,7 +3082,7 @@ function drawMerchantPopup(){
             ctx.fillStyle='#ffcc44';ctx.font='12px monospace';
             ctx.fillText('🔑 '+T('key')+' x'+(item.count||1),px+20,y2+20);
             ctx.fillStyle='#888';ctx.font='10px monospace';
-            ctx.fillText(lang==='zh'?'打开锁住的房间':'Opens locked rooms',px+20,y2+36);
+            ctx.fillText('打开锁住的房间',px+20,y2+36);
         }
 
         // Price + buy button
@@ -3492,11 +3108,11 @@ function drawMerchantPopup(){
             ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
             ctx.fillStyle='#44dd88';ctx.font='11px monospace';ctx.textAlign='left';
             ctx.fillText(herbName(k)+' x'+inventory.herbs[k],px+20,sy2+18);
-            var sellPrice=3;
-            var sbX=px+pw-80,sbW=60,sbH=22;
-            ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
-            ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
-            ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
+                    var sellPrice=5;
+                    var sbX=px+pw-80,sbW=60,sbH=22;
+                    ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
+                    ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
+                    ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
         }
         sellY+=Math.min(herbKeys.length,3)*32+8;
         
@@ -3507,7 +3123,7 @@ function drawMerchantPopup(){
             ctx.fillStyle='#111118';ctx.fillRect(px+10,sy2,pw-20,28);
             ctx.fillStyle=pot.color||'#88aaff';ctx.font='11px monospace';ctx.textAlign='left';
             ctx.fillText(recipeName(pot),px+20,sy2+18);
-            var sellPrice=5+pot.tier*3;
+            var sellPrice=8+pot.tier*5;
             var sbX=px+pw-80,sbW=60,sbH=22;
             ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
             ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
@@ -3542,7 +3158,7 @@ function drawBuffPopup(){
     ctx.strokeStyle='#44dd88';ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph);
     // Title
     ctx.fillStyle='#44dd88';ctx.font='bold 14px monospace';ctx.textAlign='center';
-    ctx.fillText(lang==='zh'?'增益详情':'Buff Details',W/2,py+25);
+    ctx.fillText('增益详情',W/2,py+25);
     // Close button
     var cbS=24,cbX=px+pw-cbS-8,cbY=py+8;
     ctx.fillStyle='#aa4444';ctx.fillRect(cbX,cbY,cbS,cbS);
@@ -3557,24 +3173,24 @@ function drawBuffPopup(){
     ctx.fillStyle=buffColor;ctx.font='bold 16px monospace';
     ctx.fillText(b.name,W/2,py+60);
     ctx.fillStyle='#aaa';ctx.font='12px monospace';
-    ctx.fillText('Tier '+b.tier,W/2,py+80);
+    ctx.fillText('第 '+b.tier+' 阶',W/2,py+80);
     // Effect description
     ctx.fillStyle='#ddd';ctx.font='11px monospace';
     var desc='';
-    if(b.effect==='attack') desc='ATK +'+b.value;
-    else if(b.effect==='defense') desc='DEF +'+b.value;
-    else if(b.effect==='maxhp') desc='Max HP +'+b.value;
-    else if(b.effect==='speed') desc='Speed +'+b.value;
-    else if(b.effect==='regen') desc='HP Regen +'+b.value+'/s';
-    else if(b.effect==='poison') desc='Poison Damage +'+b.value;
-    else if(b.effect==='stealth') desc='Stealth';
-    else if(b.effect==='revive') desc='Auto-Revive once';
+    if(b.effect==='attack') desc='攻击 +'+b.value;
+    else if(b.effect==='defense') desc='防御 +'+b.value;
+    else if(b.effect==='maxhp') desc='最大生命 +'+b.value;
+    else if(b.effect==='speed') desc='速度 +'+b.value;
+    else if(b.effect==='regen') desc='生命回复 +'+b.value+'/s';
+    else if(b.effect==='poison') desc='毒素伤害 +'+b.value;
+    else if(b.effect==='stealth') desc='隐身';
+    else if(b.effect==='revive') desc='自动复活一次';
     ctx.fillText(desc,W/2,py+100);
     // Remove button
     var rmBtnW=120,rmBtnH=32,rmBtnX=(W-rmBtnW)/2,rmBtnY=py+ph-50;
     ctx.fillStyle='#dd4444';ctx.fillRect(rmBtnX,rmBtnY,rmBtnW,rmBtnH);
     ctx.fillStyle='#fff';ctx.font='bold 11px monospace';
-    ctx.fillText(lang==='zh'?'移除增益':'Remove Buff',rmBtnX+rmBtnW/2,rmBtnY+rmBtnH/2+4);
+    ctx.fillText('移除增益',rmBtnX+rmBtnW/2,rmBtnY+rmBtnH/2+4);
 }
 
 function handleRelicChoiceClick(cx,cy){
@@ -3613,7 +3229,7 @@ function handleExpeditionPopupClick(cx,cy){
             if(idx>=0){
                 activeBuffs.splice(idx,1);
                 applyBuffs();
-                spawnFloat(player.x,player.y-20,lang==='zh'?'移除增益':'Buff Removed','#ffaa44');
+                spawnFloat(player.x,player.y-20,'移除增益','#ffaa44');
             }
             buffPopup=null;playSound('click');return;
         }
@@ -3626,14 +3242,12 @@ function handleExpeditionPopupClick(cx,cy){
         var btnW=110,btnH=34,gap=20;
         var b1x=W/2-btnW-gap/2,b2x=W/2+gap/2,bty=py+ph-50;
         if(cx>=b1x&&cx<=b1x+btnW&&cy>=bty&&cy<=bty+btnH){
-            // Replace weapon — old goes to inventory
-            if(equippedWeapon&&equippedWeapon.name!=='Rusty Dagger') inventory.weapons.push(equippedWeapon);
+            // Replace weapon — expedition mode, old weapon discarded
             equippedWeapon=weaponPopup.weapon;
             weaponPopup=null; playSound('craft'); return;
         }
         if(cx>=b2x&&cx<=b2x+btnW&&cy>=bty&&cy<=bty+btnH){
-            // Keep current — new goes to inventory
-            inventory.weapons.push(weaponPopup.weapon);
+            // Keep current — discard new weapon (expedition only)
             weaponPopup=null; playSound('click'); return;
         }
         return;
@@ -3682,8 +3296,8 @@ function handleExpeditionPopupClick(cx,cy){
             if(cx>=sbX&&cx<=sbX+sbW&&cy>=sy2+3&&cy<=sy2+3+sbH){
                 inventory.herbs[k]--;
                 if(inventory.herbs[k]<=0) delete inventory.herbs[k];
-                gold+=3;
-                spawnFloat(player.x,player.y-20,T('soldItem')+' +3G','#ffd700');
+                gold+=5;
+                spawnFloat(player.x,player.y-20,T('soldItem')+' +5G','#ffd700');
                 playSound('pickup'); return;
             }
         }
@@ -3695,7 +3309,7 @@ function handleExpeditionPopupClick(cx,cy){
             var sy2=sellY+i*32;
             var sbX=px2+pw2-80,sbW=60,sbH=22;
             if(cx>=sbX&&cx<=sbX+sbW&&cy>=sy2+3&&cy<=sy2+3+sbH){
-                var sellPrice=5+pot.tier*3;
+                var sellPrice=8+pot.tier*5;
                 inventory.potions.splice(i,1);
                 gold+=sellPrice;
                 spawnFloat(player.x,player.y-20,T('soldItem')+' +'+sellPrice+'G','#ffd700');
@@ -3746,15 +3360,18 @@ function getLabLayout(){
     var cR=Math.min(40,W*0.05,H*0.06);
     var cX=vpx,cY=H*0.62;
     var benchW=Math.min(130,W*0.15),benchH=Math.min(80,H*0.12);
-    var benchX=W*0.1,benchY=H*0.52;
+    var benchX=W*0.06,benchY=H*0.62;
     var shelfW=Math.min(110,W*0.13),shelfH=Math.min(110,H*0.18);
-    var shelfX=W*0.82-shelfW/2,shelfY=H*0.44;
+    var shelfX=W*0.82-shelfW/2,shelfY=H*0.55;
     // Weapon rack (left of alembic)
     var rackW=Math.min(80,W*0.1),rackH=Math.min(90,H*0.14);
     var rackX=W*0.32,rackY=H*0.48;
     // Merchant corner (right side, near shelf)
     var merchW=Math.min(70,W*0.08),merchH=Math.min(80,H*0.12);
     var merchX=W*0.68,merchY=H*0.62;
+    // Alchemy Forge (weapon forging) — bottom-left corner
+    var forgeW=Math.min(70,W*0.09),forgeH=Math.min(60,H*0.09);
+    var forgeX=W*0.04,forgeY=H*0.74;
     return {
         vp:{x:vpx,y:vpy}, backWall:{x:vpx-bwW/2,y:vpy-bwH/2,w:bwW,h:bwH},
         door:{x:exitX,y:exitY,w:exitW,h:exitH},
@@ -3763,9 +3380,10 @@ function getLabLayout(){
         shelf:{x:shelfX,y:shelfY,w:shelfW,h:shelfH},
         rack:{x:rackX,y:rackY,w:rackW,h:rackH},
         merch:{x:merchX,y:merchY,w:merchW,h:merchH},
-        research:{x:W*0.18,y:H*0.72,w:Math.min(90,W*0.1),h:Math.min(60,H*0.09)},
-        relicCase:{x:W*0.78,y:H*0.72,w:Math.min(80,W*0.09),h:Math.min(60,H*0.09)},
-        skillBook:{x:W*0.48,y:H*0.78,w:Math.min(80,W*0.09),h:Math.min(55,H*0.08)}
+        research:{x:W*0.22,y:H*0.74,w:Math.min(90,W*0.1),h:Math.min(60,H*0.09)},
+        relicCase:{x:W*0.76,y:H*0.72,w:Math.min(80,W*0.09),h:Math.min(60,H*0.09)},
+        skillBook:{x:W*0.46,y:H*0.78,w:Math.min(80,W*0.09),h:Math.min(55,H*0.08)},
+        forge:{x:forgeX,y:forgeY,w:forgeW,h:forgeH}
     };
 }
 
@@ -3977,6 +3595,28 @@ function drawCaveScene(){
     ctx.fillStyle=skillHov?'#dd8844':'#886633';ctx.font='bold 11px monospace';ctx.textAlign='center';
     ctx.fillText(T('tabSkills'),sb.x+sb.w/2,sb.y+sb.h+16);
 
+    // Alchemy Forge (weapon crafting anvil)
+    var fg=lay.forge,forgeHov=labHover==='forge';
+    ctx.fillStyle=forgeHov?'#2a1a10':'#1a1008';
+    ctx.fillRect(fg.x,fg.y,fg.w,fg.h);
+    ctx.strokeStyle=forgeHov?'#ff8844':'#884422';ctx.lineWidth=2;ctx.strokeRect(fg.x,fg.y,fg.w,fg.h);
+    // Anvil shape
+    var ax=fg.x+fg.w/2,ay=fg.y+fg.h*0.55;
+    ctx.fillStyle=forgeHov?'#666':'#444';
+    ctx.fillRect(ax-fg.w*0.35,ay-fg.h*0.2,fg.w*0.7,fg.h*0.25); // top
+    ctx.fillRect(ax-fg.w*0.22,ay+fg.h*0.05,fg.w*0.44,fg.h*0.22); // body
+    ctx.fillRect(ax-fg.w*0.14,ay+fg.h*0.27,fg.w*0.28,fg.h*0.15); // base
+    // Hammer
+    ctx.fillStyle=forgeHov?'#cc8833':'#996622';
+    ctx.save();ctx.translate(ax+fg.w*0.2,ay-fg.h*0.15);ctx.rotate(-0.6);
+    ctx.fillRect(-3,-10,6,16);ctx.fillRect(-6,-12,12,8);ctx.restore();
+    // Fire glow
+    if(forgeHov){ctx.save();ctx.globalAlpha=0.1;var fgG=ctx.createRadialGradient(ax,ay,3,ax,ay,fg.w*0.8);fgG.addColorStop(0,'#ff6600');fgG.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=fgG;ctx.fillRect(fg.x-10,fg.y-10,fg.w+20,fg.h+20);ctx.restore();}
+    // Forged weapon indicator
+    if(forgedWeapon){ctx.fillStyle='#ffcc44';ctx.font='bold 7px monospace';ctx.textAlign='center';ctx.fillText('★',ax,fg.y+fg.h*0.15);}
+    ctx.fillStyle=forgeHov?'#ff8844':'#cc6622';ctx.font='bold 11px monospace';ctx.textAlign='center';
+    ctx.fillText('锻造',fg.x+fg.w/2,fg.y+fg.h+16);
+
     // Torches
     var torchSpots=[{x:bw.x-W*0.08,y:bw.y+bw.h*0.3},{x:bw.x+bw.w+W*0.08,y:bw.y+bw.h*0.3},{x:W*0.06,y:H*0.45},{x:W*0.94,y:H*0.45}];
     for(var i=0;i<torchSpots.length;i++){var tp=torchSpots[i];ctx.fillStyle='#3a3030';ctx.fillRect(tp.x-2,tp.y+3,4,8);ctx.fillStyle='#4a3318';ctx.fillRect(tp.x-2,tp.y-10,4,16);var flk=Math.sin(t*7+i*2.3)*2,fSz=8+Math.sin(t*4+i)*2;var fGr=ctx.createRadialGradient(tp.x,tp.y-12+flk,1,tp.x,tp.y-12+flk,fSz);fGr.addColorStop(0,'rgba(255,200,50,0.85)');fGr.addColorStop(0.4,'rgba(255,120,20,0.35)');fGr.addColorStop(1,'rgba(255,60,0,0)');ctx.fillStyle=fGr;ctx.beginPath();ctx.arc(tp.x,tp.y-12+flk,fSz,0,Math.PI*2);ctx.fill();var wG=ctx.createRadialGradient(tp.x,tp.y,5,tp.x,tp.y,80+i*10);wG.addColorStop(0,'rgba(255,160,50,0.06)');wG.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=wG;ctx.fillRect(tp.x-90,tp.y-80,180,160);}
@@ -3991,6 +3631,142 @@ function drawCaveScene(){
     var vig=ctx.createRadialGradient(vpx,H*0.45,Math.min(W,H)*0.2,vpx,H*0.45,Math.max(W,H)*0.7);
     vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,'rgba(0,0,0,0.5)');
     ctx.fillStyle=vig;ctx.fillRect(0,0,W,H);
+}
+
+function updateLabPlayer(){
+    var W=canvas.width,H=canvas.height;
+    var lay=labFurniture;
+    var spd=3.5;
+    if(!labPlayer.initialized){
+        labPlayer.x=W/2; labPlayer.y=H*0.72;
+        labPlayer.initialized=true;
+    }
+    // Input: keyboard
+    var dx=0,dy=0;
+    if(keys['ArrowLeft']||keys['KeyA']) dx-=1;
+    if(keys['ArrowRight']||keys['KeyD']) dx+=1;
+    if(keys['ArrowUp']||keys['KeyW']) dy-=1;
+    if(keys['ArrowDown']||keys['KeyS']) dy+=1;
+    // Mobile joystick
+    if(labHallStick.active){
+        var sdx=labHallStick.cx-labHallStick.sx,sdy=labHallStick.cy-labHallStick.sy;
+        var slen=Math.sqrt(sdx*sdx+sdy*sdy);
+        if(slen>8){ dx+=sdx/Math.max(slen,40); dy+=sdy/Math.max(slen,40); }
+    }
+    var len=Math.sqrt(dx*dx+dy*dy);
+    if(len>0){ dx/=len; dy/=len; }
+    labPlayer.vx=dx*spd; labPlayer.vy=dy*spd;
+    var nx=labPlayer.x+labPlayer.vx, ny=labPlayer.y+labPlayer.vy;
+    var pr=14;
+    // Clamp to screen
+    nx=Math.max(pr,Math.min(W-pr,nx));
+    ny=Math.max(pr,Math.min(H-pr,ny));
+    // Trapezoid floor boundary: floor goes from (bw.x,bw.y+bw.h)-(bw.x+bw.w,bw.y+bw.h) at top to (0,H)-(W,H) at bottom
+    var bw=lay.backWall;
+    if(bw){
+        var floorTopY=bw.y+bw.h;
+        var floorBotY=H;
+        var span=floorBotY-floorTopY;
+        var t2=Math.max(0,Math.min(1,(ny-floorTopY)/span));
+        var leftX=bw.x*(1-t2)+0*t2+pr;
+        var rightX=(bw.x+bw.w)*(1-t2)+W*t2-pr;
+        // Keep player inside trapezoid
+        if(ny<floorTopY+pr) ny=floorTopY+pr;
+        if(ny>H-pr) ny=H-pr;
+        nx=Math.max(leftX,Math.min(rightX,nx));
+    }
+    // Furniture collision (push player out of furniture rects)
+    var furnitureKeys2=['bench','cauldron','shelf','rack','merch','research','relicCase','skillBook','forge','door'];
+    for(var i2=0;i2<furnitureKeys2.length;i2++){
+        var fk2=furnitureKeys2[i2],fb2=lay[fk2];
+        if(!fb2) continue;
+        var fw=fb2.w||(fb2.r?fb2.r*2:0),fh=fb2.h||(fb2.r?fb2.r*2:0);
+        if(fw===0||fh===0) continue;
+        var fx2=fb2.x,fy2=fb2.y;
+        // AABB overlap check with player radius
+        if(nx+pr>fx2&&nx-pr<fx2+fw&&ny+pr>fy2&&ny-pr<fy2+fh){
+            // Find smallest overlap axis and push out
+            var overlapL=nx+pr-fx2,overlapR=fx2+fw-(nx-pr);
+            var overlapT=ny+pr-fy2,overlapB=fy2+fh-(ny-pr);
+            var minOv=Math.min(overlapL,overlapR,overlapT,overlapB);
+            if(minOv===overlapL) nx=fx2-pr;
+            else if(minOv===overlapR) nx=fx2+fw+pr;
+            else if(minOv===overlapT) ny=fy2-pr;
+            else ny=fy2+fh+pr;
+        }
+    }
+    labPlayer.x=nx; labPlayer.y=ny;
+    if(dx>0.1) labPlayer.facing=1; else if(dx<-0.1) labPlayer.facing=-1;
+    // Animate
+    if(len>0.1){ labPlayer.animTimer++; if(labPlayer.animTimer>=8){labPlayer.animTimer=0;labPlayer.animFrame=(labPlayer.animFrame+1)%4;} }
+    else { labPlayer.animFrame=0; labPlayer.animTimer=0; }
+    // Find nearest furniture using rect-to-point distance (works from all 4 sides)
+    var keys2=['bench','cauldron','shelf','rack','merch','research','relicCase','skillBook','forge','door'];
+    var nearest=null,nearDist=80;
+    for(var i=0;i<keys2.length;i++){
+        var fk=keys2[i],fb=lay[fk];
+        if(!fb) continue;
+        var fw2=fb.w||(fb.r?fb.r*2:0),fh2=fb.h||(fb.r?fb.r*2:0);
+        // Clamp player center to furniture rect, get distance to nearest edge
+        var clampX=Math.max(fb.x,Math.min(fb.x+fw2,labPlayer.x));
+        var clampY=Math.max(fb.y,Math.min(fb.y+fh2,labPlayer.y));
+        var dist=Math.sqrt((labPlayer.x-clampX)*(labPlayer.x-clampX)+(labPlayer.y-clampY)*(labPlayer.y-clampY));
+        if(dist<nearDist){nearDist=dist;nearest=fk;}
+    }
+    labNearFurniture=nearest;
+    if(nearest) labInteractPromptAlpha=Math.min(1,labInteractPromptAlpha+0.08);
+    else labInteractPromptAlpha=Math.max(0,labInteractPromptAlpha-0.1);
+}
+
+function drawLabPlayer(){
+    var p=labPlayer;
+    var isMoving=(Math.abs(p.vx)>0.1||Math.abs(p.vy)>0.1);
+    var x=p.x, y=p.y;
+    var sprSize=TILE*1.4; // slightly larger than expedition for visibility
+    // Shadow
+    ctx.save();ctx.globalAlpha=0.2;ctx.fillStyle='#000';
+    ctx.beginPath();ctx.ellipse(x,y+sprSize*0.38,sprSize*0.28,sprSize*0.1,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.scale(p.facing,1);
+    if(SPR&&SPR.ready){
+        var spr=isMoving?SPR.playerFrames[p.animFrame%SPR.playerFrames.length]:SPR.playerIdle;
+        ctx.drawImage(spr,-sprSize/2,-sprSize/2,sprSize,sprSize);
+    } else {
+        ctx.fillStyle='#44dd88';ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+
+    // Interact prompt
+    if(labNearFurniture&&labInteractPromptAlpha>0){
+        ctx.save();ctx.globalAlpha=labInteractPromptAlpha;
+        var isMob=('ontouchstart' in window);
+        var promptText=isMob?'点击交互':'按E交互';
+        var pw2=ctx.measureText(promptText).width+16;
+        ctx.fillStyle='rgba(0,0,0,0.7)';
+        ctx.beginPath();
+        var rx=p.x-pw2/2,ry=p.y-52;
+        ctx.roundRect?ctx.roundRect(rx,ry,pw2,20,4):ctx.fillRect(rx,ry,pw2,20);
+        ctx.fill();
+        ctx.fillStyle='#44dd88';ctx.font='bold 10px monospace';ctx.textAlign='center';
+        ctx.fillText(promptText,p.x,p.y-38);
+        ctx.restore();
+    }
+}
+
+function drawLabHallStick(){
+    if(!labHallStick.active) return;
+    var sx=labHallStick.sx,sy=labHallStick.sy;
+    var cx2=labHallStick.cx,cy2=labHallStick.cy;
+    ctx.save();ctx.globalAlpha=0.35;
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sx,sy,40,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(sx,sy,40,0,Math.PI*2);ctx.stroke();
+    ctx.globalAlpha=0.55;
+    var dx=cx2-sx,dy=cy2-sy,dl=Math.sqrt(dx*dx+dy*dy);
+    var clampR=35;
+    if(dl>clampR){cx2=sx+dx/dl*clampR;cy2=sy+dy/dl*clampR;}
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx2,cy2,18,0,Math.PI*2);ctx.fill();
+    ctx.restore();
 }
 
 function renderLab(){
@@ -4017,7 +3793,7 @@ function renderLab(){
     ctx.fillStyle='rgba(10,10,20,0.6)';ctx.fillRect(bkX,bkY,bkW,bkH);
     ctx.strokeStyle='#cc9944';ctx.lineWidth=1;ctx.strokeRect(bkX,bkY,bkW,bkH);
     ctx.fillStyle='#cc9944';ctx.font='bold 9px monospace';ctx.textAlign='center';
-    ctx.fillText('📚 '+(lang==='zh'?'图鉴':'Bestiary'),bkX+bkW/2,bkY+bkH/2+3);
+    ctx.fillText('📚 图鉴',bkX+bkW/2,bkY+bkH/2+3);
 
     // Carried potions belt
     if(carriedPotions.length>0){
@@ -4025,6 +3801,13 @@ function renderLab(){
         ctx.fillStyle='rgba(10,10,20,0.6)';ctx.fillRect(W/2-beltW/2,H-30,beltW,22);
         ctx.fillStyle='#44dd88';ctx.font='10px monospace';ctx.textAlign='center';
         ctx.fillText(T('carriedSlots')+': '+carriedPotions.map(function(p){return recipeName(p);}).join(', '),W/2,H-15);
+    }
+
+    // Lab hall player (only when no panel open)
+    if(!labTab&&!showSettings){
+        updateLabPlayer();
+        drawLabPlayer();
+        drawLabHallStick();
     }
 
     // Panel overlay
@@ -4042,10 +3825,11 @@ function renderLab(){
         ctx.fillStyle='#ff6666';ctx.font='bold 16px monospace';ctx.textAlign='center';
         ctx.fillText('X',cbX+cbS/2,cbY+cbS/2+5);
         // Title
-        var panelTitles={extract:T('tabExtract'),brew:T('tabBrew'),potions:T('tabPotions'),expedition:T('tabExpedition'),weapons:T('tabWeapons'),shop:T('tabShop'),research:T('tabResearch'),relics:T('relicCase'),skills:T('skillTree'),bestiary:(lang==='zh'?'📚 图鉴':'📚 Bestiary')};
+        var panelTitles={extract:T('tabExtract'),brew:T('tabBrew'),potions:T('tabPotions'),expedition:T('tabExpedition'),weapons:T('tabWeapons'),shop:T('tabShop'),research:T('tabResearch'),relics:T('relicCase'),skills:T('skillTree'),bestiary:'📚 图鉴',forge:'⚒ 炼金锻造'};
         ctx.fillStyle='#44dd88';ctx.font='bold 18px monospace';ctx.textAlign='center';
         ctx.fillText(panelTitles[labTab]||'',W/2,ppy+30);
         var contentY=ppy+50;
+        labPanelContentY=contentY; labPanelVisH=ph-85;
         ctx.save();
         ctx.beginPath();ctx.rect(ppx,ppy+40,pw,ph-55);ctx.clip();
         ctx.translate(0, labScrollY);
@@ -4059,6 +3843,7 @@ function renderLab(){
         else if(labTab==='relics') drawLabRelics(contentY);
         else if(labTab==='skills') drawLabSkills(contentY);
         else if(labTab==='bestiary') drawLabBestiary(contentY);
+        else if(labTab==='forge') drawLabForge(contentY);
         ctx.restore();
     }
 
@@ -4226,12 +4011,12 @@ function drawLabExtract(cy){
         ctx.strokeStyle='#333';ctx.lineWidth=1;ctx.strokeRect(qx,qy,qw,qh);
         ctx.fillStyle='#666';ctx.font='9px monospace';ctx.textAlign='center';
         ctx.fillText(T('quality')+' '+Math.round(qProg*100)+'%',centerX,qy+qh+12);
-        return;
+        labScrollMax=0;return;
     }
     // Normal herb list
     ctx.fillStyle='#aaa';ctx.font='13px monospace';ctx.textAlign='center';ctx.fillText(T('selectHerb'),W/2,cy);cy+=25;
     var herbKeys=Object.keys(inventory.herbs).filter(function(k){return inventory.herbs[k]>0;});
-    if(herbKeys.length===0){ctx.fillStyle='#555';ctx.fillText(T('noHerbs'),W/2,cy+30);return;}
+    if(herbKeys.length===0){ctx.fillStyle='#555';ctx.fillText(T('noHerbs'),W/2,cy+30);labScrollMax=Math.max(0,(cy+50-labPanelContentY)-labPanelVisH);return;}
     var itemH=44,startX=W/2-160;
     for(var i=0;i<herbKeys.length;i++){
         var k=herbKeys[i],h2=HERBS[k],count=inventory.herbs[k];
@@ -4251,9 +4036,11 @@ function drawLabExtract(cy){
     cy+=herbKeys.length*(itemH+4)+20;
     ctx.fillStyle='#888';ctx.font='11px monospace';ctx.textAlign='center';ctx.fillText(T('yourEssences'),W/2,cy);cy+=18;
     var essKeys=Object.keys(inventory.essences).filter(function(k){return inventory.essences[k]>0;});
-    if(essKeys.length===0){ctx.fillStyle='#444';ctx.fillText(T('noneYet'),W/2,cy+10);return;}
+    if(essKeys.length===0){ctx.fillStyle='#444';ctx.fillText(T('noneYet'),W/2,cy+10);labScrollMax=Math.max(0,(cy+30-labPanelContentY)-labPanelVisH);return;}
     var ex=W/2-essKeys.length*45;
     for(var i=0;i<essKeys.length;i++){var ek=essKeys[i],ess=ESSENCES[ek];ctx.fillStyle=ess.color;ctx.font='bold 13px monospace';ctx.textAlign='center';ctx.fillText(essenceName(ek),ex+i*90,cy);ctx.fillStyle='#aaa';ctx.font='11px monospace';ctx.fillText('x'+inventory.essences[ek],ex+i*90,cy+14);}
+    cy+=30;
+    labScrollMax=Math.max(0, (cy-labPanelContentY)-labPanelVisH);
 }
 
 function drawLabBrew(cy){
@@ -4297,7 +4084,9 @@ function drawLabBrew(cy){
             ctx.fillText(essenceName(ek),tbx+tBtnW/2,ty+14);
             ctx.fillText('3→1',tbx+tBtnW/2,ty+26);
         }
+        cy=ty+40;
     }
+    labScrollMax=Math.max(0, (cy-labPanelContentY)-labPanelVisH);
 }
 
 function drawLabPotions(cy){
@@ -4312,6 +4101,8 @@ function drawLabPotions(cy){
     if(inventory.potions.length===0&&carriedPotions.length===0){ctx.fillStyle='#555';ctx.fillText(T('noPotions'),W/2,cy+20);return;}
     var itemH=40,startX=W/2-160;
     for(var i=0;i<inventory.potions.length;i++){var p=inventory.potions[i];var iy=cy+i*(itemH+4);ctx.fillStyle='#111118';ctx.fillRect(startX,iy,320,itemH);ctx.strokeStyle=p.color||'#333';ctx.lineWidth=1;ctx.strokeRect(startX,iy,320,itemH);ctx.fillStyle=p.color||'#ddd';ctx.font='12px monospace';ctx.textAlign='left';ctx.fillText(recipeName(p),startX+14,iy+16);ctx.fillStyle='#888';ctx.font='10px monospace';ctx.fillText(recipeDesc(p)+' ('+T('tier')+' '+p.tier+')',startX+14,iy+32);var btnX=startX+240,btnY=iy+6,btnW=70,btnH=28;var full=carriedPotions.length>=getMaxCarry();ctx.fillStyle=full?'#555':'#44dd88';ctx.fillRect(btnX,btnY,btnW,btnH);ctx.fillStyle=full?'#888':'#000';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText(T('equip'),btnX+btnW/2,btnY+btnH/2+4);}
+    cy+=inventory.potions.length*(itemH+4)+10;
+    labScrollMax=Math.max(0, (cy-labPanelContentY)-labPanelVisH);
 }
 
 // ============ WEAPONS LAB PANEL ============
@@ -4378,6 +4169,80 @@ function drawLabWeapons(cy){
         ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='center';
         ctx.fillText(T('equip'),btnX+btnW/2,btnY+btnH/2+4);
     }
+    cy+=inventory.weapons.length*40+20;
+    labScrollMax=Math.max(0, (cy-labPanelContentY)-labPanelVisH);
+}
+
+// ============ ALCHEMY FORGE PANEL ============
+// Selected potions for forging (indices into inventory.potions)
+var forgeSelected = [];
+var forgePotionListY = 0; // rendered y-start of potion list, for click detection
+var forgeButtonY = 0;    // rendered y of forge button
+
+function drawLabForge(cy){
+    var W=canvas.width;
+    ctx.fillStyle='#ff8844';ctx.font='bold 13px monospace';ctx.textAlign='center';
+    ctx.fillText('⚒ 炼金锻造',W/2,cy);cy+=18;
+    ctx.fillStyle='#888';ctx.font='10px monospace';
+    ctx.fillText('选择3瓶药水炼制武器（最高紫色品质）',W/2,cy);cy+=16;
+    ctx.fillText('药水等级越高，武器品质越好',W/2,cy);cy+=20;
+
+    // Current forged weapon
+    ctx.fillStyle='#aaa';ctx.font='11px monospace';
+    ctx.fillText('— 当前锻造武器 —',W/2,cy);cy+=16;
+    if(forgedWeapon){
+        ctx.fillStyle=forgedWeapon.color;ctx.font='bold 13px monospace';
+        ctx.fillText(weaponName(forgedWeapon),W/2,cy);cy+=14;
+        ctx.fillStyle='#aaa';ctx.font='10px monospace';
+        ctx.fillText(T('dmg')+':'+forgedWeapon.dmg+' '+T('spd')+':'+forgedWeapon.speed.toFixed(1)+' T'+forgedWeapon.tier,W/2,cy);cy+=18;
+    } else {
+        ctx.fillStyle='#555';ctx.font='11px monospace';
+        ctx.fillText('（无）',W/2,cy);cy+=18;
+    }
+
+    cy+=8;
+    // Potion selection list
+    ctx.fillStyle='#cc8844';ctx.font='bold 11px monospace';
+    ctx.fillText('选择药水（已选：'+forgeSelected.length+'/3）',W/2,cy);cy+=16;
+    forgePotionListY = cy; // record for click detection
+
+    var startX=W/2-160;
+    if(inventory.potions.length===0){
+        ctx.fillStyle='#444';ctx.font='10px monospace';ctx.fillText('背包中没有药水',W/2,cy+10);
+        cy+=30;
+    } else {
+        for(var i=0;i<inventory.potions.length;i++){
+            var p=inventory.potions[i];
+            var iy=cy+i*36;
+            var isSel=forgeSelected.indexOf(i)>=0;
+            ctx.fillStyle=isSel?'rgba(255,136,68,0.25)':'#111118';ctx.fillRect(startX,iy,320,32);
+            ctx.strokeStyle=isSel?'#ff8844':(p.color||'#333');ctx.lineWidth=isSel?2:1;ctx.strokeRect(startX,iy,320,32);
+            // Tier stars
+            var tierStr='';for(var ts=0;ts<=p.tier;ts++) tierStr+='★';
+            ctx.fillStyle=p.color||'#ddd';ctx.font='10px monospace';ctx.textAlign='left';
+            ctx.fillText(tierStr+' '+recipeName(p)+' (T'+p.tier+')',startX+10,iy+13);
+            ctx.fillStyle='#777';ctx.font='9px monospace';
+            ctx.fillText(recipeDesc(p),startX+10,iy+25);
+            // Select button
+            var btnX=startX+248,btnW=60,btnH=24,btnY=iy+4;
+            ctx.fillStyle=isSel?'#ff8844':'#555';ctx.fillRect(btnX,btnY,btnW,btnH);
+            ctx.fillStyle='#fff';ctx.font='bold 9px monospace';ctx.textAlign='center';
+            ctx.fillText(isSel?'取消':'选择',btnX+btnW/2,btnY+btnH/2+3);
+        }
+        cy+=inventory.potions.length*36+8;
+    }
+
+    // Forge button
+    cy+=8;
+    var canForge=forgeSelected.length===3;
+    var fbW=160,fbH=36,fbX=W/2-fbW/2,fbY=cy;
+    forgeButtonY = fbY; // record for click detection
+    ctx.fillStyle=canForge?'#ff8844':'#333';ctx.fillRect(fbX,fbY,fbW,fbH);
+    ctx.fillStyle=canForge?'#000':'#555';ctx.font='bold 12px monospace';ctx.textAlign='center';
+    ctx.fillText('⚒ 锻造武器',fbX+fbW/2,fbY+fbH/2+4);
+    cy+=fbH+10;
+
+    labScrollMax=Math.max(0, (cy-labPanelContentY)-labPanelVisH);
 }
 
 function drawLabShop(cy){
@@ -4386,8 +4251,8 @@ function drawLabShop(cy){
     ctx.fillText(T('gold')+': '+gold,W/2,cy);cy+=20;
     if(labShopStock.length===0){
         ctx.fillStyle='#555';ctx.font='12px monospace';
-        ctx.fillText(lang==='zh'?'商品已售罄':'Sold out',W/2,cy+20);
-        return;
+        ctx.fillText('商品已售罄',W/2,cy+20);
+        labScrollMax=0;return;
     }
     var startX=W/2-160,itemH=50;
     for(var i=0;i<labShopStock.length;i++){
@@ -4415,7 +4280,7 @@ function drawLabShop(cy){
             ctx.fillStyle='#ffcc44';ctx.font='12px monospace';
             ctx.fillText('🔑 '+T('key')+' x'+(item.count||1),startX+14,y2+20);
             ctx.fillStyle='#888';ctx.font='10px monospace';
-            ctx.fillText(lang==='zh'?'打开锁住的房间':'Opens locked rooms',startX+14,y2+36);
+            ctx.fillText('打开锁住的房间',startX+14,y2+36);
         }
         var btnW2=70,btnH2=28,btnX=startX+240,btnY=y2+10;
         var canAfford=gold>=item.price;
@@ -4438,7 +4303,7 @@ function drawLabShop(cy){
         var sbX=startX+240,sbW=70,sbH=22;
         ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
         ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
-        ctx.fillText('3G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
+        ctx.fillText('5G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
     }
     sellY+=Math.min(herbKeys.length,5)*32+8;
     
@@ -4449,7 +4314,7 @@ function drawLabShop(cy){
         ctx.fillStyle='#111118';ctx.fillRect(startX,sy2,320,28);
         ctx.fillStyle=pot.color||'#88aaff';ctx.font='11px monospace';ctx.textAlign='left';
         ctx.fillText(recipeName(pot),startX+14,sy2+18);
-        var sellPrice=5+pot.tier*3;
+        var sellPrice=8+pot.tier*5;
         var sbX=startX+240,sbW=70,sbH=22;
         ctx.fillStyle='#ddaa22';ctx.fillRect(sbX,sy2+3,sbW,sbH);
         ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
@@ -4470,6 +4335,8 @@ function drawLabShop(cy){
         ctx.fillStyle='#000';ctx.font='bold 9px monospace';ctx.textAlign='center';
         ctx.fillText(sellPrice+'G '+T('sell'),sbX+sbW/2,sy2+3+sbH/2+3);
     }
+    sellY+=Math.min(inventory.weapons.length,5)*32+8;
+    labScrollMax=Math.max(0, (sellY-labPanelContentY)-labPanelVisH);
 }
 
 function drawLabResearch(cy){
@@ -4508,6 +4375,7 @@ function drawLabResearch(cy){
             ctx.fillText(cost+'G',btnX+btnW/2,btnY+btnH/2+4);
         }
     }
+    labScrollMax=Math.max(0, (cy+RESEARCH.length*44+20-labPanelContentY)-labPanelVisH);
 }
 
 function drawLabRelics(cy){
@@ -4523,21 +4391,32 @@ function drawLabRelics(cy){
         ctx.fillStyle=found?'#111120':'#0a0a12';ctx.fillRect(cx2,cy2,cellW,cellH);
         ctx.strokeStyle=found?c.color:'#222';ctx.lineWidth=2;ctx.strokeRect(cx2,cy2,cellW,cellH);
         if(found){
-            // Diamond icon
-            ctx.fillStyle=c.color;
-            ctx.beginPath();ctx.moveTo(cx2+cellW/2,cy2+8);ctx.lineTo(cx2+cellW/2+8,cy2+20);
-            ctx.lineTo(cx2+cellW/2,cy2+32);ctx.lineTo(cx2+cellW/2-8,cy2+20);ctx.closePath();ctx.fill();
+            // Sprite icon (or fallback diamond)
+            var relSpr=SPR.relicSprites&&SPR.relicSprites[c.id];
+            var iconSz=28,iconX=cx2+cellW/2-iconSz/2,iconY=cy2+6;
+            if(relSpr){
+                ctx.save();ctx.imageSmoothingEnabled=false;
+                ctx.shadowColor=c.color;ctx.shadowBlur=6;
+                var sc3=Math.min(iconSz/relSpr.width,iconSz/relSpr.height);
+                var dw3=Math.round(relSpr.width*sc3),dh3=Math.round(relSpr.height*sc3);
+                ctx.drawImage(relSpr,cx2+cellW/2-dw3/2,iconY+(iconSz-dh3)/2,dw3,dh3);
+                ctx.restore();
+            } else {
+                ctx.fillStyle=c.color;
+                ctx.beginPath();ctx.moveTo(cx2+cellW/2,cy2+8);ctx.lineTo(cx2+cellW/2+8,cy2+20);
+                ctx.lineTo(cx2+cellW/2,cy2+32);ctx.lineTo(cx2+cellW/2-8,cy2+20);ctx.closePath();ctx.fill();
+            }
             ctx.fillStyle='#ddd';ctx.font='bold 9px monospace';ctx.textAlign='center';
             ctx.fillText(collectibleName(c),cx2+cellW/2,cy2+44);
             // Skill info
             if(c.skillName){
                 ctx.fillStyle=c.color;ctx.font='bold 8px monospace';
-                ctx.fillText(lang==='zh'?c.skillNameZh:c.skillName,cx2+cellW/2,cy2+56);
+                ctx.fillText(c.skillNameZh||c.skillName,cx2+cellW/2,cy2+56);
                 ctx.fillStyle='#888';ctx.font='7px monospace';
-                var skillD=lang==='zh'?c.skillDescZh:c.skillDesc;
+                var skillD=c.skillDescZh||c.skillDesc;
                 if(skillD.length>20) skillD=skillD.substring(0,18)+'...';
                 ctx.fillText(skillD,cx2+cellW/2,cy2+66);
-                ctx.fillText((lang==='zh'?'被动':'Passive'),cx2+cellW/2,cy2+78);
+                ctx.fillText('被动',cx2+cellW/2,cy2+78);
             }
         } else {
             ctx.fillStyle='#333';ctx.font='bold 16px monospace';ctx.textAlign='center';
@@ -4546,6 +4425,10 @@ function drawLabRelics(cy){
             ctx.fillText('???',cx2+cellW/2,cy2+60);
         }
     }
+    // Update dynamic scroll max
+    var rows2=Math.ceil(COLLECTIBLES.length/cols);
+    var contentEnd=cy+rows2*(cellH+8)+20;
+    labScrollMax=Math.max(0, (contentEnd-labPanelContentY)-labPanelVisH);
 }
 
 function drawLabSkills(cy){
@@ -4573,9 +4456,9 @@ function drawLabSkills(cy){
             ctx.beginPath();ctx.arc(nodeCx,nodeCy,nodeR,0,Math.PI*2);
             ctx.fillStyle=unlocked?branch.color:(canBuy?'#1a1a2a':'#0e0e16');ctx.fill();
             ctx.strokeStyle=unlocked?branch.color:(canBuy?'#666':'#333');ctx.lineWidth=unlocked?2:1;ctx.stroke();
-            // Icon
-            ctx.fillStyle=unlocked?'#fff':(canBuy?'#ccc':'#555');ctx.font='bold 10px monospace';ctx.textAlign='center';
-            ctx.fillText(T(skill.key),nodeCx,nodeCy+3);
+            // Icon (emoji)
+            ctx.font='bold 16px sans-serif';ctx.textAlign='center';
+            ctx.fillText(skill.icon||'?',nodeCx,nodeCy+5);
             // Desc + cost below
             ctx.fillStyle=unlocked?'#888':'#666';ctx.font='9px monospace';
             ctx.fillText(T(skill.descKey),nodeCx,nodeCy+nodeR+12);
@@ -4588,118 +4471,133 @@ function drawLabSkills(cy){
             }
         }
     }
+    var maxBranch=SKILL_BRANCHES.reduce(function(m,b){return Math.max(m,b.skills.length);},0);
+    var skillContentEnd=cy+40+maxBranch*70+20;
+    labScrollMax=Math.max(0, (skillContentEnd-labPanelContentY)-labPanelVisH);
 }
 
-// Draw one enemy entry on a book page
+// Draw one enemy entry on a book page. data=null means unseen (greyed out)
 function drawBestiaryPage(key, data, px, py, pw, ph2, side){
     var et=ENEMY_TYPES[key];
     if(!et) return;
+    var seen=!!data;
     var isBoss=et.isBossType,isElite=et.isEliteType;
-    var accentColor=isBoss?'#ff4444':(isElite?'#cc44ff':'#88bbdd');
+    var accentColor=seen?(isBoss?'#ff4444':(isElite?'#cc44ff':'#88bbdd')):'#333355';
     var cx2=px+pw/2;
 
     // Page background
     ctx.fillStyle=side==='left'?'#1a1428':'#12101e';
     ctx.fillRect(px,py,pw,ph2);
-    ctx.strokeStyle=accentColor;ctx.lineWidth=2;ctx.strokeRect(px,py,pw,ph2);
+    ctx.strokeStyle=accentColor;ctx.lineWidth=seen?2:1;ctx.strokeRect(px,py,pw,ph2);
 
-    // Sprite portrait area (top ~55% of page)
+    // Sprite portrait area (top ~52% of page)
     var imgH=Math.floor(ph2*0.52);
     var imgW=pw-20;
     var imgX=px+10,imgY=py+10;
-    // Background for portrait
     ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fillRect(imgX,imgY,imgW,imgH);
     ctx.strokeStyle=accentColor;ctx.lineWidth=1;ctx.globalAlpha=0.5;
     ctx.strokeRect(imgX,imgY,imgW,imgH);ctx.globalAlpha=1;
 
-    var spr=SPR.bestiarySprites&&SPR.bestiarySprites[key];
-    if(spr){
-        // Draw sprite centered, scaled to fit — disable smoothing for crisp pixel art
-        var scale=Math.min(imgW/spr.width, imgH/spr.height)*0.85;
-        // Use integer scale for sharpest pixel art
-        var pixelScale=Math.max(1,Math.floor(scale));
-        // If pixel scale gives much smaller image, fall back to float scale
-        if(pixelScale*spr.width < imgW*0.5) pixelScale=scale;
-        var dw=Math.round(spr.width*pixelScale),dh=Math.round(spr.height*pixelScale);
-        var dx=Math.round(imgX+(imgW-dw)/2),dy=Math.round(imgY+(imgH-dh)/2);
+    if(!seen){
+        // Unknown silhouette: draw "?" and dim overlay
         ctx.save();
-        ctx.imageSmoothingEnabled=false;
-        ctx.shadowColor=et.color||accentColor;ctx.shadowBlur=10;
-        ctx.drawImage(spr,dx,dy,dw,dh);
+        ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(imgX,imgY,imgW,imgH);
+        ctx.fillStyle='#444';ctx.font='bold '+Math.floor(imgH*0.55)+'px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('?',imgX+imgW/2,imgY+imgH/2);
+        ctx.textBaseline='alphabetic';
         ctx.restore();
     } else {
-        // Fallback: colored circle with glow
-        ctx.save();
-        ctx.shadowColor=et.color||'#888';ctx.shadowBlur=20;
-        ctx.fillStyle=et.color||'#888';
-        ctx.beginPath();ctx.arc(imgX+imgW/2,imgY+imgH/2,Math.min(imgW,imgH)/3,0,Math.PI*2);ctx.fill();
-        ctx.restore();
+        var spr=SPR.bestiarySprites&&SPR.bestiarySprites[key];
+        if(spr){
+            var scale=Math.min(imgW/spr.width, imgH/spr.height)*0.85;
+            var pixelScale=Math.max(1,Math.floor(scale));
+            if(pixelScale*spr.width < imgW*0.5) pixelScale=scale;
+            var dw=Math.round(spr.width*pixelScale),dh=Math.round(spr.height*pixelScale);
+            var dx=Math.round(imgX+(imgW-dw)/2),dy=Math.round(imgY+(imgH-dh)/2);
+            ctx.save();
+            ctx.imageSmoothingEnabled=false;
+            ctx.shadowColor=et.color||accentColor;ctx.shadowBlur=10;
+            ctx.drawImage(spr,dx,dy,dw,dh);
+            ctx.restore();
+        } else {
+            ctx.save();
+            ctx.shadowColor=et.color||'#888';ctx.shadowBlur=20;
+            ctx.fillStyle=et.color||'#888';
+            ctx.beginPath();ctx.arc(imgX+imgW/2,imgY+imgH/2,Math.min(imgW,imgH)/3,0,Math.PI*2);ctx.fill();
+            ctx.restore();
+        }
+        // Type badge
+        if(isBoss){
+            // Boss: red gradient banner with glow
+            ctx.save();
+            var bgrad=ctx.createLinearGradient(imgX,imgY+imgH-22,imgX,imgY+imgH);
+            bgrad.addColorStop(0,'rgba(180,0,0,0.9)');bgrad.addColorStop(1,'rgba(255,60,0,0.95)');
+            ctx.fillStyle=bgrad;ctx.fillRect(imgX,imgY+imgH-22,imgW,22);
+            ctx.strokeStyle='#ff4400';ctx.lineWidth=1;ctx.strokeRect(imgX,imgY+imgH-22,imgW,22);
+            ctx.shadowColor='#ff4400';ctx.shadowBlur=8;
+            ctx.fillStyle='#ffe0c0';ctx.font='bold 11px monospace';ctx.textAlign='center';
+            ctx.fillText('★ 首领 ★',imgX+imgW/2,imgY+imgH-7);
+            ctx.restore();
+        } else if(isElite){
+            ctx.save();
+            var egrad=ctx.createLinearGradient(imgX,imgY+imgH-18,imgX,imgY+imgH);
+            egrad.addColorStop(0,'rgba(120,0,200,0.88)');egrad.addColorStop(1,'rgba(180,0,255,0.95)');
+            ctx.fillStyle=egrad;ctx.fillRect(imgX,imgY+imgH-18,imgW,18);
+            ctx.fillStyle='#eeccff';ctx.font='bold 10px monospace';ctx.textAlign='center';
+            ctx.fillText('◆ 精英 ◆',imgX+imgW/2,imgY+imgH-5);
+            ctx.restore();
+        }
     }
 
-    // Type badge over portrait
-    if(isBoss){
-        ctx.fillStyle='rgba(255,0,0,0.85)';ctx.fillRect(imgX,imgY+imgH-18,imgW,18);
-        ctx.fillStyle='#fff';ctx.font='bold 10px monospace';ctx.textAlign='center';
-        ctx.fillText('★ BOSS ★',imgX+imgW/2,imgY+imgH-5);
-    } else if(isElite){
-        ctx.fillStyle='rgba(180,0,255,0.85)';ctx.fillRect(imgX,imgY+imgH-18,imgW,18);
-        ctx.fillStyle='#fff';ctx.font='bold 10px monospace';ctx.textAlign='center';
-        ctx.fillText('◆ ELITE ◆',imgX+imgW/2,imgY+imgH-5);
-    }
-
-    // Info area (bottom ~45% of page)
-    var pad=18; // horizontal padding inside page
+    var pad=18;
     var infoY=imgY+imgH+10;
-    var nameStr=lang==='zh'?(et.nameZh||et.name):et.name;
-    ctx.fillStyle=accentColor;ctx.font='bold 13px monospace';ctx.textAlign='center';
+    var nameStr=seen?(et.nameZh||et.name):'???';
+    ctx.fillStyle=seen?accentColor:'#444';ctx.font='bold 13px monospace';ctx.textAlign='center';
     ctx.fillText(nameStr,cx2,infoY);infoY+=16;
 
-    // Seen count
-    ctx.fillStyle='#888';ctx.font='9px monospace';
-    ctx.fillText((lang==='zh'?'遭遇 ':'Seen ')+data.count+'x',cx2,infoY);infoY+=14;
+    if(seen){
+        // Seen count
+        ctx.fillStyle='#888';ctx.font='9px monospace';
+        ctx.fillText('遭遇 '+data.count+'x',cx2,infoY);infoY+=14;
 
-    // Stats
-    var stats=[
-        {k:'HP', v:et.hp.toFixed(1), c:'#ff6666'},
-        {k:'ATK',v:et.atk.toFixed(1),c:'#ff9944'},
-        {k:'SPD',v:et.spd.toFixed(1),c:'#44ddff'},
-    ];
-    var sw=(pw-pad*2)/3;
-    for(var si=0;si<3;si++){
-        var sx=px+pad+si*sw+sw/2;
-        ctx.fillStyle='#555';ctx.font='8px monospace';ctx.textAlign='center';
-        ctx.fillText(stats[si].k,sx,infoY);
-        ctx.fillStyle=stats[si].c;ctx.font='bold 11px monospace';
-        ctx.fillText(stats[si].v,sx,infoY+12);
-    }
-    infoY+=28;
+        // Stats
+        var stats=[
+            {k:'HP', v:et.hp.toFixed(1), c:'#ff6666'},
+            {k:'ATK',v:et.atk.toFixed(1),c:'#ff9944'},
+            {k:'SPD',v:et.spd.toFixed(1),c:'#44ddff'},
+        ];
+        var sw=(pw-pad*2)/3;
+        for(var si=0;si<3;si++){
+            var sx=px+pad+si*sw+sw/2;
+            ctx.fillStyle='#555';ctx.font='8px monospace';ctx.textAlign='center';
+            ctx.fillText(stats[si].k,sx,infoY);
+            ctx.fillStyle=stats[si].c;ctx.font='bold 11px monospace';
+            ctx.fillText(stats[si].v,sx,infoY+12);
+        }
+        infoY+=28;
 
-    // Description (word-wrap)
-    var desc=lang==='zh'?(et.descZh||et.desc):et.desc;
-    ctx.fillStyle='#ccbbee';ctx.font='9px monospace';ctx.textAlign='left';
-    var maxW=pw-pad*2-4,lh=13,lx=px+pad;
-    if(lang==='zh'){
+        // Description (word-wrap)
+        var desc=et.descZh||et.desc;
+        ctx.fillStyle='#ccbbee';ctx.font='9px monospace';ctx.textAlign='left';
+        var maxW=pw-pad*2-4,lh=13,lx=px+pad;
         var cl='';
         for(var ci=0;ci<desc.length;ci++){
             var t2=cl+desc[ci];
             if(ctx.measureText(t2).width>maxW&&cl){ctx.fillText(cl,lx,infoY);infoY+=lh;cl=desc[ci];if(infoY>py+ph2-20)break;}
             else cl=t2;
         }
-        if(cl&&infoY<=py+ph2-20) ctx.fillText(cl,lx,infoY); infoY+=lh;
-    } else {
-        var wl='',ws2=desc.split(' ');
-        for(var wi=0;wi<ws2.length;wi++){
-            var tl2=wl+(wl?' ':'')+ws2[wi];
-            if(ctx.measureText(tl2).width>maxW&&wl){ctx.fillText(wl,lx,infoY);infoY+=lh;wl=ws2[wi];if(infoY>py+ph2-20)break;}
-            else wl=tl2;
-        }
-        if(wl&&infoY<=py+ph2-20) ctx.fillText(wl,lx,infoY); infoY+=lh;
-    }
+        if(cl&&infoY<=py+ph2-20){ctx.fillText(cl,lx,infoY);infoY+=lh;}
 
-    // Skills
-    if(et.skills&&et.skills.length>0&&infoY<=py+ph2-12){
-        ctx.fillStyle='#ffcc44';ctx.font='9px monospace';ctx.textAlign='left';
-        ctx.fillText('['+et.skills.join(' · ')+']',lx,infoY);
+        // Skills
+        if(et.skills&&et.skills.length>0&&infoY<=py+ph2-12){
+            ctx.fillStyle='#ffcc44';ctx.font='9px monospace';ctx.textAlign='left';
+            ctx.fillText('['+et.skills.join(' · ')+']',lx,infoY);
+        }
+    } else {
+        // Unseen hint
+        ctx.fillStyle='#333';ctx.font='9px monospace';ctx.textAlign='center';
+        var typeHint=isBoss?'Boss':(isElite?'精英':'未知生物');
+        ctx.fillText(typeHint,cx2,infoY);
     }
 }
 
@@ -4707,57 +4605,52 @@ function drawLabBestiary(cy){
     var W=canvas.width,H=canvas.height;
     var ph=Math.min(H-60,500),ppy=(H-ph)/2;
     var navH=36;
-    // Book: two pages side by side inside panel content area
     var bookW=Math.min(W-24,560),bookH=ph-(cy-ppy)-navH-14;
     var bookX=(W-bookW)/2,bookY=cy-4;
-    var seenKeys=Object.keys(seenEnemies);
-    var total=seenKeys.length;
-    // page = pair index (0 = entries 0&1, 1 = entries 2&3 ...)
+    // Use ALL enemy types as the master list (preserve insertion order)
+    var allKeys=Object.keys(ENEMY_TYPES);
+    var total=allKeys.length;
+    var seenCount=Object.keys(seenEnemies).length;
     var maxPage=Math.max(0,Math.ceil(total/2)-1);
     bestiaryPage=Math.max(0,Math.min(bestiaryPage,maxPage));
 
     // Discovered counter
-    ctx.fillStyle='#888';ctx.font='10px monospace';ctx.textAlign='center';
-    ctx.fillText((lang==='zh'?'已发现: ':'Discovered: ')+total+'/'+Object.keys(ENEMY_TYPES).length,W/2,bookY-2);
+    ctx.fillStyle='#aaaacc';ctx.font='10px monospace';ctx.textAlign='center';
+    ctx.fillText('已发现: '+seenCount+' / '+total,W/2,bookY-2);
 
-    if(total===0){
-        ctx.fillStyle='#1a1428';ctx.fillRect(bookX,bookY,bookW,bookH);
-        ctx.fillStyle='#666';ctx.font='12px monospace';ctx.textAlign='center';
-        ctx.fillText(lang==='zh'?'尚未遇到任何敌人':'No enemies encountered yet',W/2,bookY+bookH/2);
+    var pageW=bookW/2,spineW=6;
+    var leftKey=allKeys[bestiaryPage*2];
+    var rightKey=allKeys[bestiaryPage*2+1];
+
+    // Draw left page (always exists)
+    drawBestiaryPage(leftKey, seenEnemies[leftKey]||null, bookX, bookY, pageW, bookH, 'left');
+
+    // Draw right page (may be undefined on last odd page)
+    if(rightKey){
+        drawBestiaryPage(rightKey, seenEnemies[rightKey]||null, bookX+pageW, bookY, pageW, bookH, 'right');
     } else {
-        var pageW=bookW/2,spineW=6;
-        var leftKey=seenKeys[bestiaryPage*2];
-        var rightKey=seenKeys[bestiaryPage*2+1];
-
-        // Draw left page
-        drawBestiaryPage(leftKey,seenEnemies[leftKey],bookX,bookY,pageW,bookH,'left');
-
-        // Draw right page (may be empty on last odd page)
-        if(rightKey){
-            drawBestiaryPage(rightKey,seenEnemies[rightKey],bookX+pageW,bookY,pageW,bookH,'right');
-        } else {
-            ctx.fillStyle='#12101e';ctx.fillRect(bookX+pageW,bookY,pageW,bookH);
-            ctx.strokeStyle='#334';ctx.lineWidth=2;ctx.strokeRect(bookX+pageW,bookY,pageW,bookH);
-        }
-
-        // Spine
-        ctx.fillStyle='#2a2040';ctx.fillRect(bookX+pageW-spineW/2,bookY,spineW,bookH);
-        ctx.strokeStyle='#553388';ctx.lineWidth=1;
-        ctx.beginPath();ctx.moveTo(bookX+pageW,bookY);ctx.lineTo(bookX+pageW,bookY+bookH);ctx.stroke();
+        ctx.fillStyle='#12101e';ctx.fillRect(bookX+pageW,bookY,pageW,bookH);
+        ctx.strokeStyle='#334';ctx.lineWidth=2;ctx.strokeRect(bookX+pageW,bookY,pageW,bookH);
     }
 
-    // Navigation row (inside panel, fixed below book)
+    // Spine
+    ctx.fillStyle='#2a2040';ctx.fillRect(bookX+pageW-spineW/2,bookY,spineW,bookH);
+    ctx.strokeStyle='#553388';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(bookX+pageW,bookY);ctx.lineTo(bookX+pageW,bookY+bookH);ctx.stroke();
+
+    // Navigation row
     var navY=bookY+bookH+navH/2+2;
     ctx.fillStyle='#555';ctx.font='10px monospace';ctx.textAlign='center';
     ctx.fillText((bestiaryPage+1)+'/'+(Math.ceil(total/2)||1),W/2,navY);
     if(bestiaryPage>0){
         ctx.fillStyle='#44aaff';ctx.font='bold 12px monospace';
-        ctx.fillText(lang==='zh'?'◀ 上一页':'◀ PREV',bookX+55,navY);
+        ctx.fillText('◀ 上一页',bookX+55,navY);
     }
     if(bestiaryPage<maxPage){
         ctx.fillStyle='#44aaff';ctx.font='bold 12px monospace';
-        ctx.fillText(lang==='zh'?'下一页 ▶':'NEXT ▶',bookX+bookW-55,navY);
+        ctx.fillText('下一页 ▶',bookX+bookW-55,navY);
     }
+    labScrollMax=0;
 }
 
 function drawLabExpedition(cy){
@@ -4787,6 +4680,7 @@ function drawLabExpedition(cy){
         ctx.fillStyle='#000';ctx.font='bold 12px monospace';
         ctx.fillText(T('explore'),cx2+cardW/2,btnY+btnH/2+4);
     }
+    labScrollMax=0;
 }
 
 // ============ TUTORIAL OVERLAY ============
@@ -4814,7 +4708,7 @@ function drawTutorialLab(){
     ctx.strokeRect(target.x-pad,target.y-pad,target.w+pad*2,target.h+pad*2);
     ctx.restore();
     // Text bubble
-    var text=lang==='zh'?step.zh:step.en;
+    var text=step.zh||step.en;
     var lines=text.split('\n');
     var bubW=Math.min(W-40,320),bubH=lines.length*22+50,bubX=(W-bubW)/2,bubY=Math.min(target.y-bubH-20, H-bubH-60);
     if(bubY<10) bubY=target.y+target.h+20;
@@ -4831,7 +4725,7 @@ function drawTutorialLab(){
     var btnW=100,btnH=28,btnX=W/2-btnW/2,btnY=bubY+bubH-40;
     ctx.fillStyle='#44dd88';ctx.fillRect(btnX,btnY,btnW,btnH);
     ctx.fillStyle='#000';ctx.font='bold 12px monospace';
-    ctx.fillText(tutorialStep<TUTORIAL_LAB.length-1?(lang==='zh'?'下一步':'Next'):(lang==='zh'?'开始探险！':'Go!'),W/2,btnY+btnH/2+4);
+    ctx.fillText(tutorialStep<TUTORIAL_LAB.length-1?'下一步':'开始探险！',W/2,btnY+btnH/2+4);
 }
 function drawTutorialExp(){
     if(tutorialDone || tutorialPhase!=='expedition') return;
@@ -4839,7 +4733,7 @@ function drawTutorialExp(){
     if(!step) return;
     var W=canvas.width,H=canvas.height;
     tutorialBlink=(tutorialBlink+1)%60;
-    var text=lang==='zh'?step.zh:step.en;
+    var text=step.zh||step.en;
     var lines=text.split('\n');
     var bubW=Math.min(W-40,340),bubH=lines.length*22+50,bubX=(W-bubW)/2,bubY=H*0.15;
     ctx.save();ctx.globalAlpha=0.5;ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.restore();
@@ -4854,7 +4748,7 @@ function drawTutorialExp(){
     var btnW=100,btnH=28,btnX=W/2-btnW/2,btnY=bubY+bubH-40;
     ctx.fillStyle='#4488ee';ctx.fillRect(btnX,btnY,btnW,btnH);
     ctx.fillStyle='#fff';ctx.font='bold 12px monospace';
-    ctx.fillText(tutorialStep<TUTORIAL_EXP.length-1?(lang==='zh'?'下一步':'Next'):(lang==='zh'?'出发！':'Go!'),W/2,btnY+btnH/2+4);
+    ctx.fillText(tutorialStep<TUTORIAL_EXP.length-1?'下一步':'出发！',W/2,btnY+btnH/2+4);
 }
 function handleTutorialClick(cx,cy){
     var W=canvas.width,H=canvas.height;
@@ -4862,7 +4756,7 @@ function handleTutorialClick(cx,cy){
     var lines,bubH,bubY,bubW;
     if(tutorialPhase==='lab'){
         var step=TUTORIAL_LAB[tutorialStep];if(!step) return false;
-        var text=lang==='zh'?step.zh:step.en;
+        var text=step.zh;
         lines=text.split('\n');
         bubW=Math.min(W-40,320);bubH=lines.length*22+50;
         var lay=labFurniture;var target=lay[step.key];
@@ -4870,7 +4764,7 @@ function handleTutorialClick(cx,cy){
         if(bubY<10&&target) bubY=target.y+target.h+20;
     } else {
         var step=TUTORIAL_EXP[tutorialStep];if(!step) return false;
-        var text=lang==='zh'?step.zh:step.en;
+        var text=step.zh;
         lines=text.split('\n');
         bubW=Math.min(W-40,340);bubH=lines.length*22+50;bubY=H*0.15;
     }
@@ -4938,15 +4832,7 @@ function drawSettings(){
     ctx.fillStyle='#44dd88';ctx.font='bold '+(compact?14:18)+'px monospace';ctx.textAlign='center';
     ctx.fillText(T('settingsTitle'),W/2,py+titleH);
     var cy=py+titleH+20, sliderW=pw-100, sliderX=px+85;
-    // Language
-    var fSz=compact?11:13, lbW=compact?50:60, lbH=compact?22:26;
-    ctx.fillStyle='#aaa';ctx.font=fSz+'px monospace';ctx.textAlign='left';
-    ctx.fillText(T('langLabel'),px+12,cy+(compact?3:5));
-    var lbX=sliderX,lbY=cy-(compact?8:10);
-    ctx.fillStyle='#222';ctx.fillRect(lbX,lbY,lbW,lbH);ctx.strokeStyle='#44dd88';ctx.lineWidth=1;ctx.strokeRect(lbX,lbY,lbW,lbH);
-    ctx.fillStyle='#44dd88';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
-    ctx.fillText(lang==='zh'?'中文':'EN',lbX+lbW/2,lbY+lbH/2+4);
-    cy+=lh;
+    var fSz=compact?11:13;
     // BGM Volume
     ctx.fillStyle='#aaa';ctx.font=fSz+'px monospace';ctx.textAlign='left';
     ctx.fillText(T('bgmVol'),px+12,cy+(compact?3:5));
@@ -4994,14 +4880,14 @@ function drawSettings(){
     ctx.fillStyle=godMode?'#ffd700':'#333';ctx.fillRect(godBtnX,godBtnY,godBtnW,godBtnH);
     ctx.strokeStyle=godMode?'#ffee88':'#666';ctx.lineWidth=1;ctx.strokeRect(godBtnX,godBtnY,godBtnW,godBtnH);
     ctx.fillStyle=godMode?'#000':'#888';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
-    ctx.fillText((lang==='zh'?'无敌模式: ':'God Mode: ')+(godMode?(lang==='zh'?'开启':'ON'):(lang==='zh'?'关闭':'OFF')),godBtnX+godBtnW/2,godBtnY+godBtnH/2+4);
+    ctx.fillText('无敌模式: '+(godMode?'开启':'关闭'),godBtnX+godBtnW/2,godBtnY+godBtnH/2+4);
     cy+=godBtnH+(compact?6:10);
     // Return to Menu button
     var menuBtnW=pw-24,menuBtnH=compact?24:28,menuBtnX=px+12,menuBtnY=cy;
     ctx.fillStyle='#dd8844';ctx.fillRect(menuBtnX,menuBtnY,menuBtnW,menuBtnH);
     ctx.strokeStyle='#ffaa66';ctx.lineWidth=1;ctx.strokeRect(menuBtnX,menuBtnY,menuBtnW,menuBtnH);
     ctx.fillStyle='#000';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
-    ctx.fillText(lang==='zh'?'返回主菜单':'Return to Menu',menuBtnX+menuBtnW/2,menuBtnY+menuBtnH/2+4);
+    ctx.fillText('返回主菜单',menuBtnX+menuBtnW/2,menuBtnY+menuBtnH/2+4);
     cy+=lh;
     // Close button
     var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cy;
@@ -5016,10 +4902,6 @@ function handleSettingsClick(cx,cy){
     var ph=Math.min(H-padY*2,compact?280:380);
     var pw=Math.min(W-30,340),px=(W-pw)/2,py=(H-ph)/2;
     var cyy=py+titleH+20, sliderW=pw-100, sliderX=px+85;
-    // Language toggle
-    var lbW=compact?50:60,lbH=compact?22:26,lbX=sliderX,lbY=cyy-(compact?8:10);
-    if(cx>=lbX&&cx<=lbX+lbW&&cy>=lbY&&cy<=lbY+lbH){lang=lang==='en'?'zh':'en';playSound('click');return;}
-    cyy+=lh;
     // BGM slider
     var trackH=compact?8:10;
     if(cy>=cyy-12&&cy<=cyy+12&&cx>=sliderX&&cx<=sliderX+sliderW){
@@ -5098,6 +4980,20 @@ function loadSettings(){
 // ============ CLICK / TOUCH HANDLERS ============
 function hitBox(cx,cy,box){ return cx>=box.x&&cx<=box.x+box.w&&cy>=box.y&&cy<=box.y+box.h; }
 
+function openLabFurniture(fk){
+    playSound('click');
+    if(fk==='bench'){ labTab='extract';labScrollY=0;selectedEssences=[];extractMini=null; }
+    else if(fk==='cauldron'){ labTab='brew';labScrollY=0;selectedEssences=[]; }
+    else if(fk==='shelf'){ labTab='potions';labScrollY=0; }
+    else if(fk==='rack'){ labTab='weapons';labScrollY=0; }
+    else if(fk==='merch'){ labTab='shop';labScrollY=0; }
+    else if(fk==='research'){ labTab='research';labScrollY=0; }
+    else if(fk==='relicCase'){ labTab='relics';labScrollY=0; }
+    else if(fk==='skillBook'){ labTab='skills';labScrollY=0; }
+    else if(fk==='forge'){ labTab='forge';labScrollY=0; }
+    else if(fk==='door'){ labTab='expedition';labScrollY=0; }
+}
+
 function handleLabClick(cx,cy){
     if(showSettings){handleSettingsClick(cx,cy);return;}
     if(tutorialPhase==='lab'){handleTutorialClick(cx,cy);return;}
@@ -5111,6 +5007,12 @@ function handleLabClick(cx,cy){
     if(cx>=100&&cx<=146&&cy>=15&&cy<=37){labTab='bestiary';bestiaryPage=0;labScrollY=0;playSound('click');return;}
     // Bestiary page nav handled below inside labTab block
 
+    // No panel open: interact with nearby furniture, or fall through to hitBox checks below
+    if(!labTab){
+        if(labNearFurniture){ openLabFurniture(labNearFurniture);return; }
+        // fall through to else-branch hitBox furniture checks
+    }
+
     if(labTab){
         var pw=Math.min(W-40,520),ph=Math.min(H-60,500);
         var ppx=(W-pw)/2,ppy=(H-ph)/2;
@@ -5122,7 +5024,7 @@ function handleLabClick(cx,cy){
             var bookHb=ph-(contentYb-ppy)-navHb-14;
             var bookXb=(W-bookWb)/2,bookYb=contentYb-4;
             var navYb=bookYb+bookHb+navHb/2+2;
-            var totalB=Object.keys(seenEnemies).length;
+            var totalB=Object.keys(ENEMY_TYPES).length;
             var maxPageB=Math.max(0,Math.ceil(totalB/2)-1);
             if(cy>=navYb-14&&cy<=navYb+14){
                 if(cx>=bookXb&&cx<W/2-20&&bestiaryPage>0){bestiaryPage--;playSound('click');return;}
@@ -5255,9 +5157,26 @@ function handleLabClick(cx,cy){
                     var iy=enchCy+i*36;
                     var btnX=startX+240,btnY=iy+4,btnW=70,btnH=24;
                     if(cx>=btnX&&cx<=btnX+btnW&&cy>=btnY&&cy<=btnY+btnH){
-                        equippedWeapon.enchant=enchantable[i];
+                        var ep=enchantable[i];
+                        // Remove previous enchant stats first
+                        if(equippedWeapon.enchant){
+                            var prev=equippedWeapon.enchant;
+                            if(prev.effect==='attack') equippedWeapon.dmg=Math.max(1,equippedWeapon.dmg-Math.ceil(prev.value*0.5+1));
+                            else if(prev.effect==='speed') equippedWeapon.speed=Math.max(0.5,parseFloat((equippedWeapon.speed-(0.2+prev.tier*0.1)).toFixed(1)));
+                            else if(prev.effect==='defense') equippedWeapon._defBonus=0;
+                        }
+                        equippedWeapon.enchant=ep;
+                        // Apply new enchant stats
+                        if(ep.effect==='attack'){
+                            var bonus=Math.ceil(ep.value*0.5+1);
+                            equippedWeapon.dmg+=bonus;
+                        } else if(ep.effect==='speed'){
+                            equippedWeapon.speed=parseFloat((equippedWeapon.speed+(0.2+ep.tier*0.1)).toFixed(1));
+                        } else if(ep.effect==='defense'){
+                            equippedWeapon._defBonus=ep.tier+1;
+                        }
                         // Remove potion from inventory
-                        var idx=inventory.potions.indexOf(enchantable[i]);
+                        var idx=inventory.potions.indexOf(ep);
                         if(idx>=0) inventory.potions.splice(idx,1);
                         labMessage=T('enchanted');labMessageTimer=120;playSound('levelUp');return;
                     }
@@ -5275,6 +5194,48 @@ function handleLabClick(cx,cy){
                         playSound('craft');return;
                     }
                 }
+            }
+        } else if(labTab==='forge'){
+            var startX=W/2-160;
+            // Use recorded Y from render (adjusted for scroll offset)
+            var fgCy=forgePotionListY+labScrollY;
+            // Potion select buttons
+            for(var i=0;i<inventory.potions.length;i++){
+                var iy=fgCy+i*36;
+                var btnX=startX+248,btnW=60,btnH=24,btnY=iy+4;
+                if(cx>=btnX&&cx<=btnX+btnW&&cy>=btnY&&cy<=btnY+btnH){
+                    var selIdx=forgeSelected.indexOf(i);
+                    if(selIdx>=0){ forgeSelected.splice(selIdx,1); }
+                    else if(forgeSelected.length<3){ forgeSelected.push(i); }
+                    playSound('click'); return;
+                }
+            }
+            // Forge button
+            var fbY=forgeButtonY+labScrollY;
+            var fbW=160,fbH=36,fbX=W/2-fbW/2;
+            if(forgeSelected.length===3&&cx>=fbX&&cx<=fbX+fbW&&cy>=fbY&&cy<=fbY+fbH){
+                // Determine quality from avg potion tier
+                var avgTier=0;
+                forgeSelected.forEach(function(idx){avgTier+=inventory.potions[idx].tier;});
+                avgTier/=3;
+                // Map avg tier to rarity: 0→0(gray), 1→1(green), 2→2(blue), 3→3(purple), max purple
+                var rarity=Math.min(3,Math.round(avgTier));
+                // Pick weapon tier proportionally
+                var wepTier=Math.min(2,Math.floor(avgTier));
+                var pool=WEAPONS.filter(function(w){return (w.tier||0)===wepTier;});
+                if(pool.length===0) pool=WEAPONS;
+                var wType=pool[randInt(0,pool.length-1)];
+                var forged=makeWeapon(wType);
+                forged.rarity=rarity;
+                forged.color=RARITY_COLORS[rarity];
+                // Remove used potions (sort descending to avoid index shift)
+                forgeSelected.sort(function(a,b){return b-a;});
+                forgeSelected.forEach(function(idx){inventory.potions.splice(idx,1);});
+                forgeSelected=[];
+                forgedWeapon=forged;
+                // Also equip it as current weapon for next expedition
+                labMessage='锻造成功：'+weaponName(forged);
+                labMessageTimer=180; playSound('levelUp'); return;
             }
         } else if(labTab==='expedition'){
             var pw2=Math.min(W-40,520),ppx2=(W-pw2)/2;
@@ -5313,7 +5274,7 @@ function handleLabClick(cx,cy){
                 var sbX=startX+240,sbW=70,sbH=22;
                 if(cx>=sbX&&cx<=sbX+sbW&&cy>=sy2+3&&cy<=sy2+3+sbH){
                     inventory.herbs[k]--;if(inventory.herbs[k]<=0) delete inventory.herbs[k];
-                    gold+=3;labMessage=T('soldItem');labMessageTimer=60;playSound('pickup');return;
+                    gold+=5;labMessage=T('soldItem');labMessageTimer=60;playSound('pickup');return;
                 }
             }
             sellY+=Math.min(herbKeys.length,5)*32+8;
@@ -5322,7 +5283,7 @@ function handleLabClick(cx,cy){
             for(var i=0;i<Math.min(inventory.potions.length,5);i++){
                 var pot=inventory.potions[i];
                 var sy2=sellY+i*32;
-                var sellPrice=5+pot.tier*3;
+                var sellPrice=8+pot.tier*5;
                 var sbX=startX+240,sbW=70,sbH=22;
                 if(cx>=sbX&&cx<=sbX+sbW&&cy>=sy2+3&&cy<=sy2+3+sbH){
                     inventory.potions.splice(i,1);
@@ -5391,6 +5352,7 @@ function handleLabClick(cx,cy){
         if(lay.research&&hitBox(cx,cy,lay.research)){labTab='research';labScrollY=0;playSound('click');return;}
         if(lay.relicCase&&hitBox(cx,cy,lay.relicCase)){labTab='relics';labScrollY=0;playSound('click');return;}
         if(lay.skillBook&&hitBox(cx,cy,lay.skillBook)){labTab='skills';labScrollY=0;playSound('click');return;}
+        if(lay.forge&&hitBox(cx,cy,lay.forge)){labTab='forge';labScrollY=0;playSound('click');return;}
     }
 }
 
@@ -5412,6 +5374,7 @@ function handleMenuTouch(cx,cy){
         gold=0; totalScore=0; expeditionNum=0;
         inventory={herbs:{},essences:{},potions:[],weapons:[]};
         equippedWeapon=makeWeapon(WEAPONS[0]);
+        forgedWeapon=null; forgeSelected=[];
         discoveredRecipes=[];
         carriedPotions=[];
         researchLevels={};
@@ -5479,7 +5442,7 @@ canvas.addEventListener('click',function(e){
         if(cx>=W-72&&cx<=W-46&&cy>=14&&cy<=40){showBestiary=true;bestiaryPage=0;playSound('click');return;}
         // Exit expedition button (bottom-left)
         if(cx>=10&&cx<=70&&cy>=canvas.height-36&&cy<=canvas.height-10){
-            if(confirm(lang==='zh'?'确定退出本次冒险？进度将丢失。':'Abandon this run? Progress will be lost.')){
+            if(confirm('确定退出本次冒险？进度将丢失。')){
                 endExpedition();
             }
             return;
@@ -5533,6 +5496,7 @@ canvas.addEventListener('mousemove',function(e){
     else if(lay.research&&hitBox(cx,cy,lay.research)) labHover='research';
     else if(lay.relicCase&&hitBox(cx,cy,lay.relicCase)) labHover='relics';
     else if(lay.skillBook&&hitBox(cx,cy,lay.skillBook)) labHover='skills';
+    else if(lay.forge&&hitBox(cx,cy,lay.forge)) labHover='forge';
     else labHover=null;
     canvas.style.cursor=labHover?'pointer':'default';
 });
@@ -5589,14 +5553,14 @@ function drawMenu(){
     ctx.shadowColor='#44dd88';ctx.shadowBlur=15;ctx.fillStyle='#44dd88';ctx.fillRect(btnX,startY,btnW,btnH);ctx.shadowBlur=0;
     ctx.strokeStyle='#88ffbb';ctx.lineWidth=2;ctx.strokeRect(btnX,startY,btnW,btnH);
     ctx.fillStyle='#000';ctx.font='bold 14px monospace';ctx.textAlign='center';
-    ctx.fillText(lang==='zh'?'新游戏':'New Game',btnX+btnW/2,startY+btnH/2+1);
+    ctx.fillText('新游戏',btnX+btnW/2,startY+btnH/2+1);
     // Continue button (if save exists)
     if(hasSave){
         var continueY=startY+btnH+btnGap;
         ctx.fillStyle='#4488ee';ctx.fillRect(btnX,continueY,btnW,btnH);
         ctx.strokeStyle='#6699ff';ctx.lineWidth=2;ctx.strokeRect(btnX,continueY,btnW,btnH);
         ctx.fillStyle='#fff';ctx.font='bold 14px monospace';
-        ctx.fillText(lang==='zh'?'继续游戏':'Continue',btnX+btnW/2,continueY+btnH/2+1);
+        ctx.fillText('继续游戏',btnX+btnW/2,continueY+btnH/2+1);
     }
     // Settings gear
     drawSettingsGear(W-50,15,26);
@@ -5644,7 +5608,7 @@ function drawGameOver(){
 function saveGame(){
     var data={
         gold:gold, totalScore:totalScore, expeditionNum:expeditionNum,
-        inventory:inventory, equippedWeapon:equippedWeapon,
+        inventory:inventory, equippedWeapon:equippedWeapon, forgedWeapon:forgedWeapon,
         discoveredRecipes:discoveredRecipes, carriedPotions:carriedPotions,
         researchLevels:researchLevels, foundCollectibles:foundCollectibles,
         playerKeys:playerKeys, lang:lang, unlockedSkills:unlockedSkills,
@@ -5661,6 +5625,7 @@ function loadGame(){
         gold=data.gold||0; totalScore=data.totalScore||0; expeditionNum=data.expeditionNum||0;
         inventory=data.inventory||{herbs:{},essences:{},potions:[],weapons:[]};
         equippedWeapon=data.equippedWeapon||makeWeapon(WEAPONS[0]);
+        forgedWeapon=data.forgedWeapon||null;
         if(data.seenEnemies) seenEnemies=data.seenEnemies;
         
         // Fix missing type property in old saves
