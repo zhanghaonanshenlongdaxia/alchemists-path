@@ -559,8 +559,8 @@ function setupFloor(biomeIdx, floor){
     }
 
     // Spawn enemies (balanced: harder base, steeper scaling)
-    var baseHP = 5+Math.floor(expeditionNum*1.2)+floor*3;
-    var baseATK = 2+Math.floor(expeditionNum*0.5)+Math.floor(floor*1.2);
+    var baseHP = 50+Math.floor(expeditionNum*12)+floor*30;
+    var baseATK = 20+Math.floor(expeditionNum*5)+Math.floor(floor*12);
     if(!isBossFloor){
         var enemyCount = Math.min(3+expeditionNum+floor, 8);
         for(var i=1;i<rooms.length;i++){
@@ -592,7 +592,7 @@ function setupFloor(biomeIdx, floor){
 
     // Spawn boss in arena center
     if(isBossFloor){
-        var bossHP = baseHP*8+expeditionNum*5;
+        var bossHP = baseHP*8+expeditionNum*50;
         var bossATK = Math.ceil(baseATK*3);
         var bcx=Math.floor(MAP_W/2)*TILE+TILE/2, bcy=Math.floor(MAP_H/2)*TILE+TILE/2;
         var bossTypeKeys={forest:'grizzly',cave:'kraken',swamp:'dragon'};
