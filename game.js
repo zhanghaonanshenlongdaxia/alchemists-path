@@ -3860,27 +3860,7 @@ function renderLab(){
         ctx.restore();
     }
 
-    // Mobile interact button (right side, shown when near furniture, no panel open)
-    if(isMobile && !labTab && labNearFurniture && labInteractPromptAlpha>0.1){
-        var ibSize=64, ibX=W-ibSize-16, ibY=H/2-ibSize/2;
-        labInteractBtnBox={x:ibX,y:ibY,w:ibSize,h:ibSize};
-        ctx.save();ctx.globalAlpha=labInteractPromptAlpha*0.92;
-        // Button background
-        var ibGrad=ctx.createRadialGradient(ibX+ibSize/2,ibY+ibSize/2,4,ibX+ibSize/2,ibY+ibSize/2,ibSize/2);
-        ibGrad.addColorStop(0,'rgba(68,221,136,0.5)');ibGrad.addColorStop(1,'rgba(30,60,40,0.85)');
-        ctx.fillStyle=ibGrad;
-        ctx.beginPath();ctx.arc(ibX+ibSize/2,ibY+ibSize/2,ibSize/2,0,Math.PI*2);ctx.fill();
-        ctx.strokeStyle='#44dd88';ctx.lineWidth=2;
-        ctx.beginPath();ctx.arc(ibX+ibSize/2,ibY+ibSize/2,ibSize/2,0,Math.PI*2);ctx.stroke();
-        // Icon
-        ctx.fillStyle='#fff';ctx.font='bold 26px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
-        ctx.fillText('⚙',ibX+ibSize/2,ibY+ibSize/2);
-        ctx.fillStyle='#44dd88';ctx.font='bold 9px monospace';ctx.textBaseline='alphabetic';
-        ctx.fillText('交互',ibX+ibSize/2,ibY+ibSize-6);
-        ctx.restore();
-    } else {
-        labInteractBtnBox=null;
-    }
+    labInteractBtnBox=null;
 
     // Message toast
     if(labMessageTimer>0){
