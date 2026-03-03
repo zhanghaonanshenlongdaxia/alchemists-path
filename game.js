@@ -285,6 +285,7 @@ var labPlayer = { x:0, y:0, vx:0, vy:0, facing:1, animFrame:0, animTimer:0, init
 var labNearFurniture = null; // key of nearest interactable furniture
 var labHallStick = { active:false, sx:0, sy:0, cx:0, cy:0, id:-1 }; // mobile joystick for lab hall
 var labInteractPromptAlpha = 0;
+var labInteractBtnBox = null; // mobile interact button hitbox
 
 // ============ TUTORIAL SYSTEM ============
 var tutorialDone = false;
@@ -609,6 +610,9 @@ function setupFloor(biomeIdx, floor){
         };
         enemies.push(boss);
         bossRef=boss;
+        // Record boss to bestiary immediately on spawn
+        if(!seenEnemies[bossTypeKey]) seenEnemies[bossTypeKey]={count:0,sprite:null};
+        if(!boss._seenRecorded){seenEnemies[bossTypeKey].count++;boss._seenRecorded=true;}
         // Boss entrance text
         spawnFloat(bcx,bcy-30,T('bossAppears'),'#ff4444');
         playBGM('boss');
@@ -3847,6 +3851,28 @@ function renderLab(){
         ctx.restore();
     }
 
+    // Mobile interact button (right side, shown when near furniture, no panel open)
+    if(isMobile && !labTab && labNearFurniture && labInteractPromptAlpha>0.1){
+        var ibSize=64, ibX=W-ibSize-16, ibY=H/2-ibSize/2;
+        labInteractBtnBox={x:ibX,y:ibY,w:ibSize,h:ibSize};
+        ctx.save();ctx.globalAlpha=labInteractPromptAlpha*0.92;
+        // Button background
+        var ibGrad=ctx.createRadialGradient(ibX+ibSize/2,ibY+ibSize/2,4,ibX+ibSize/2,ibY+ibSize/2,ibSize/2);
+        ibGrad.addColorStop(0,'rgba(68,221,136,0.5)');ibGrad.addColorStop(1,'rgba(30,60,40,0.85)');
+        ctx.fillStyle=ibGrad;
+        ctx.beginPath();ctx.arc(ibX+ibSize/2,ibY+ibSize/2,ibSize/2,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#44dd88';ctx.lineWidth=2;
+        ctx.beginPath();ctx.arc(ibX+ibSize/2,ibY+ibSize/2,ibSize/2,0,Math.PI*2);ctx.stroke();
+        // Icon
+        ctx.fillStyle='#fff';ctx.font='bold 26px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('⚙',ibX+ibSize/2,ibY+ibSize/2);
+        ctx.fillStyle='#44dd88';ctx.font='bold 9px monospace';ctx.textBaseline='alphabetic';
+        ctx.fillText('交互',ibX+ibSize/2,ibY+ibSize-6);
+        ctx.restore();
+    } else {
+        labInteractBtnBox=null;
+    }
+
     // Message toast
     if(labMessageTimer>0){
         labMessageTimer--;
@@ -4997,6 +5023,11 @@ function openLabFurniture(fk){
 function handleLabClick(cx,cy){
     if(showSettings){handleSettingsClick(cx,cy);return;}
     if(tutorialPhase==='lab'){handleTutorialClick(cx,cy);return;}
+    // Mobile interact button (right side)
+    if(labInteractBtnBox&&cx>=labInteractBtnBox.x&&cx<=labInteractBtnBox.x+labInteractBtnBox.w&&cy>=labInteractBtnBox.y&&cy<=labInteractBtnBox.y+labInteractBtnBox.h){
+        if(labNearFurniture){openLabFurniture(labNearFurniture);}
+        return;
+    }
     var W=canvas.width,H=canvas.height;
     // Save button
     var svW=45,svH=22,svX=15,svY=15;
