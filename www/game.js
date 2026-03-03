@@ -2569,8 +2569,8 @@ function drawExpeditionHUD(){
             ctx.fillText(Math.ceil(db.timer/60)+'s',dx+dbIconSize/2,dbY+dbIconSize-5);
         }
     }
-    // Exit expedition button (bottom-left)
-    var exitBtnX=10,exitBtnY=canvas.height-36,exitBtnW=60,exitBtnH=26;
+    // Exit expedition button (bottom-right, away from joystick)
+    var exitBtnW=60,exitBtnH=26,exitBtnX=W-exitBtnW-10,exitBtnY=canvas.height-36;
     ctx.fillStyle='rgba(120,20,20,0.7)';ctx.fillRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
     ctx.strokeStyle='#ff4444';ctx.lineWidth=1;ctx.strokeRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
     ctx.fillStyle='#ff8888';ctx.font='bold 9px monospace';ctx.textAlign='center';
@@ -5467,8 +5467,9 @@ canvas.addEventListener('click',function(e){
         if(cx>=W-38&&cx<=W-12&&cy>=15&&cy<=41){showSettings=true;playSound('click');return;}
         // Bestiary book button
         if(cx>=W-72&&cx<=W-46&&cy>=14&&cy<=40){showBestiary=true;bestiaryPage=0;playSound('click');return;}
-        // Exit expedition button (bottom-left)
-        if(cx>=10&&cx<=70&&cy>=canvas.height-36&&cy<=canvas.height-10){
+        // Exit expedition button (bottom-right)
+        var exitBtnW3=60,exitBtnX3=canvas.width-exitBtnW3-10;
+        if(cx>=exitBtnX3&&cx<=exitBtnX3+exitBtnW3&&cy>=canvas.height-36&&cy<=canvas.height-10){
             if(confirm('确定退出本次冒险？进度将丢失。')){
                 endExpedition();
             }
