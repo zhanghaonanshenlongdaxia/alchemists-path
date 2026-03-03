@@ -77,7 +77,7 @@ let gold = 0;
 let discoveredRecipes = [];
 let totalScore = 0;
 let player = null;
-let playerStats = { hp:8, maxHp:8, atk:2, def:0, speed:0, regen:0, poison:0, stealth:0, revive:false };
+let playerStats = { hp:10, maxHp:10, atk:2, def:0, speed:0, regen:0, poison:0, stealth:0, revive:false };
 let activeBuffs = [];
 let map = [], rooms = [];
 let enemies = [], herbDrops = [], particles = [], floatingTexts = [];
@@ -558,11 +558,11 @@ function setupFloor(biomeIdx, floor){
         stairsZone = {x:ep.x, y:ep.y};
     }
 
-    // Spawn enemies
-    var baseHP = 2+Math.floor(expeditionNum*0.5)+floor*2;
-    var baseATK = 1+Math.floor(expeditionNum*0.3)+floor;
+    // Spawn enemies (balanced: harder base, steeper scaling)
+    var baseHP = 5+Math.floor(expeditionNum*1.2)+floor*3;
+    var baseATK = 2+Math.floor(expeditionNum*0.5)+Math.floor(floor*1.2);
     if(!isBossFloor){
-        var enemyCount = Math.min(2+expeditionNum+floor, 6);
+        var enemyCount = Math.min(3+expeditionNum+floor, 8);
         for(var i=1;i<rooms.length;i++){
             var r=rooms[i], cnt=randInt(1,enemyCount);
             for(var j=0;j<cnt;j++){
@@ -592,8 +592,8 @@ function setupFloor(biomeIdx, floor){
 
     // Spawn boss in arena center
     if(isBossFloor){
-        var bossHP = baseHP*6+expeditionNum*3;
-        var bossATK = Math.ceil(baseATK*2.5);
+        var bossHP = baseHP*8+expeditionNum*5;
+        var bossATK = Math.ceil(baseATK*3);
         var bcx=Math.floor(MAP_W/2)*TILE+TILE/2, bcy=Math.floor(MAP_H/2)*TILE+TILE/2;
         var bossTypeKeys={forest:'grizzly',cave:'kraken',swamp:'dragon'};
         var bossTypeKey=bossTypeKeys[currentBiome.enemyType]||'grizzly';
