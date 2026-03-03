@@ -146,7 +146,7 @@ const SKILL_BRANCHES = [
     { id:'survival', key:'skSurvival', color:'#4488ee', skills:[
         { id:'thickSkin',  key:'skThickSkin',  descKey:'skThickSkinD',  cost:25,  icon:'🌟' },
         { id:'scavenger',  key:'skScavenger',  descKey:'skScavengerD',  cost:50,  icon:'💰' },
-        { id:'dodge',      key:'skDodge',      descKey:'skDodgeD',      cost:80,  icon:'💨' },
+        { id:'dodge',        key:'skDodge',     descKey:'skDodgeD',      cost:80,  icon:'💨' },
         { id:'secondWind', key:'skSecondWind', descKey:'skSecondWindD', cost:120, icon:'💫' },
     ]}
 ];
@@ -1016,6 +1016,9 @@ function update(){
         var spd=PLAYER_SPEED+playerStats.speed*0.5;
         tryMove(player,mx*spd,my*spd);
         if(frameCount%6===0) player.animFrame=(player.animFrame+1)%4;
+        // Update move facing based on horizontal movement
+        if(mx>0.1) player.moveFacing=1;
+        else if(mx<-0.1) player.moveFacing=-1;
     }
     if(isMobile&&mobileAimStick.active){
         var adx=mobileAimStick.cx-mobileAimStick.sx,ady=mobileAimStick.cy-mobileAimStick.sy;
@@ -2124,7 +2127,7 @@ function renderExpedition(){
     if(SPR.ready){
         var spr=player.moving?SPR.playerFrames[player.animFrame%SPR.playerFrames.length]:SPR.playerIdle;
         ctx.save();ctx.translate(ppx,ppy);
-        var flip=(player.angle>Math.PI/2||player.angle<-Math.PI/2)?-1:1;
+        var flip=(player.moveFacing||1)<0?-1:1;
         ctx.scale(flip,1);
         ctx.drawImage(spr,-TILE/2,-TILE/2,TILE,TILE);
         ctx.restore();

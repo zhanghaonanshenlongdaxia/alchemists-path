@@ -133,7 +133,7 @@ const LANG = {
         resHP: '生命上限+1', resDEF: '基础防御+1', resATK: '基础攻击+1', resSpeed: '移速+',
         resLuck: '幸运+', resCarry: '腰带+1格',
         lvl: '级', maxLvl: '满级',
-        key: '钥匙', keys: '钥匙', needKey: '需要钥匙',
+        key: '钥匙', keys: '钥匙', needKey: '需要钥匙(打开宝箱)',
         newRelic: '发现新遗物！',
         relicCase: '遗物柜', relicsFound: '已发现遗物',
         minimap: '地图',
