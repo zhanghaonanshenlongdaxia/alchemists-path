@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="blade" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#99bbcc"/>
+      <stop offset="100%" stop-color="#445566"/>
+    </linearGradient>
+  </defs>
+  <!-- Blade (shorter, wider) -->
+  <polygon points="32,10 28,42 32,46 36,42" fill="url(#blade)" stroke="#334455" stroke-width="1"/>
+  <line x1="31" y1="14" x2="30" y2="40" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Guard (ornate) -->
+  <path d="M18 41 Q22 46 32 44 Q42 46 46 41 Q42 38 32 40 Q22 38 18 41 Z" fill="#cc9944" stroke="#886622" stroke-width="1"/>
+  <!-- Handle (wrapped) -->
+  <rect x="29" y="44" width="6" height="12" rx="1.5" fill="#662200" stroke="#441100" stroke-width="1"/>
+  <line x1="30" y1="47" x2="34" y2="47" stroke="#884422" stroke-width="1"/>
+  <line x1="30" y1="50" x2="34" y2="50" stroke="#884422" stroke-width="1"/>
+  <line x1="30" y1="53" x2="34" y2="53" stroke="#884422" stroke-width="1"/>
+  <!-- Pommel -->
+  <circle cx="32" cy="57" r="3.5" fill="#cc9944" stroke="#886622" stroke-width="1"/>
+  <!-- Glint -->
+  <circle cx="38" cy="16" r="2" fill="rgba(255,255,255,0.8)"/>
+</svg>

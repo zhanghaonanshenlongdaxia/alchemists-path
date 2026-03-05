@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="book" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#aa7733"/>
+      <stop offset="100%" stop-color="#664422"/>
+    </linearGradient>
+  </defs>
+  <!-- Book shadow -->
+  <rect x="14" y="12" width="36" height="44" rx="3" fill="rgba(0,0,0,0.3)"/>
+  <!-- Book back cover -->
+  <rect x="12" y="10" width="36" height="44" rx="3" fill="#553311" stroke="#331100" stroke-width="1"/>
+  <!-- Book spine -->
+  <rect x="12" y="10" width="7" height="44" rx="3" fill="#663322" stroke="#331100" stroke-width="1"/>
+  <!-- Book front cover -->
+  <rect x="16" y="10" width="32" height="44" rx="3" fill="url(#book)" stroke="#553311" stroke-width="1.5"/>
+  <!-- Cover decoration border -->
+  <rect x="19" y="13" width="26" height="38" rx="2" fill="none" stroke="#cc9944" stroke-width="1"/>
+  <!-- Book title area -->
+  <rect x="21" y="16" width="22" height="8" rx="1" fill="rgba(0,0,0,0.3)"/>
+  <!-- Monster silhouette on cover -->
+  <ellipse cx="32" cy="34" rx="7" ry="7" fill="rgba(0,0,0,0.4)"/>
+  <path d="M28 28 L26 22 M30 27 L30 21 M32 27 L33 21 M34 27 L36 22" stroke="rgba(0,0,0,0.4)" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="30" cy="33" r="1.5" fill="#cc3300"/>
+  <circle cx="34" cy="33" r="1.5" fill="#cc3300"/>
+  <!-- Pages visible from side -->
+  <rect x="44" y="13" width="3" height="38" rx="1" fill="#eeeecc" stroke="#ccccaa" stroke-width="0.5"/>
+  <!-- Gold clasp -->
+  <rect x="45" y="30" width="4" height="6" rx="1" fill="#ffdd44" stroke="#cc9922" stroke-width="1"/>
+  <!-- Title text lines -->
+  <line x1="23" y1="20" x2="41" y2="20" stroke="#cc9944" stroke-width="1"/>
+  <line x1="25" y1="23" x2="39" y2="23" stroke="#cc9944" stroke-width="0.8"/>
+</svg>

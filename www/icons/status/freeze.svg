@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#88ddff"/>
+      <stop offset="100%" stop-color="#114477"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="28" fill="url(#bg)" stroke="#224488" stroke-width="2"/>
+  <!-- Snowflake -->
+  <line x1="32" y1="10" x2="32" y2="54" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <line x1="10" y1="32" x2="54" y2="32" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <line x1="16" y1="16" x2="48" y2="48" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <line x1="48" y1="16" x2="16" y2="48" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <!-- Branch tips -->
+  <line x1="32" y1="10" x2="27" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="32" y1="10" x2="37" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="32" y1="54" x2="27" y2="49" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="32" y1="54" x2="37" y2="49" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="10" y1="32" x2="15" y2="27" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="10" y1="32" x2="15" y2="37" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="54" y1="32" x2="49" y2="27" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="54" y1="32" x2="49" y2="37" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <!-- Center -->
+  <circle cx="32" cy="32" r="4" fill="white"/>
+  <circle cx="32" cy="32" r="2" fill="#88ddff"/>
+</svg>

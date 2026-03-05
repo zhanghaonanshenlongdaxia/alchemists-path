@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#334455"/>
+      <stop offset="100%" stop-color="#111822"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#bg)" stroke="#44aaff" stroke-width="1.5"/>
+  <!-- Gear outer -->
+  <path d="M32 10 L34 14 Q38 13 41 15 L41 11 Q45 13 47 17 L43 19 Q45 23 44 27 L48 28 Q48 32 48 32 L44 33 Q45 37 43 41 L47 43 Q45 47 41 49 L41 45 Q38 47 34 46 L32 50 L30 46 Q26 47 23 45 L23 49 Q19 47 17 43 L21 41 Q19 37 20 33 L16 32 Q16 28 20 28 L20 27 Q19 23 21 19 L17 17 Q19 13 23 11 L23 15 Q26 13 30 14 Z" fill="#5588aa" stroke="#224466" stroke-width="1"/>
+  <!-- Center circle -->
+  <circle cx="32" cy="32" r="10" fill="#334455" stroke="#44aaff" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="6" fill="#44aaff" stroke="#224477" stroke-width="1"/>
+  <circle cx="32" cy="32" r="3" fill="#88ccff"/>
+</svg>

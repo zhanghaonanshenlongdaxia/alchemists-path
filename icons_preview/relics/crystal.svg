@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="cryst" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#aaeeff"/>
+      <stop offset="50%" stop-color="#44aadd"/>
+      <stop offset="100%" stop-color="#114466"/>
+    </linearGradient>
+  </defs>
+  <!-- Crystal cluster -->
+  <!-- Main crystal -->
+  <polygon points="32,6 38,28 32,34 26,28" fill="url(#cryst)" stroke="#226688" stroke-width="1.2"/>
+  <polygon points="32,8 36,26 32,30" fill="rgba(200,240,255,0.4)"/>
+  <!-- Left crystal -->
+  <polygon points="20,16 24,38 20,44 16,38" fill="#55aacc" stroke="#226688" stroke-width="1"/>
+  <polygon points="20,18 23,36 20,40" fill="rgba(200,240,255,0.3)"/>
+  <!-- Right crystal -->
+  <polygon points="44,16 48,38 44,44 40,38" fill="#55aacc" stroke="#226688" stroke-width="1"/>
+  <polygon points="44,18 47,36 44,40" fill="rgba(200,240,255,0.3)"/>
+  <!-- Small crystals -->
+  <polygon points="26,32 29,46 26,50 23,46" fill="#88ccee" stroke="#226688" stroke-width="1"/>
+  <polygon points="38,32 41,46 38,50 35,46" fill="#88ccee" stroke="#226688" stroke-width="1"/>
+  <!-- Base rock -->
+  <ellipse cx="32" cy="52" rx="16" ry="6" fill="#445566" stroke="#223344" stroke-width="1"/>
+  <!-- Sparkles -->
+  <circle cx="32" cy="6" r="2.5" fill="rgba(200,240,255,0.9)"/>
+  <circle cx="16" cy="12" r="1.5" fill="rgba(180,220,255,0.7)"/>
+  <circle cx="48" cy="12" r="1.5" fill="rgba(180,220,255,0.7)"/>
+  <circle cx="10" cy="32" r="1" fill="rgba(150,210,255,0.6)"/>
+  <circle cx="54" cy="28" r="1" fill="rgba(150,210,255,0.6)"/>
+</svg>

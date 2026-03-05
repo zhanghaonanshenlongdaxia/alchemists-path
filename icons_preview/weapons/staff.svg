@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="orb" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#bbaaff"/>
+      <stop offset="100%" stop-color="#4422aa"/>
+    </radialGradient>
+  </defs>
+  <!-- Staff pole -->
+  <rect x="30" y="18" width="4" height="44" rx="2" fill="#884422" stroke="#553311" stroke-width="1"/>
+  <!-- Wrappings -->
+  <line x1="30" y1="28" x2="34" y2="28" stroke="#cc8844" stroke-width="2"/>
+  <line x1="30" y1="36" x2="34" y2="36" stroke="#cc8844" stroke-width="2"/>
+  <line x1="30" y1="44" x2="34" y2="44" stroke="#cc8844" stroke-width="2"/>
+  <!-- Orb -->
+  <circle cx="32" cy="14" r="11" fill="url(#orb)" stroke="#6644cc" stroke-width="1.5"/>
+  <!-- Orb shine -->
+  <ellipse cx="28" cy="10" rx="3.5" ry="2.5" fill="rgba(255,255,255,0.35)" transform="rotate(-20,28,10)"/>
+  <!-- Orb glow ring -->
+  <circle cx="32" cy="14" r="13" fill="none" stroke="rgba(150,100,255,0.25)" stroke-width="2"/>
+  <!-- Magic sparkles -->
+  <circle cx="20" cy="8" r="2" fill="#bbaaff"/>
+  <circle cx="44" cy="6" r="1.5" fill="#ddccff"/>
+  <circle cx="46" cy="18" r="1" fill="#bbaaff"/>
+  <circle cx="18" cy="20" r="1" fill="#ddccff"/>
+  <!-- Stars -->
+  <text x="8" y="15" font-size="7" fill="#9977ff">✦</text>
+  <text x="48" y="28" font-size="6" fill="#9977ff">✦</text>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#441111"/>
+      <stop offset="100%" stop-color="#220000"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#bg)" stroke="#cc2222" stroke-width="2"/>
+  <!-- Door frame -->
+  <rect x="16" y="14" width="24" height="36" rx="2" fill="#331111" stroke="#cc4444" stroke-width="1.5"/>
+  <!-- Door panel -->
+  <rect x="18" y="16" width="20" height="32" rx="1" fill="#220000" stroke="#882222" stroke-width="1"/>
+  <!-- Door handle -->
+  <circle cx="35" cy="32" r="2" fill="#cc6644" stroke="#882222" stroke-width="1"/>
+  <!-- Arrow pointing right (exit) -->
+  <line x1="36" y1="32" x2="50" y2="32" stroke="#ff4444" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="50,32 42,26 42,38" fill="#ff4444"/>
+  <!-- Speed lines -->
+  <line x1="36" y1="26" x2="46" y2="26" stroke="rgba(255,80,80,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="36" y1="38" x2="46" y2="38" stroke="rgba(255,80,80,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Warning X hint -->
+  <circle cx="32" cy="32" r="29" fill="none" stroke="rgba(255,50,50,0.15)" stroke-width="3"/>
+</svg>

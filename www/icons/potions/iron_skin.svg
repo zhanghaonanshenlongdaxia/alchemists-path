@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="liq" cx="50%" cy="60%" r="50%">
+      <stop offset="0%" stop-color="#eecc44"/>
+      <stop offset="100%" stop-color="#997700"/>
+    </radialGradient>
+  </defs>
+  <path d="M22 28 L18 50 Q18 58 32 58 Q46 58 46 50 L42 28 Z" fill="url(#liq)" stroke="#664400" stroke-width="1.5"/>
+  <ellipse cx="27" cy="44" rx="4" ry="7" fill="rgba(255,240,150,0.3)"/>
+  <path d="M22 28 L18 50 Q18 58 32 58 Q46 58 46 50 L42 28 Z" fill="rgba(255,255,255,0.08)"/>
+  <rect x="26" y="18" width="12" height="12" rx="2" fill="#ddaa22" stroke="#886600" stroke-width="1.5"/>
+  <rect x="27" y="11" width="10" height="9" rx="3" fill="#cc9944" stroke="#885522" stroke-width="1"/>
+  <!-- Shield icon -->
+  <path d="M26 37 Q26 50 32 53 Q38 50 38 37 L32 35 Z" fill="rgba(255,255,255,0.7)" stroke="none"/>
+  <circle cx="44" cy="20" r="2" fill="#ffee99"/>
+</svg>

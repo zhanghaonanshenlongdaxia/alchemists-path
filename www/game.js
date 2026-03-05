@@ -2545,59 +2545,85 @@ function drawExpeditionHUD(){
     // Player debuff icons (bottom center, above quickbar)
     var dbKeys=Object.keys(playerDebuffs).filter(function(k){return playerDebuffs[k]&&playerDebuffs[k].timer>0;});
     if(dbKeys.length>0){
-        var dbIconSize=26,dbGap=6;
+        var dbIconSize=32,dbGap=6;
         var dbTotalW=dbKeys.length*(dbIconSize+dbGap)-dbGap;
-        var dbX=(W-dbTotalW)/2, dbY=canvas.height-(isMobile?120:110);
+        var dbX=(W-dbTotalW)/2, dbY=canvas.height-(isMobile?130:120);
         for(var di=0;di<dbKeys.length;di++){
             var dtype=dbKeys[di];
             var ddef=STATUS_DEFS[dtype];
             if(!ddef) continue;
             var dx=dbX+di*(dbIconSize+dbGap);
-            // Background
-            ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(dx,dbY,dbIconSize,dbIconSize);
-            ctx.strokeStyle=ddef.color;ctx.lineWidth=1.5;ctx.strokeRect(dx,dbY,dbIconSize,dbIconSize);
-            // Icon
-            ctx.fillStyle=ddef.color;ctx.font='14px monospace';ctx.textAlign='center';
-            ctx.fillText(ddef.icon,dx+dbIconSize/2,dbY+dbIconSize/2+4);
-            // Timer bar at bottom of icon
             var db=playerDebuffs[dtype];
             var dtRatio=db.timer/ddef.duration;
+            // Background
+            ctx.fillStyle='rgba(0,0,0,0.65)';ctx.fillRect(dx,dbY,dbIconSize,dbIconSize);
+            ctx.strokeStyle=ddef.color;ctx.lineWidth=1.5;ctx.strokeRect(dx,dbY,dbIconSize,dbIconSize);
+            // SVG icon or emoji fallback
+            var sIcon=ICONS.status[dtype];
+            if(sIcon){
+                ctx.drawImage(sIcon,dx+1,dbY+1,dbIconSize-2,dbIconSize-2);
+            } else {
+                ctx.fillStyle=ddef.color;ctx.font='18px monospace';ctx.textAlign='center';
+                ctx.fillText(ddef.icon,dx+dbIconSize/2,dbY+dbIconSize/2+5);
+            }
+            // Timer bar at bottom
             ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(dx,dbY+dbIconSize-3,dbIconSize,3);
             ctx.fillStyle=ddef.color;ctx.fillRect(dx,dbY+dbIconSize-3,dbIconSize*dtRatio,3);
-            // Chinese name below icon
+            // Chinese name
             ctx.fillStyle=ddef.color;ctx.font='bold 8px monospace';ctx.textAlign='center';
             ctx.fillText(ddef.nameZh||ddef.name,dx+dbIconSize/2,dbY+dbIconSize+9);
-            // Timer text below name
+            // Timer
             ctx.fillStyle='#aaa';ctx.font='8px monospace';
             ctx.fillText(Math.ceil(db.timer/60)+'s',dx+dbIconSize/2,dbY+dbIconSize+18);
         }
     }
     // Potion quickbelt (bottom-center, above joystick)
     if(carriedPotions.length>0){
-        var qbSlotW=54,qbSlotH=52,qbGap=5;
+        var qbSlotW=54,qbSlotH=54,qbGap=5;
         var qbTotalW=carriedPotions.length*(qbSlotW+qbGap)-qbGap;
-        var qbX=Math.floor((W-qbTotalW)/2),qbY=canvas.height-(isMobile?65:70);
+        var qbX=Math.floor((W-qbTotalW)/2),qbY=canvas.height-(isMobile?68:72);
         for(var pi=0;pi<carriedPotions.length;pi++){
             var qslot=carriedPotions[pi],qp=qslot.potion;
             var sx=qbX+pi*(qbSlotW+qbGap);
-            ctx.fillStyle='rgba(15,15,25,0.85)';ctx.fillRect(sx,qbY,qbSlotW,qbSlotH);
+            // Slot background
+            ctx.fillStyle='rgba(10,10,20,0.88)';ctx.fillRect(sx,qbY,qbSlotW,qbSlotH);
             ctx.strokeStyle=qp.color||'#44dd88';ctx.lineWidth=1.5;ctx.strokeRect(sx,qbY,qbSlotW,qbSlotH);
-            ctx.fillStyle=qp.color||'#ddd';ctx.font='bold 9px monospace';ctx.textAlign='center';
-            ctx.fillText(recipeName(qp),sx+qbSlotW/2,qbY+14);
-            ctx.fillStyle='#888';ctx.font='8px monospace';
-            ctx.fillText(recipeDesc(qp),sx+qbSlotW/2,qbY+25);
-            ctx.fillStyle='#ffdd44';ctx.font='bold 13px monospace';
-            ctx.fillText('×'+qslot.count,sx+qbSlotW/2,qbY+40);
+            // Potion SVG icon (top 36px)
+            var pIcon=ICONS.potions[qp.name];
+            if(pIcon){
+                ctx.drawImage(pIcon,sx+3,qbY+2,qbSlotW-6,36);
+            } else {
+                ctx.fillStyle=qp.color||'#ddd';ctx.font='bold 8px monospace';ctx.textAlign='center';
+                ctx.fillText(recipeName(qp),sx+qbSlotW/2,qbY+20);
+            }
+            // Count badge
+            ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(sx,qbY+38,qbSlotW,16);
+            ctx.fillStyle='#ffdd44';ctx.font='bold 12px monospace';ctx.textAlign='center';
+            ctx.fillText('×'+qslot.count,sx+qbSlotW/2,qbY+50);
         }
     }
     // Settings gear in expedition (top-right, left of minimap)
-    drawSettingsGear(W-38,15,26);
-    // Exit expedition button (left side, below HP stats)
-    var exitBtnW=60,exitBtnH=22,exitBtnX=10,exitBtnY=95;
-    ctx.fillStyle='rgba(120,20,20,0.7)';ctx.fillRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
-    ctx.strokeStyle='#ff4444';ctx.lineWidth=1;ctx.strokeRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
-    ctx.fillStyle='#ff8888';ctx.font='bold 9px monospace';ctx.textAlign='center';
-    ctx.fillText('退出冒险',exitBtnX+exitBtnW/2,exitBtnY+exitBtnH/2+3);
+    if(ICONS.ui.settings){
+        ctx.save();ctx.globalAlpha=0.85;
+        ctx.drawImage(ICONS.ui.settings,W-40,13,28,28);
+        ctx.restore();
+    } else {
+        drawSettingsGear(W-38,15,26);
+    }
+    // Exit expedition button (left side, below HP stats) with icon
+    var exitBtnW=60,exitBtnH=26,exitBtnX=10,exitBtnY=95;
+    if(ICONS.ui.exit){
+        ctx.fillStyle='rgba(80,10,10,0.7)';ctx.fillRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
+        ctx.strokeStyle='#ff4444';ctx.lineWidth=1;ctx.strokeRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
+        ctx.drawImage(ICONS.ui.exit,exitBtnX+2,exitBtnY+1,22,22);
+        ctx.fillStyle='#ff8888';ctx.font='bold 9px monospace';ctx.textAlign='left';
+        ctx.fillText('退出',exitBtnX+26,exitBtnY+exitBtnH/2+3);
+    } else {
+        ctx.fillStyle='rgba(120,20,20,0.7)';ctx.fillRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
+        ctx.strokeStyle='#ff4444';ctx.lineWidth=1;ctx.strokeRect(exitBtnX,exitBtnY,exitBtnW,exitBtnH);
+        ctx.fillStyle='#ff8888';ctx.font='bold 9px monospace';ctx.textAlign='center';
+        ctx.fillText('退出冒险',exitBtnX+exitBtnW/2,exitBtnY+exitBtnH/2+3);
+    }
 }
 
 function useCarriedPotion(index){
@@ -3822,14 +3848,26 @@ function renderLab(){
     ctx.fillText(T('saveBtn'),svX+svW/2,svY+svH/2+3);
 
     // Settings gear
-    drawSettingsGear(70,15,22);
+    if(ICONS.ui.settings){
+        ctx.save();ctx.globalAlpha=0.85;
+        ctx.drawImage(ICONS.ui.settings,68,13,24,24);
+        ctx.restore();
+    } else {
+        drawSettingsGear(70,15,22);
+    }
 
     // Bestiary button in lab
     var bkX=100,bkY=15,bkW=46,bkH=22;
     ctx.fillStyle='rgba(10,10,20,0.6)';ctx.fillRect(bkX,bkY,bkW,bkH);
     ctx.strokeStyle='#cc9944';ctx.lineWidth=1;ctx.strokeRect(bkX,bkY,bkW,bkH);
-    ctx.fillStyle='#cc9944';ctx.font='bold 9px monospace';ctx.textAlign='center';
-    ctx.fillText('📚 图鉴',bkX+bkW/2,bkY+bkH/2+3);
+    if(ICONS.ui.bestiary){
+        ctx.drawImage(ICONS.ui.bestiary,bkX+2,bkY+1,18,18);
+        ctx.fillStyle='#cc9944';ctx.font='bold 9px monospace';ctx.textAlign='left';
+        ctx.fillText('图鉴',bkX+22,bkY+bkH/2+3);
+    } else {
+        ctx.fillStyle='#cc9944';ctx.font='bold 9px monospace';ctx.textAlign='center';
+        ctx.fillText('📚 图鉴',bkX+bkW/2,bkY+bkH/2+3);
+    }
 
     // Carried potions belt (summary)
     if(carriedPotions.length>0){
@@ -5738,6 +5776,67 @@ function loadGame(){
     }catch(e){ return false; }
 }
 
+// ============ ICON SYSTEM ============
+var ICONS = { potions:{}, status:{}, ui:{} };
+var ICON_BASE = 'icons/';
+function loadSVGIcon(path){
+    return new Promise(function(resolve){
+        var img = new Image();
+        img.onload = function(){ resolve(img); };
+        img.onerror = function(){ resolve(null); };
+        img.src = ICON_BASE + path;
+    });
+}
+async function loadGameIcons(){
+    var potionMap = {
+        'Healing Brew':'potions/healing_brew.svg',
+        'Greater Heal':'potions/greater_heal.svg',
+        'Master Healing':'potions/greater_heal.svg',
+        'Divine Blessing':'potions/greater_heal.svg',
+        'Strength Elixir':'potions/strength_elixir.svg',
+        'Berserker Draft':'potions/strength_elixir.svg',
+        'Titan Strength':'potions/strength_elixir.svg',
+        'Elemental Fury':'potions/strength_elixir.svg',
+        'Iron Skin':'potions/iron_skin.svg',
+        'Stone Shield':'potions/iron_skin.svg',
+        'Diamond Shield':'potions/iron_skin.svg',
+        'Fortress Wall':'potions/iron_skin.svg',
+        'Swift Potion':'potions/swift_potion.svg',
+        'Regen Potion':'potions/regen_potion.svg',
+        'Rapid Regen':'potions/regen_potion.svg',
+        'Vitality Tonic':'potions/regen_potion.svg',
+        'Supreme Vitality':'potions/regen_potion.svg',
+        'Phoenix Draught':'potions/phoenix_draught.svg',
+        'Phoenix Rebirth':'potions/phoenix_draught.svg',
+        'Venom Blade':'potions/venom_blade.svg',
+        'Deadly Venom':'potions/venom_blade.svg',
+        'Shadow Elixir':'potions/venom_blade.svg'
+    };
+    var statusMap = {
+        'poison':'status/poison.svg',
+        'paralyze':'status/paralyze.svg',
+        'sleep':'status/sleep.svg',
+        'freeze':'status/freeze.svg',
+        'burn':'status/burn.svg',
+        'dizzy':'status/dizzy.svg'
+    };
+    var uiMap = {
+        'settings':'ui/settings.svg',
+        'bestiary':'ui/bestiary.svg',
+        'exit':'ui/exit.svg',
+        'minimap':'ui/minimap.svg'
+    };
+    var loaded = [];
+    for(var name in potionMap) loaded.push((function(n,p){ return loadSVGIcon(p).then(function(img){ ICONS.potions[n]=img; }); })(name, potionMap[name]));
+    for(var key in statusMap) loaded.push((function(k,p){ return loadSVGIcon(p).then(function(img){ ICONS.status[k]=img; }); })(key, statusMap[key]));
+    for(var k in uiMap) loaded.push((function(k2,p){ return loadSVGIcon(p).then(function(img){ ICONS.ui[k2]=img; }); })(k, uiMap[k]));
+    await Promise.all(loaded);
+}
+function drawIconOrFallback(iconImg, x, y, w, h, fallbackFn){
+    if(iconImg){ ctx.drawImage(iconImg, x, y, w, h); }
+    else if(fallbackFn){ fallbackFn(); }
+}
+
 // ============ MAIN LOOP ============
 function render(){
     if(state==='menu') drawMenu();
@@ -5761,4 +5860,4 @@ document.addEventListener('visibilitychange',function(){
         mobileAimStick.active=false;mobileAimStick.id=-1;
     }
 });
-(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();await loadBestiarySprites();await loadRelicSprites();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
+(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();await loadBestiarySprites();await loadRelicSprites();await loadGameIcons();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="liq" cx="50%" cy="60%" r="50%">
+      <stop offset="0%" stop-color="#cc66ff"/>
+      <stop offset="100%" stop-color="#660088"/>
+    </radialGradient>
+  </defs>
+  <path d="M22 28 L18 50 Q18 58 32 58 Q46 58 46 50 L42 28 Z" fill="url(#liq)" stroke="#440055" stroke-width="1.5"/>
+  <ellipse cx="27" cy="44" rx="4" ry="7" fill="rgba(200,150,255,0.3)"/>
+  <path d="M22 28 L18 50 Q18 58 32 58 Q46 58 46 50 L42 28 Z" fill="rgba(255,255,255,0.07)"/>
+  <rect x="26" y="18" width="12" height="12" rx="2" fill="#aa44dd" stroke="#440055" stroke-width="1.5"/>
+  <rect x="27" y="11" width="10" height="9" rx="3" fill="#cc9944" stroke="#885522" stroke-width="1"/>
+  <!-- Skull icon -->
+  <ellipse cx="32" cy="42" rx="6" ry="5.5" fill="rgba(255,255,255,0.7)"/>
+  <rect x="29" y="47" width="2.5" height="3" fill="rgba(255,255,255,0.7)"/>
+  <rect x="32.5" y="47" width="2.5" height="3" fill="rgba(255,255,255,0.7)"/>
+  <circle cx="30" cy="41" r="1.5" fill="#660088"/>
+  <circle cx="34" cy="41" r="1.5" fill="#660088"/>
+  <path d="M30 45 Q32 44 34 45" stroke="#660088" stroke-width="1" fill="none"/>
+  <!-- Drip -->
+  <ellipse cx="44" cy="22" r="2" fill="#cc66ff"/>
+  <ellipse cx="40" cy="17" r="1.2" fill="#dd88ff"/>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a2233"/>
+      <stop offset="100%" stop-color="#0a0e18"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#bg)" stroke="#44dd88" stroke-width="1.5"/>
+  <!-- Map grid rooms -->
+  <rect x="10" y="22" width="12" height="10" rx="1" fill="#2a3a4a" stroke="#44aacc" stroke-width="1"/>
+  <rect x="24" y="16" width="12" height="12" rx="1" fill="#2a3a4a" stroke="#44aacc" stroke-width="1"/>
+  <rect x="24" y="30" width="12" height="12" rx="1" fill="#2a3a4a" stroke="#44aacc" stroke-width="1"/>
+  <rect x="38" y="22" width="12" height="10" rx="1" fill="#2a3a4a" stroke="#44aacc" stroke-width="1"/>
+  <rect x="38" y="34" width="12" height="10" rx="1" fill="#2a3a4a" stroke="#44aacc" stroke-width="1"/>
+  <!-- Corridors -->
+  <rect x="22" y="25" width="2" height="4" fill="#44aacc" opacity="0.5"/>
+  <rect x="36" y="25" width="2" height="4" fill="#44aacc" opacity="0.5"/>
+  <rect x="28" y="28" width="8" height="2" fill="#44aacc" opacity="0.5"/>
+  <rect x="36" y="37" width="2" height="4" fill="#44aacc" opacity="0.5"/>
+  <!-- Player dot (pulsing green) -->
+  <circle cx="30" cy="36" r="3" fill="#44dd88" stroke="#22aa66" stroke-width="1"/>
+  <circle cx="30" cy="36" r="1.5" fill="#88ffaa"/>
+  <!-- Enemy dots -->
+  <circle cx="44" cy="27" r="2" fill="#ff4444" stroke="#cc2222" stroke-width="0.8"/>
+  <circle cx="42" cy="39" r="2" fill="#ff4444" stroke="#cc2222" stroke-width="0.8"/>
+  <!-- Stairs/exit -->
+  <circle cx="44" cy="27" r="0" fill="none"/>
+  <polygon points="10,49 18,49 14,56" fill="#ffdd44" stroke="#cc9922" stroke-width="1"/>
+  <!-- Border glow -->
+  <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(68,221,136,0.2)" stroke-width="4"/>
+</svg>
