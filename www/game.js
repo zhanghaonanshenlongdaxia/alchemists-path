@@ -59,8 +59,8 @@ const HERBS_LIST = Object.keys(HERBS).map(function(k){ return Object.assign({key
 const MAP_W = 32, MAP_H = 22;
 const TILE = 32;
 const MAX_FLOORS = 6; // floors per expedition (last floor is boss)
-const ENEMY_SPEED = 1.5; // base enemy movement speed (px/frame)
-const PLAYER_SPEED = 2.8; // base player movement speed (px/frame)
+const ENEMY_SPEED = 0.9; // base enemy movement speed (px/frame)
+const PLAYER_SPEED = 1.8; // base player movement speed (px/frame)
 const PLAYER_RADIUS = 10; // player collision radius
 const SIGHT_RANGE = 220; // enemy sight range (px)
 const ALERT_RANGE = 300; // enemy alert range after being attacked (px)
@@ -560,7 +560,7 @@ function setupFloor(biomeIdx, floor){
 
     // Spawn enemies (balanced: harder base, steeper scaling)
     var baseHP = 15+Math.floor(expeditionNum*3.6)+floor*9;
-    var baseATK = 6+Math.floor(expeditionNum*1.5)+Math.floor(floor*3.6);
+    var baseATK = Math.max(1, Math.floor((3+Math.floor(expeditionNum*0.75)+Math.floor(floor*1.8))/10));
     if(!isBossFloor){
         var enemyCount = Math.min(3+expeditionNum+floor, 8);
         for(var i=1;i<rooms.length;i++){
