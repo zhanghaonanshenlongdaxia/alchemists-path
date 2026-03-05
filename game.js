@@ -706,7 +706,7 @@ function startExpedition(biomeIdx){
     expeditionFoundRelics = []; // reset expedition relics
     // Equip forged weapon for this expedition (returns to forgedWeapon after)
     equippedWeapon = forgedWeapon || makeWeapon(WEAPONS[0]);
-    missionTimer = 90*60; // 90 seconds total
+    missionTimer = 180*60; // 180 seconds per floor
 
     // Generate shop stock for merchant
     generateShopStock(biomeIdx, 0);
@@ -734,6 +734,7 @@ function startExpedition(biomeIdx){
 function goNextFloor(){
     currentFloor++;
     if(currentFloor>=MAX_FLOORS){ endExpedition(); return; }
+    missionTimer = 180*60; // reset timer for each new floor
     generateShopStock(BIOMES.indexOf(currentBiome), currentFloor);
     setupFloor(BIOMES.indexOf(currentBiome), currentFloor);
     spawnFloat(player.x,player.y-20, T('floor')+' '+(currentFloor+1), '#ffdd44');
