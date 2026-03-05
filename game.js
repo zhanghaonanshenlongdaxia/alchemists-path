@@ -559,7 +559,7 @@ function setupFloor(biomeIdx, floor){
     }
 
     // Spawn enemies (balanced: harder base, steeper scaling)
-    var baseHP = 15+Math.floor(expeditionNum*3.6)+floor*9;
+    var baseHP = Math.floor((15+Math.floor(expeditionNum*3.6)+floor*9)/2);
     var baseATK = Math.max(1, Math.floor((3+Math.floor(expeditionNum*0.75)+Math.floor(floor*1.8))/10));
     if(!isBossFloor){
         var enemyCount = Math.min(3+expeditionNum+floor, 8);
