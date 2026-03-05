@@ -5780,59 +5780,47 @@ function loadGame(){
 
 // ============ ICON SYSTEM ============
 var ICONS = { potions:{}, status:{}, ui:{} };
-var ICON_BASE = 'icons/';
-function loadSVGIcon(path){
+// Potion name -> embedded icon key mapping
+var POTION_ICON_KEY = {
+    'Healing Brew':'healing_brew','Greater Heal':'greater_heal',
+    'Master Healing':'greater_heal','Divine Blessing':'greater_heal',
+    'Strength Elixir':'strength_elixir','Berserker Draft':'strength_elixir',
+    'Titan Strength':'strength_elixir','Elemental Fury':'strength_elixir',
+    'Iron Skin':'iron_skin','Stone Shield':'iron_skin',
+    'Diamond Shield':'iron_skin','Fortress Wall':'iron_skin',
+    'Swift Potion':'swift_potion',
+    'Regen Potion':'regen_potion','Rapid Regen':'regen_potion',
+    'Vitality Tonic':'regen_potion','Supreme Vitality':'regen_potion',
+    'Phoenix Draught':'phoenix_draught','Phoenix Rebirth':'phoenix_draught',
+    'Venom Blade':'venom_blade','Deadly Venom':'venom_blade','Shadow Elixir':'venom_blade'
+};
+function loadImgFromDataUrl(dataUrl){
     return new Promise(function(resolve){
-        var img = new Image();
-        img.onload = function(){ resolve(img); };
-        img.onerror = function(){ resolve(null); };
-        img.src = ICON_BASE + path;
+        if(!dataUrl){resolve(null);return;}
+        var img=new Image();
+        img.onload=function(){resolve(img);};
+        img.onerror=function(){resolve(null);};
+        img.src=dataUrl;
     });
 }
-async function loadGameIcons(){
-    var potionMap = {
-        'Healing Brew':'potions/healing_brew.svg',
-        'Greater Heal':'potions/greater_heal.svg',
-        'Master Healing':'potions/greater_heal.svg',
-        'Divine Blessing':'potions/greater_heal.svg',
-        'Strength Elixir':'potions/strength_elixir.svg',
-        'Berserker Draft':'potions/strength_elixir.svg',
-        'Titan Strength':'potions/strength_elixir.svg',
-        'Elemental Fury':'potions/strength_elixir.svg',
-        'Iron Skin':'potions/iron_skin.svg',
-        'Stone Shield':'potions/iron_skin.svg',
-        'Diamond Shield':'potions/iron_skin.svg',
-        'Fortress Wall':'potions/iron_skin.svg',
-        'Swift Potion':'potions/swift_potion.svg',
-        'Regen Potion':'potions/regen_potion.svg',
-        'Rapid Regen':'potions/regen_potion.svg',
-        'Vitality Tonic':'potions/regen_potion.svg',
-        'Supreme Vitality':'potions/regen_potion.svg',
-        'Phoenix Draught':'potions/phoenix_draught.svg',
-        'Phoenix Rebirth':'potions/phoenix_draught.svg',
-        'Venom Blade':'potions/venom_blade.svg',
-        'Deadly Venom':'potions/venom_blade.svg',
-        'Shadow Elixir':'potions/venom_blade.svg'
-    };
-    var statusMap = {
-        'poison':'status/poison.svg',
-        'paralyze':'status/paralyze.svg',
-        'sleep':'status/sleep.svg',
-        'freeze':'status/freeze.svg',
-        'burn':'status/burn.svg',
-        'dizzy':'status/dizzy.svg'
-    };
-    var uiMap = {
-        'settings':'ui/settings.svg',
-        'bestiary':'ui/bestiary.svg',
-        'exit':'ui/exit.svg',
-        'minimap':'ui/minimap.svg'
-    };
-    var loaded = [];
-    for(var name in potionMap) loaded.push((function(n,p){ return loadSVGIcon(p).then(function(img){ ICONS.potions[n]=img; }); })(name, potionMap[name]));
-    for(var key in statusMap) loaded.push((function(k,p){ return loadSVGIcon(p).then(function(img){ ICONS.status[k]=img; }); })(key, statusMap[key]));
-    for(var k in uiMap) loaded.push((function(k2,p){ return loadSVGIcon(p).then(function(img){ ICONS.ui[k2]=img; }); })(k, uiMap[k]));
-    await Promise.all(loaded);
+function loadGameIcons(){
+    if(typeof ICON_DATA==='undefined'){return Promise.resolve();}
+    var tasks=[];
+    // potions by key
+    var pd=ICON_DATA.potions||{};
+    for(var pk in pd) tasks.push((function(k,d){return loadImgFromDataUrl(d).then(function(img){ICONS.potions[k]=img;});})(pk,pd[pk]));
+    // potion name aliases
+    for(var pname in POTION_ICON_KEY){
+        var pkey=POTION_ICON_KEY[pname];
+        if(pd[pkey]) tasks.push((function(n,d){return loadImgFromDataUrl(d).then(function(img){ICONS.potions[n]=img;});})(pname,pd[pkey]));
+    }
+    // status
+    var sd=ICON_DATA.status||{};
+    for(var sk in sd) tasks.push((function(k,d){return loadImgFromDataUrl(d).then(function(img){ICONS.status[k]=img;});})(sk,sd[sk]));
+    // ui
+    var ud=ICON_DATA.ui||{};
+    for(var uk in ud) tasks.push((function(k,d){return loadImgFromDataUrl(d).then(function(img){ICONS.ui[k]=img;});})(uk,ud[uk]));
+    return Promise.all(tasks);
 }
 function drawIconOrFallback(iconImg, x, y, w, h, fallbackFn){
     if(iconImg){ ctx.drawImage(iconImg, x, y, w, h); }

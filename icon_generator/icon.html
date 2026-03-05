@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Game Icon Generator</title>
+<style>body{background:#222;display:flex;flex-direction:column;align-items:center;padding:20px;font-family:sans-serif;color:#fff;}</style>
+</head>
+<body>
+<h2>炼金之路 - 游戏图标</h2>
+<canvas id="c" width="512" height="512"></canvas>
+<br>
+<button onclick="download()" style="margin-top:16px;padding:10px 24px;font-size:16px;cursor:pointer;">下载 PNG</button>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = 512, H = 512;
+
+function draw() {
+  // === Background: deep purple-to-dark-navy radial gradient ===
+  const bg = ctx.createRadialGradient(W/2, H/2, 30, W/2, H/2, W*0.72);
+  bg.addColorStop(0, '#2a1a4a');
+  bg.addColorStop(0.5, '#1a0f35');
+  bg.addColorStop(1, '#0d0820');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // === Outer glowing ring ===
+  const ringGrad = ctx.createRadialGradient(W/2, H/2, 220, W/2, H/2, 250);
+  ringGrad.addColorStop(0, 'rgba(180,130,255,0)');
+  ringGrad.addColorStop(0.7, 'rgba(150,80,255,0.15)');
+  ringGrad.addColorStop(1, 'rgba(100,40,200,0.3)');
+  ctx.fillStyle = ringGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // === Six-pointed star (hexagram) - outer rune circle ===
+  ctx.save();
+  ctx.translate(W/2, H/2);
+
+  // Rotating rune marks on circle
+  const runeCircleR = 210;
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2 - Math.PI/2;
+    const rx = Math.cos(a) * runeCircleR;
+    const ry = Math.sin(a) * runeCircleR;
+    ctx.save();
+    ctx.translate(rx, ry);
+    ctx.rotate(a + Math.PI/2);
+    if (i % 3 === 0) {
+      // Diamond marker
+      ctx.fillStyle = 'rgba(255,210,80,0.9)';
+      ctx.beginPath();
+      ctx.moveTo(0, -8); ctx.lineTo(5, 0); ctx.lineTo(0, 8); ctx.lineTo(-5, 0);
+      ctx.closePath(); ctx.fill();
+    } else {
+      // Small dot
+      ctx.fillStyle = 'rgba(200,150,255,0.7)';
+      ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // Outer ring stroke
+  ctx.strokeStyle = 'rgba(180,130,255,0.4)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(0, 0, runeCircleR, 0, Math.PI*2); ctx.stroke();
+
+  // Inner ring
+  ctx.strokeStyle = 'rgba(255,200,80,0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(0, 0, 170, 0, Math.PI*2); ctx.stroke();
+
+  // === Hexagram (Star of David style) ===
+  function hexagramPath(r, rotation) {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 3) * Math.PI + rotation;
+      const x = Math.cos(a) * r, y = Math.sin(a) * r;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  }
+
+  // Triangle 1
+  hexagramPath(155, 0);
+  ctx.strokeStyle = 'rgba(255,200,80,0.6)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255,180,60,0.05)';
+  ctx.fill();
+
+  // Triangle 2 (rotated 60deg)
+  hexagramPath(155, Math.PI/3);
+  ctx.strokeStyle = 'rgba(180,100,255,0.6)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(140,80,255,0.05)';
+  ctx.fill();
+
+  ctx.restore();
+
+  // === Flask / Potion bottle ===
+  ctx.save();
+  ctx.translate(W/2, H/2 + 10);
+
+  // Glow behind flask
+  const flaskGlow = ctx.createRadialGradient(0, 20, 10, 0, 20, 100);
+  flaskGlow.addColorStop(0, 'rgba(80,255,180,0.35)');
+  flaskGlow.addColorStop(1, 'rgba(80,255,180,0)');
+  ctx.fillStyle = flaskGlow;
+  ctx.beginPath(); ctx.arc(0, 20, 100, 0, Math.PI*2); ctx.fill();
+
+  // Flask body (rounded bottom)
+  ctx.beginPath();
+  ctx.moveTo(-28, -30);
+  ctx.bezierCurveTo(-55, -10, -75, 30, -68, 70);
+  ctx.bezierCurveTo(-60, 105, -35, 115, 0, 115);
+  ctx.bezierCurveTo(35, 115, 60, 105, 68, 70);
+  ctx.bezierCurveTo(75, 30, 55, -10, 28, -30);
+  ctx.closePath();
+
+  // Liquid fill gradient
+  const liquidGrad = ctx.createLinearGradient(-60, 20, 60, 100);
+  liquidGrad.addColorStop(0, '#00e8aa');
+  liquidGrad.addColorStop(0.4, '#00cc88');
+  liquidGrad.addColorStop(1, '#007755');
+  ctx.fillStyle = liquidGrad;
+  ctx.fill();
+
+  // Foam / bubbles on top of liquid
+  ctx.fillStyle = 'rgba(150,255,210,0.4)';
+  ctx.beginPath(); ctx.arc(-20, -5, 14, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(15, -10, 10, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(-5, -20, 8, 0, Math.PI*2); ctx.fill();
+
+  // Flask glass shine overlay
+  ctx.beginPath();
+  ctx.moveTo(-28, -30);
+  ctx.bezierCurveTo(-55, -10, -75, 30, -68, 70);
+  ctx.bezierCurveTo(-60, 105, -35, 115, 0, 115);
+  ctx.bezierCurveTo(35, 115, 60, 105, 68, 70);
+  ctx.bezierCurveTo(75, 30, 55, -10, 28, -30);
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(120,255,200,0.7)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Glass shine highlight
+  ctx.beginPath();
+  ctx.moveTo(-45, 10);
+  ctx.quadraticCurveTo(-60, 40, -55, 70);
+  ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+  ctx.lineWidth = 8;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // Neck of flask
+  const neckGrad = ctx.createLinearGradient(-18, -75, 18, -30);
+  neckGrad.addColorStop(0, '#1a3a2a');
+  neckGrad.addColorStop(1, '#2a5a3a');
+  ctx.fillStyle = neckGrad;
+  ctx.beginPath();
+  ctx.moveTo(-18, -30);
+  ctx.lineTo(-15, -75);
+  ctx.lineTo(15, -75);
+  ctx.lineTo(18, -30);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(120,255,200,0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Cork
+  const corkGrad = ctx.createLinearGradient(-15, -90, 15, -74);
+  corkGrad.addColorStop(0, '#c8922a');
+  corkGrad.addColorStop(1, '#8a5a18');
+  ctx.fillStyle = corkGrad;
+  ctx.beginPath();
+  ctx.roundRect(-13, -92, 26, 18, 4);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,200,100,0.5)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Bubbles inside flask
+  const bubbles = [{x:-30, y:50, r:8}, {x:20, y:70, r:6}, {x:-10, y:90, r:5}, {x:35, y:45, r:7}];
+  bubbles.forEach(b => {
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.12)'; ctx.fill();
+  });
+
+  // Sparkle stars around flask
+  const sparkles = [
+    {x:-90, y:-60, s:12}, {x:95, y:-40, s:10}, {x:-100, y:60, s:8},
+    {x:100, y:80, s:9}, {x:60, y:-80, s:7}
+  ];
+  sparkles.forEach(sp => {
+    drawStar(sp.x, sp.y, sp.s, 'rgba(255,230,100,0.85)');
+  });
+
+  ctx.restore();
+
+  // === Title text: 炼金之路 ===
+  ctx.save();
+  ctx.translate(W/2, H - 52);
+  ctx.textAlign = 'center';
+  // Shadow/glow
+  ctx.shadowColor = 'rgba(180,100,255,0.8)';
+  ctx.shadowBlur = 18;
+  // Outer stroke
+  ctx.font = 'bold 46px "Microsoft YaHei", serif';
+  ctx.strokeStyle = 'rgba(100,40,180,0.8)';
+  ctx.lineWidth = 5;
+  ctx.strokeText('炼金之路', 0, 0);
+  // Gold fill
+  const textGrad = ctx.createLinearGradient(-100, -40, 100, 0);
+  textGrad.addColorStop(0, '#ffe066');
+  textGrad.addColorStop(0.5, '#fff5a0');
+  textGrad.addColorStop(1, '#ffaa22');
+  ctx.fillStyle = textGrad;
+  ctx.fillText('炼金之路', 0, 0);
+  ctx.restore();
+
+  // === Corner alchemical symbols ===
+  const corners = [
+    {x:40, y:40}, {x:W-40, y:40}, {x:40, y:H-40}, {x:W-40, y:H-40}
+  ];
+  corners.forEach((c, i) => {
+    ctx.save(); ctx.translate(c.x, c.y);
+    ctx.strokeStyle = 'rgba(255,200,80,0.5)';
+    ctx.lineWidth = 1.5;
+    // Small alchemical-like mark
+    ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-6, 0); ctx.lineTo(6, 0);
+    ctx.moveTo(0, -6); ctx.lineTo(0, 6);
+    ctx.stroke();
+    ctx.restore();
+  });
+}
+
+function drawStar(x, y, size, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = color;
+  for (let rot = 0; rot < 2; rot++) {
+    ctx.save();
+    ctx.rotate(rot * Math.PI / 4);
+    ctx.beginPath();
+    ctx.moveTo(0, -size);
+    ctx.lineTo(size*0.15, -size*0.15);
+    ctx.lineTo(size, 0);
+    ctx.lineTo(size*0.15, size*0.15);
+    ctx.lineTo(0, size);
+    ctx.lineTo(-size*0.15, size*0.15);
+    ctx.lineTo(-size, 0);
+    ctx.lineTo(-size*0.15, -size*0.15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+draw();
+
+function download() {
+  const a = document.createElement('a');
+  a.download = 'icon_512.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+</script>
+</body>
+</html>
