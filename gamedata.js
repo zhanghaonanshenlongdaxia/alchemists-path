@@ -390,30 +390,30 @@ const ESSENCES = {
 
 // ============ RECIPES ============
 const RECIPES = [
-    { ingredients:['vita','herba'],  name:'Healing Brew',    effect:'heal',   tier:1, value:2, color:'#ee4444', desc:'+3 HP' },
-    { ingredients:['vita','ignis'],  name:'Strength Elixir', effect:'attack', tier:1, value:2, color:'#ff6622', desc:'+2 ATK' },
-    { ingredients:['vita','aqua'],   name:'Vitality Tonic',  effect:'maxhp',  tier:1, value:2, color:'#44dd88', desc:'+2 Max HP' },
-    { ingredients:['herba','terra'], name:'Iron Skin',       effect:'defense',tier:1, value:2, color:'#ddaa22', desc:'+2 DEF' },
-    { ingredients:['ignis','terra'], name:'Berserker Draft', effect:'attack', tier:2, value:4, color:'#ff4400', desc:'+4 ATK' },
-    { ingredients:['aqua','lux'],    name:'Swift Potion',    effect:'speed',  tier:1, value:1, color:'#88ccff', desc:'+Speed' },
-    { ingredients:['lux','herba'],   name:'Regen Potion',    effect:'regen',  tier:1, value:1, color:'#aaffaa', desc:'HP Regen' },
-    { ingredients:['toxin','ignis'], name:'Venom Blade',     effect:'poison', tier:1, value:1, color:'#aa44dd', desc:'Poison ATK' },
-    { ingredients:['toxin','lux'],   name:'Shadow Elixir',   effect:'stealth',tier:1, value:1, color:'#6644aa', desc:'Stealth' },
-    { ingredients:['aqua','terra'],  name:'Stone Shield',    effect:'defense',tier:2, value:4, color:'#8899aa', desc:'+4 DEF' },
-    { ingredients:['vita','lux'],    name:'Greater Heal',    effect:'heal',   tier:2, value:5, color:'#ff88aa', desc:'+5 HP' },
-    { ingredients:['ignis','lux'],   name:'Phoenix Draught', effect:'revive', tier:2, value:1, color:'#ffaa00', desc:'Auto-Revive' },
+    { ingredients:['vita','herba'],  name:'Healing Brew',    effect:'heal',   tier:1, value:10, color:'#ee4444', desc:'+10 HP' },
+    { ingredients:['vita','ignis'],  name:'Strength Elixir', effect:'attack', tier:1, value:5,  color:'#ff6622', desc:'+5 ATK' },
+    { ingredients:['vita','aqua'],   name:'Vitality Tonic',  effect:'maxhp',  tier:1, value:5,  color:'#44dd88', desc:'+5 Max HP' },
+    { ingredients:['herba','terra'], name:'Iron Skin',       effect:'defense',tier:1, value:5,  color:'#ddaa22', desc:'+5 DEF' },
+    { ingredients:['ignis','terra'], name:'Berserker Draft', effect:'attack', tier:2, value:10, color:'#ff4400', desc:'+10 ATK' },
+    { ingredients:['aqua','lux'],    name:'Swift Potion',    effect:'speed',  tier:1, value:3,  color:'#88ccff', desc:'+Speed' },
+    { ingredients:['lux','herba'],   name:'Regen Potion',    effect:'regen',  tier:1, value:3,  color:'#aaffaa', desc:'HP Regen' },
+    { ingredients:['toxin','ignis'], name:'Venom Blade',     effect:'poison', tier:1, value:3,  color:'#aa44dd', desc:'Poison ATK' },
+    { ingredients:['toxin','lux'],   name:'Shadow Elixir',   effect:'stealth',tier:1, value:1,  color:'#6644aa', desc:'Stealth' },
+    { ingredients:['aqua','terra'],  name:'Stone Shield',    effect:'defense',tier:2, value:10, color:'#8899aa', desc:'+10 DEF' },
+    { ingredients:['vita','lux'],    name:'Greater Heal',    effect:'heal',   tier:2, value:25, color:'#ff88aa', desc:'+25 HP' },
+    { ingredients:['ignis','lux'],   name:'Phoenix Draught', effect:'revive', tier:2, value:1,  color:'#ffaa00', desc:'Auto-Revive' },
     // 3-ingredient advanced potions
-    { ingredients:['vita','herba','aqua'],  name:'Supreme Vitality', effect:'maxhp', tier:3, value:5, color:'#44ffaa', desc:'+5 Max HP' },
-    { ingredients:['ignis','terra','vita'], name:'Titan Strength',   effect:'attack',tier:3, value:6, color:'#ff3300', desc:'+6 ATK' },
-    { ingredients:['aqua','terra','lux'],   name:'Diamond Shield',   effect:'defense',tier:3, value:6, color:'#aaddff', desc:'+6 DEF' },
-    { ingredients:['vita','lux','herba'],   name:'Master Healing',   effect:'heal',  tier:3, value:8, color:'#ffaacc', desc:'+8 HP' },
-    { ingredients:['toxin','ignis','lux'],  name:'Deadly Venom',     effect:'poison',tier:2, value:2, color:'#dd44ff', desc:'Poison DMG' },
-    { ingredients:['aqua','lux','herba'],   name:'Rapid Regen',      effect:'regen', tier:2, value:2, color:'#88ffcc', desc:'Fast Regen' },
+    { ingredients:['vita','herba','aqua'],  name:'Supreme Vitality', effect:'maxhp', tier:3, value:15, color:'#44ffaa', desc:'+15 Max HP' },
+    { ingredients:['ignis','terra','vita'], name:'Titan Strength',   effect:'attack',tier:3, value:18, color:'#ff3300', desc:'+18 ATK' },
+    { ingredients:['aqua','terra','lux'],   name:'Diamond Shield',   effect:'defense',tier:3, value:18, color:'#aaddff', desc:'+18 DEF' },
+    { ingredients:['vita','lux','herba'],   name:'Master Healing',   effect:'heal',  tier:3, value:40, color:'#ffaacc', desc:'+40 HP' },
+    { ingredients:['toxin','ignis','lux'],  name:'Deadly Venom',     effect:'poison',tier:2, value:5,  color:'#dd44ff', desc:'Poison DMG' },
+    { ingredients:['aqua','lux','herba'],   name:'Rapid Regen',      effect:'regen', tier:2, value:6,  color:'#88ffcc', desc:'Fast Regen' },
     // 4-ingredient legendary potions
-    { ingredients:['vita','ignis','aqua','terra'], name:'Elemental Fury',  effect:'attack', tier:4, value:10, color:'#ff00ff', desc:'+10 ATK' },
-    { ingredients:['vita','herba','lux','aqua'],   name:'Divine Blessing', effect:'heal',   tier:4, value:15, color:'#ffffaa', desc:'+15 HP' },
-    { ingredients:['terra','aqua','lux','herba'],  name:'Fortress Wall',   effect:'defense',tier:4, value:10, color:'#6699ff', desc:'+10 DEF' },
-    { ingredients:['vita','ignis','lux','toxin'],  name:'Phoenix Rebirth', effect:'revive', tier:3, value:2, color:'#ffaa44', desc:'Revive+Heal' }
+    { ingredients:['vita','ignis','aqua','terra'], name:'Elemental Fury',  effect:'attack', tier:4, value:30, color:'#ff00ff', desc:'+30 ATK' },
+    { ingredients:['vita','herba','lux','aqua'],   name:'Divine Blessing', effect:'heal',   tier:4, value:60, color:'#ffffaa', desc:'+60 HP' },
+    { ingredients:['terra','aqua','lux','herba'],  name:'Fortress Wall',   effect:'defense',tier:4, value:30, color:'#6699ff', desc:'+30 DEF' },
+    { ingredients:['vita','ignis','lux','toxin'],  name:'Phoenix Rebirth', effect:'revive', tier:3, value:2,  color:'#ffaa44', desc:'Revive+Heal' }
 ];
 
 // ============ RESEARCH (permanent upgrades) ============
