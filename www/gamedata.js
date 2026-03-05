@@ -360,12 +360,12 @@ const ENEMY_TYPE_EFFECTS = {
 
 // ============ STATUS EFFECTS ============
 const STATUS_DEFS = {
-    poison:   { name:'Poison',   nameZh:'中毒',  color:'#aa44dd', icon:'☠', duration:180, tickDmg:1,  tickRate:60, desc:'Deals damage over time',         descZh:'持续造成伤害' },
-    paralyze: { name:'Paralyze', nameZh:'麻痹',  color:'#ffee44', icon:'⚡', duration:120, speedMul:0, desc:'Cannot move for duration',       descZh:'无法移动' },
-    sleep:    { name:'Sleep',    nameZh:'睡眠',  color:'#8888ff', icon:'💤', duration:180, speedMul:0, noAlert:true, desc:'Falls asleep, wakes on hit',     descZh:'入睡，受击醒来' },
-    dizzy:    { name:'Dizzy',    nameZh:'眩晕',  color:'#ffaa44', icon:'🌀', duration:90,  speedMul:0.3, aimPenalty:true, desc:'Confused movement, reduced accuracy', descZh:'移动混乱，命中降低' },
-    freeze:   { name:'Freeze',   nameZh:'冰冻',  color:'#44ddff', icon:'❄', duration:150, speedMul:0, defBuff:2,  desc:'Frozen solid, extra defense',    descZh:'冻结，额外防御' },
-    burn:     { name:'Burn',     nameZh:'灼烧',  color:'#ff6622', icon:'🔥', duration:150, tickDmg:2,  tickRate:40, defPenalty:1, desc:'Burning, reduces defense', descZh:'燃烧，降低防御' },
+    poison:   { name:'Poison',   nameZh:'中毒',  color:'#aa44dd', icon:'☠', duration:360, tickDmg:1,  tickRate:60, desc:'Deals damage over time',         descZh:'持续造成伤害' },
+    paralyze: { name:'Paralyze', nameZh:'麻痹',  color:'#ffee44', icon:'⚡', duration:240, speedMul:0, desc:'Cannot move for duration',       descZh:'无法移动' },
+    sleep:    { name:'Sleep',    nameZh:'睡眠',  color:'#8888ff', icon:'💤', duration:360, speedMul:0, noAlert:true, desc:'Falls asleep, wakes on hit',     descZh:'入睡，受击醒来' },
+    dizzy:    { name:'Dizzy',    nameZh:'眩晕',  color:'#ffaa44', icon:'🌀', duration:180, speedMul:0.3, aimPenalty:true, desc:'Confused movement, reduced accuracy', descZh:'移动混乱，命中降低' },
+    freeze:   { name:'Freeze',   nameZh:'冰冻',  color:'#44ddff', icon:'❄', duration:300, speedMul:0, defBuff:2,  desc:'Frozen solid, extra defense',    descZh:'冻结，额外防御' },
+    burn:     { name:'Burn',     nameZh:'灼烧',  color:'#ff6622', icon:'🔥', duration:300, tickDmg:2,  tickRate:40, defPenalty:1, desc:'Burning, reduces defense', descZh:'燃烧，降低防御' },
 };
 
 // ============ HERBS ============

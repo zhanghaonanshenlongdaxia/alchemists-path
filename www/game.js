@@ -2554,27 +2554,28 @@ function drawExpeditionHUD(){
             if(!ddef) continue;
             var dx=dbX+di*(dbIconSize+dbGap);
             var db=playerDebuffs[dtype];
-            var dtRatio=db.timer/ddef.duration;
+            var dtRatio=(db&&ddef.duration>0)?Math.min(1,Math.max(0,db.timer/ddef.duration)):0;
             // Background
             ctx.fillStyle='rgba(0,0,0,0.65)';ctx.fillRect(dx,dbY,dbIconSize,dbIconSize);
             ctx.strokeStyle=ddef.color;ctx.lineWidth=1.5;ctx.strokeRect(dx,dbY,dbIconSize,dbIconSize);
             // SVG icon or emoji fallback
             var sIcon=ICONS.status[dtype];
-            if(sIcon){
-                ctx.drawImage(sIcon,dx+1,dbY+1,dbIconSize-2,dbIconSize-2);
+            if(sIcon&&sIcon.complete&&sIcon.naturalWidth>0){
+                try{ctx.drawImage(sIcon,dx+1,dbY+1,dbIconSize-2,dbIconSize-2);}catch(e){}
             } else {
                 ctx.fillStyle=ddef.color;ctx.font='18px monospace';ctx.textAlign='center';
                 ctx.fillText(ddef.icon,dx+dbIconSize/2,dbY+dbIconSize/2+5);
             }
             // Timer bar at bottom
             ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(dx,dbY+dbIconSize-3,dbIconSize,3);
-            ctx.fillStyle=ddef.color;ctx.fillRect(dx,dbY+dbIconSize-3,dbIconSize*dtRatio,3);
+            var barW=dbIconSize*dtRatio;
+            if(barW>0){ctx.fillStyle=ddef.color;ctx.fillRect(dx,dbY+dbIconSize-3,barW,3);}
             // Chinese name
             ctx.fillStyle=ddef.color;ctx.font='bold 8px monospace';ctx.textAlign='center';
             ctx.fillText(ddef.nameZh||ddef.name,dx+dbIconSize/2,dbY+dbIconSize+9);
             // Timer
             ctx.fillStyle='#aaa';ctx.font='8px monospace';
-            ctx.fillText(Math.ceil(db.timer/60)+'s',dx+dbIconSize/2,dbY+dbIconSize+18);
+            ctx.fillText(Math.ceil((db&&db.timer||0)/60)+'s',dx+dbIconSize/2,dbY+dbIconSize+18);
         }
     }
     // Potion quickbelt (bottom-center, above joystick)
