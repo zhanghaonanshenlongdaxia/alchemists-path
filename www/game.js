@@ -118,6 +118,7 @@ function getResearchBonus(stat){
     }
     return total;
 }
+let seenEnemies = {}; // {enemyTypeKey: {count, sprite}} bestiary data
 let foundCollectibles = []; // array of collectible ids (all-time)
 let expeditionFoundRelics = []; // relics found in current expedition only
 function collectibleName(c){ return c.nameZh||c.name; }
@@ -190,7 +191,7 @@ function updateStatusEffects(){
                 if(!godMode){
                     playerStats.hp=Math.max(0,playerStats.hp-sdef.tickDmg);
                     spawnFloat(player.x,player.y-15,'-'+sdef.tickDmg,sdef.color);
-                    if(playerStats.hp<=0) gameOver();
+                    if(playerStats.hp<=0){state='gameover';playSound('dead');}
                 }
             }
         }
@@ -822,7 +823,7 @@ canvas.addEventListener('touchstart',function(e){
     if(state==='gameover'){handleGameOverTouch(t0.clientX,t0.clientY);return;}
     if(state!=='expedition') return;
     if(showSettings){handleSettingsClick(t0.clientX,t0.clientY);return;}
-    if(tutorialPhase==='expedition'){handleTutorialClick(t0.clientX,t0.clientY);return;}
+    if(tutorialPhase==='expedition'){handleTutorialClick(t0.clientX,t0.clientY);}
     if(relicChoicePopup){handleRelicChoiceClick(t0.clientX,t0.clientY);return;}
     // Handle popups first
     if(weaponPopup||merchantPopup||buffPopup){
@@ -951,8 +952,7 @@ canvas.addEventListener('touchend',function(e){
 
 // ============ EXPEDITION UPDATE ============
 function update(){
-    // Pause game during tutorial
-    if(tutorialPhase==='expedition') return;
+    // Tutorial no longer pauses game (non-blocking)
     // Lab extraction minigame update
     if(state==='lab'&&extractMini&&extractMini.step===3){
         var em=extractMini;

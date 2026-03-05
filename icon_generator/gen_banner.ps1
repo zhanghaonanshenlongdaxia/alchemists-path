@@ -179,113 +179,46 @@ DrawStar2 $g ($cx-120) ($cy+260) 10 $starC
 DrawStar2 $g 150 200 20 $starC
 DrawStar2 $g 180 800 16 $starC
 
-# ============ RIGHT SIDE: FEATURE CARDS ============
-$cardX = 1150
-$cardStartY = 160
-$cardW = 640
-$cardH = 130
-$cardGap = 30
-
-$features = @(
-    @{
-        icon  = ">"
-        title = ([string][char]0x63A2 + [char]0x9669 + [char]0x5730 + [char]0x7248 + [char]0x57CE)
-        desc  = ([string][char]0x591A + [char]0x751F + [char]0x7269 + [char]0x7FA4 + [char]0x7CFB + [char]0x3001 + [char]0x968F + [char]0x673A + [char]0x5730 + [char]0x56FE + [char]0x3001 + [char]0x5C42 + [char]0x5C42 + [char]0x6311 + [char]0x6218)
-        color = [System.Drawing.Color]::FromArgb(255, 80, 200, 255)
-    },
-    @{
-        icon  = "*"
-        title = ([string][char]0x70BC + [char]0x91D1 + [char]0x7CFB + [char]0x7EDF)
-        desc  = ([string][char]0x91C7 + [char]0x96C6 + [char]0x8349 + [char]0x836F + [char]0x3001 + [char]0x63D0 + [char]0x53D6 + [char]0x3001 + [char]0x9170 + [char]0x9020 + [char]0x5404 + [char]0x79CD + [char]0x5F3A + [char]0x529B + [char]0x836F + [char]0x5242)
-        color = [System.Drawing.Color]::FromArgb(255, 80, 255, 170)
-    },
-    @{
-        icon  = "+"
-        title = ([string][char]0x6280 + [char]0x80FD + [char]0x4E0E + [char]0x9057 + [char]0x7269)
-        desc  = ([string][char]0x89E3 + [char]0x9501 + [char]0x72EC + [char]0x7279 + [char]0x7814 + [char]0x7A76 + [char]0x6811 + [char]0x548C + [char]0x5F3A + [char]0x529B + [char]0x9057 + [char]0x7269 + [char]0x7EC4 + [char]0x5408)
-        color = [System.Drawing.Color]::FromArgb(255, 255, 200, 60)
-    },
-    @{
-        icon  = "!"
-        title = ([string][char]0x72B6 + [char]0x6001 + [char]0x4E0E + [char]0x6218 + [char]0x6597)
-        desc  = ([string][char]0x4E2D + [char]0x6BD2 + [char]0x3001 + [char]0x51B0 + [char]0x51BB + [char]0x3001 + [char]0x707C + [char]0x70E7 + [char]0x7B49 + [char]0x72B6 + [char]0x6001 + [char]0x6548 + [char]0x679C + [char]0x6218 + [char]0x6597)
-        color = [System.Drawing.Color]::FromArgb(255, 255, 100, 100)
-    }
-)
-
-$titleFont = New-Object System.Drawing.Font("Microsoft YaHei", 18, [System.Drawing.FontStyle]::Bold)
-$descFont  = New-Object System.Drawing.Font("Microsoft YaHei", 13)
-$iconFont  = New-Object System.Drawing.Font("Segoe UI Symbol", 22)
-
-for ($fi = 0; $fi -lt $features.Count; $fi++) {
-    $feat = $features[$fi]
-    $fy = $cardStartY + $fi * ($cardH + $cardGap)
-    
-    # Card background
-    $cardBgBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(35, 255, 255, 255))
-    $g.FillRectangle($cardBgBrush, $cardX, $fy, $cardW, $cardH)
-    
-    # Card border (colored left stripe)
-    $stripeBrush = New-Object System.Drawing.SolidBrush($feat.color)
-    $g.FillRectangle($stripeBrush, $cardX, $fy, 6, $cardH)
-    
-    # Card outer border
-    $cardBorderPen = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(60, 255, 255, 255), 1)
-    $g.DrawRectangle($cardBorderPen, $cardX, $fy, $cardW, $cardH)
-    
-    # Icon
-    $iconBrush = New-Object System.Drawing.SolidBrush($feat.color)
-    $g.DrawString($feat.icon, $iconFont, $iconBrush, [float]($cardX+20), [float]($fy+20))
-    
-    # Title
-    $titleBrush = New-Object System.Drawing.SolidBrush($feat.color)
-    $g.DrawString($feat.title, $titleFont, $titleBrush, [float]($cardX+70), [float]($fy+18))
-    
-    # Desc
-    $descBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(200, 200, 200, 220))
-    $g.DrawString($feat.desc, $descFont, $descBrush, [float]($cardX+20), [float]($fy+62))
-    
-    $cardBgBrush.Dispose(); $stripeBrush.Dispose(); $iconBrush.Dispose()
-    $titleBrush.Dispose(); $descBrush.Dispose(); $cardBorderPen.Dispose()
-}
-
-# ============ TITLE: 炼金之路 ============
-$bigFont = New-Object System.Drawing.Font("Microsoft YaHei", 96, [System.Drawing.FontStyle]::Bold)
+# ============ RIGHT SIDE: TITLE 炼金之路 (centered vertically) ============
 $titleStr = [string][char]0x70BC + [char]0x91D1 + [char]0x4E4B + [char]0x8DEF  # 炼金之路
 
+# Right half: x=960..1920, center at x=1440, vertically centered at y=540
+$rightCX = 1440
+$titleY   = 380  # top of title text area
+
+$bigFont = New-Object System.Drawing.Font("Microsoft YaHei", 110, [System.Drawing.FontStyle]::Bold)
+
 $sf = New-Object System.Drawing.StringFormat
-$sf.Alignment = [System.Drawing.StringAlignment]::Center
+$sf.Alignment     = [System.Drawing.StringAlignment]::Center
+$sf.LineAlignment = [System.Drawing.StringAlignment]::Center
+
+# Glow behind title
+$titleGlowPath = New-Object System.Drawing.Drawing2D.GraphicsPath
+$titleGlowPath.AddEllipse(960, 280, 960, 520)
+$titleGlowBrush = New-Object System.Drawing.Drawing2D.PathGradientBrush($titleGlowPath)
+$titleGlowBrush.CenterColor = [System.Drawing.Color]::FromArgb(40, 200, 150, 0)
+$titleGlowBrush.SurroundColors = @([System.Drawing.Color]::FromArgb(0, 0, 0, 0))
+$g.FillPath($titleGlowBrush, $titleGlowPath)
 
 # Shadow layers
-$shadowBrush1 = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(120, 100, 30, 200))
-$shadowRect1  = New-Object System.Drawing.RectangleF(1060.0, 820.0, 800.0, 140.0)
+$shadowBrush1 = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(130, 80, 20, 180))
+$shadowRect1  = New-Object System.Drawing.RectangleF(966.0, [float]($titleY+6), 960.0, 200.0)
 $g.DrawString($titleStr, $bigFont, $shadowBrush1, $shadowRect1, $sf)
 
-$shadowBrush2 = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(100, 80, 20, 180))
-$shadowRect2  = New-Object System.Drawing.RectangleF(1064.0, 824.0, 800.0, 140.0)
+$shadowBrush2 = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(90, 60, 10, 140))
+$shadowRect2  = New-Object System.Drawing.RectangleF(970.0, [float]($titleY+10), 960.0, 200.0)
 $g.DrawString($titleStr, $bigFont, $shadowBrush2, $shadowRect2, $sf)
 
 # Gold gradient fill
-$mainRect = New-Object System.Drawing.RectangleF(1056.0, 816.0, 800.0, 140.0)
+$mainRect = New-Object System.Drawing.RectangleF(960.0, [float]$titleY, 960.0, 200.0)
 $gradBrush = New-Object System.Drawing.Drawing2D.LinearGradientBrush(
-    [System.Drawing.Point]::new(1056, 816),
-    [System.Drawing.Point]::new(1856, 956),
-    [System.Drawing.Color]::FromArgb(255, 255, 235, 90),
-    [System.Drawing.Color]::FromArgb(255, 255, 160, 30)
+    [System.Drawing.Point]::new(960, $titleY),
+    [System.Drawing.Point]::new(1920, ($titleY+200)),
+    [System.Drawing.Color]::FromArgb(255, 255, 240, 100),
+    [System.Drawing.Color]::FromArgb(255, 255, 155, 20)
 )
 $g.DrawString($titleStr, $bigFont, $gradBrush, $mainRect, $sf)
 
-# Subtitle / tagline
-$subFont = New-Object System.Drawing.Font("Microsoft YaHei", 22)
-$subStr  = [string][char]0x63A2 + [char]0x9669 + "  " + [char]0x00B7 + "  " + [char]0x91C7 + [char]0x96C6 + "  " + [char]0x00B7 + "  " + [char]0x70BC + [char]0x5236 + "  " + [char]0x00B7 + "  " + [char]0x5F81 + [char]0x670D
-# 探险 · 采集 · 炼制 · 征服
-$subBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(180, 180, 220, 255))
-$subRect  = New-Object System.Drawing.RectangleF(1056.0, 956.0, 800.0, 40.0)
-$g.DrawString($subStr, $subFont, $subBrush, $subRect, $sf)
-
-# Decorative line under title
-$linePen = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(120, 255, 200, 80), 2)
-$g.DrawLine($linePen, 1156, 1005, 1756, 1005)
 
 # ============ BOTTOM AMBIENT ============
 # Vignette effect (darken corners)
