@@ -2545,9 +2545,9 @@ function drawExpeditionHUD(){
     // Player debuff icons (bottom center, above quickbar)
     var dbKeys=Object.keys(playerDebuffs).filter(function(k){return playerDebuffs[k]&&playerDebuffs[k].timer>0;});
     if(dbKeys.length>0){
-        var dbIconSize=26,dbGap=4;
+        var dbIconSize=26,dbGap=6;
         var dbTotalW=dbKeys.length*(dbIconSize+dbGap)-dbGap;
-        var dbX=(W-dbTotalW)/2, dbY=canvas.height-(isMobile?110:100);
+        var dbX=(W-dbTotalW)/2, dbY=canvas.height-(isMobile?120:110);
         for(var di=0;di<dbKeys.length;di++){
             var dtype=dbKeys[di];
             var ddef=STATUS_DEFS[dtype];
@@ -2559,14 +2559,17 @@ function drawExpeditionHUD(){
             // Icon
             ctx.fillStyle=ddef.color;ctx.font='14px monospace';ctx.textAlign='center';
             ctx.fillText(ddef.icon,dx+dbIconSize/2,dbY+dbIconSize/2+4);
-            // Timer bar at bottom
+            // Timer bar at bottom of icon
             var db=playerDebuffs[dtype];
             var dtRatio=db.timer/ddef.duration;
             ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(dx,dbY+dbIconSize-3,dbIconSize,3);
             ctx.fillStyle=ddef.color;ctx.fillRect(dx,dbY+dbIconSize-3,dbIconSize*dtRatio,3);
-            // Timer text
-            ctx.fillStyle='#fff';ctx.font='8px monospace';ctx.textAlign='center';
-            ctx.fillText(Math.ceil(db.timer/60)+'s',dx+dbIconSize/2,dbY+dbIconSize-5);
+            // Chinese name below icon
+            ctx.fillStyle=ddef.color;ctx.font='bold 8px monospace';ctx.textAlign='center';
+            ctx.fillText(ddef.nameZh||ddef.name,dx+dbIconSize/2,dbY+dbIconSize+9);
+            // Timer text below name
+            ctx.fillStyle='#aaa';ctx.font='8px monospace';
+            ctx.fillText(Math.ceil(db.timer/60)+'s',dx+dbIconSize/2,dbY+dbIconSize+18);
         }
     }
     // Potion quickbelt (bottom-center, above joystick)
