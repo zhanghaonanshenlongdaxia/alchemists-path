@@ -3342,7 +3342,12 @@ function handleExpeditionPopupClick(cx,cy){
                     var r=item.recipe;
                     inventory.potions.push({name:r.name,effect:r.effect,tier:r.tier,value:r.value,color:r.color,desc:r.desc});
                 }
-                else if(item.type==='weapon') inventory.weapons.push(item.weapon);
+                else if(item.type==='weapon'){
+                    inventory.weapons.push(item.weapon);
+                    equippedWeapon=item.weapon;
+                    forgedWeapon=item.weapon;
+                    saveGame();
+                }
                 else if(item.type==='key') playerKeys+=(item.count||1);
                 shopStock.splice(i,1);
                 spawnFloat(player.x,player.y-20,T('boughtItem'),'#44dd88');
@@ -4994,6 +4999,13 @@ function drawSettings(){
     ctx.fillStyle='#000';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
     ctx.fillText('返回主菜单',menuBtnX+menuBtnW/2,menuBtnY+menuBtnH/2+4);
     cy+=lh;
+    // God Mode toggle
+    var gmBtnW=pw-24,gmBtnH=compact?24:28,gmBtnX=px+12,gmBtnY=cy;
+    ctx.fillStyle=godMode?'#ffd700':'#333';ctx.fillRect(gmBtnX,gmBtnY,gmBtnW,gmBtnH);
+    ctx.strokeStyle=godMode?'#ffee88':'#555';ctx.lineWidth=1;ctx.strokeRect(gmBtnX,gmBtnY,gmBtnW,gmBtnH);
+    ctx.fillStyle=godMode?'#000':'#888';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
+    ctx.fillText('无敌模式: '+(godMode?'开':'关'),gmBtnX+gmBtnW/2,gmBtnY+gmBtnH/2+4);
+    cy+=lh;
     // Close button
     var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cy;
     ctx.fillStyle='#44dd88';ctx.fillRect(cbX,cbY,cbW,cbH);
@@ -5054,6 +5066,10 @@ function handleSettingsClick(cx,cy){
         playBGM('menu');
         return;
     }
+    cyy+=lh;
+    // God Mode toggle button
+    var gmBtnW2=pw-24,gmBtnH2=compact?24:28,gmBtnX2=px+12,gmBtnY2=cyy;
+    if(cx>=gmBtnX2&&cx<=gmBtnX2+gmBtnW2&&cy>=gmBtnY2&&cy<=gmBtnY2+gmBtnH2){godMode=!godMode;playSound('click');return;}
     cyy+=lh;
     // Close button
     var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cyy;
@@ -5356,6 +5372,8 @@ function handleLabClick(cx,cy){
                 forgeSelected.forEach(function(idx){inventory.potions.splice(idx,1);});
                 forgeSelected=[];
                 forgedWeapon=forged;
+                inventory.weapons.push(forged);
+                saveGame();
                 // Also equip it as current weapon for next expedition
                 labMessage='锻造成功：'+weaponName(forged);
                 labMessageTimer=180; playSound('levelUp'); return;
