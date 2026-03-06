@@ -586,14 +586,23 @@ function setupFloor(biomeIdx, floor){
                 var bName=currentBiome.enemyType||'forest';
                 var ePool=biomeEnemyPools[bName]||(biomeEnemyPools.forest);
                 var eTypeKey=isElite?ePool.elite[randInt(0,ePool.elite.length-1)]:ePool.normal[randInt(0,ePool.normal.length-1)];
-                enemies.push({
+                var eObj={
                     x:pos.x,y:pos.y,angle:Math.random()*Math.PI*2,
                     hp:Math.ceil(baseHP*hpMul), maxHp:Math.ceil(baseHP*hpMul),
                     radius:isElite?9:7, alert:false, alertTimer:0,
                     patrolAngle:Math.random()*Math.PI*2, patrolTimer:randInt(60,180),
                     animFrame:0, attackCD:0, atk:Math.ceil(baseATK*atkMul),
                     isElite:isElite, isBoss:false, enemyTypeKey:eTypeKey
-                });
+                };
+                if(isElite){
+                    eObj.eliteChargeCD=randInt(180,300);
+                    eObj.eliteCharging=false;
+                    eObj.eliteChargeAngle=0;
+                    eObj.eliteChargeTimer=0;
+                    eObj.eliteEnraged=false;
+                    eObj.eliteSlamCD=randInt(240,360);
+                }
+                enemies.push(eObj);
             }
         }
     }
@@ -1287,19 +1296,112 @@ function update(){
                 continue;
             }
         }
-        var sightRange = e.isElite?180:150;
+        // ===== ELITE SPECIAL AI =====
+        if(e.isElite){
+            // Enrage at 40% HP
+            if(!e.eliteEnraged&&e.hp<e.maxHp*0.4){
+                e.eliteEnraged=true;
+                spawnFloat(e.x,e.y-30,'狂暴！','#ff6600');
+                spawnParticles(e.x,e.y,'#ff8800',20);
+                screenShake=10; bossFlash=0.5; bossFlashColor='#ff6600';
+                bossShockwave={x:e.x,y:e.y,r:8,maxR:100,life:20};
+                playSound('levelUp');
+            }
+            var eliteSpdMul=e.eliteEnraged?1.4:1.0;
+            // Handle charge
+            if(e.eliteCharging){
+                e.eliteChargeTimer--;
+                var ecspd=3.8*eliteSpdMul;
+                tryMove(e,Math.cos(e.eliteChargeAngle)*ecspd,Math.sin(e.eliteChargeAngle)*ecspd);
+                spawnParticles(e.x,e.y,e.eliteEnraged?'#ff4400':'#ff8800',1);
+                if(d<25){
+                    var edDmg=Math.max(1,Math.ceil(e.atk*1.4)-playerStats.def);
+                    var edAct=applyDamageToPlayer(edDmg);
+                    if(edAct!==false){
+                        spawnFloat(player.x,player.y-10,'-'+edAct,'#ff5500');
+                        spawnParticles(player.x,player.y,'#ff5500',10);
+                        screenShake=9; bossFlash=0.4; bossFlashColor='#ff4400';
+                        bossShockwave={x:player.x,y:player.y,r:5,maxR:60,life:12};
+                        playSound('hit');
+                    }
+                    e.eliteCharging=false; e.eliteChargeCD=150; e.attackCD=25;
+                    if(playerStats.hp<=0){
+                        if(playerStats.revive){playerStats.revive=false;playerStats.hp=Math.floor(playerStats.maxHp/2);spawnFloat(player.x,player.y-20,T('revived'),'#ffaa00');spawnParticles(player.x,player.y,'#ffaa00',12);activeBuffs=activeBuffs.filter(function(b){return b.effect!=='revive';});}
+                        else{state='gameover';return;}
+                    }
+                }
+                if(e.eliteChargeTimer<=0) e.eliteCharging=false;
+            } else {
+                e.alert=true; e.alertTimer=9999;
+                e.angle=angleTo(e,player);
+                var eespd=ENEMY_SPEED*1.1*eliteSpdMul;
+                if(d>28) tryMove(e,Math.cos(e.angle)*eespd,Math.sin(e.angle)*eespd);
+                // Melee attack (harder hit than normal)
+                if(d<30&&e.attackCD<=0){
+                    var edmg=Math.max(1,e.atk-playerStats.def);
+                    var eact=applyDamageToPlayer(edmg);
+                    if(eact!==false){
+                        spawnFloat(player.x,player.y-10,'-'+eact,'#ff6600');
+                        spawnParticles(player.x,player.y,'#ff6600',6);
+                        screenShake=6; playSound('hit');
+                        if(e.enemyTypeKey){var efx2=ENEMY_TYPE_EFFECTS[e.enemyTypeKey];if(efx2&&efx2.length>0&&Math.random()<0.45)applyDebuffToPlayer(efx2[Math.floor(Math.random()*efx2.length)]);}
+                    }
+                    e.attackCD=e.eliteEnraged?28:38;
+                    if(playerStats.hp<=0){
+                        if(playerStats.revive){playerStats.revive=false;playerStats.hp=Math.floor(playerStats.maxHp/2);spawnFloat(player.x,player.y-20,T('revived'),'#ffaa00');spawnParticles(player.x,player.y,'#ffaa00',12);activeBuffs=activeBuffs.filter(function(b){return b.effect!=='revive';});}
+                        else{state='gameover';return;}
+                    }
+                }
+                // Charge attack
+                if(e.eliteChargeCD<=0&&d>80&&d<250){
+                    e.eliteCharging=true; e.eliteChargeAngle=e.angle; e.eliteChargeTimer=22;
+                    e.eliteChargeCD=e.eliteEnraged?100:170;
+                    spawnFloat(e.x,e.y-20,'冲锋！','#ff8800');
+                    bossFlash=0.25; bossFlashColor='#ff8800';
+                    playSound('swing');
+                }
+                // Elite slam (AoE ring) when very close
+                if(e.eliteSlamCD<=0&&d<45){
+                    e.eliteSlamCD=e.eliteEnraged?140:220;
+                    var eslamDmg=Math.max(1,Math.ceil(e.atk*0.7)-playerStats.def);
+                    if(d<40){
+                        var eslamAct=applyDamageToPlayer(eslamDmg);
+                        if(eslamAct!==false){
+                            spawnFloat(player.x,player.y-10,'-'+eslamAct,'#ff8844');
+                            screenShake=7; bossFlash=0.3; bossFlashColor='#ff6600';
+                            bossShockwave={x:e.x,y:e.y,r:8,maxR:80,life:14};
+                            playSound('hit');
+                        }
+                        if(playerStats.hp<=0){
+                            if(playerStats.revive){playerStats.revive=false;playerStats.hp=Math.floor(playerStats.maxHp/2);spawnFloat(player.x,player.y-20,T('revived'),'#ffaa00');spawnParticles(player.x,player.y,'#ffaa00',12);activeBuffs=activeBuffs.filter(function(b){return b.effect!=='revive';});}
+                            else{state='gameover';return;}
+                        }
+                    }
+                    for(var esi=0;esi<16;esi++){var esa=Math.PI*2*esi/16,esr=30+Math.random()*15;particles.push({x:e.x+Math.cos(esa)*esr,y:e.y+Math.sin(esa)*esr,vx:Math.cos(esa)*2.5,vy:Math.sin(esa)*2.5,life:20,maxLife:20,size:3,color:e.eliteEnraged?'#ff4400':'#ff8844'});}
+                    spawnFloat(e.x,e.y-20,'震地！','#ff8844');
+                }
+            }
+            if(e.eliteChargeCD>0) e.eliteChargeCD--;
+            if(e.eliteSlamCD>0) e.eliteSlamCD--;
+            if(e.attackCD>0) e.attackCD--;
+            // Ambient aura particles when enraged
+            if(e.eliteEnraged&&frameCount%8===0) spawnParticles(e.x,e.y,'#ff6600',1);
+            continue;
+        }
+        // ===== NORMAL ENEMY AI =====
+        var sightRange = 150;
         var canSee=d<sightRange&&lineOfSight(e.x,e.y,player.x,player.y);
         if(playerStats.stealth>0&&!e.alert) canSee=canSee&&d<60;
         if(canSee||(e.alert&&d<200)){
             e.alert=true;e.alertTimer=180;
             // Record to bestiary on first sight (boss/elite: record on alert too)
-            if((canSee||e.isBoss||e.isElite)&&e.enemyTypeKey){
+            if(e.enemyTypeKey){
                 var etKey=e.enemyTypeKey;
                 if(!seenEnemies[etKey]) seenEnemies[etKey]={count:0,sprite:e.sprite||null};
                 if(!e._seenRecorded){seenEnemies[etKey].count++;e._seenRecorded=true;}
             }
             e.angle=angleTo(e,player);
-            var espd = e.isElite?ENEMY_SPEED*1.1:ENEMY_SPEED*1.2;
+            var espd = ENEMY_SPEED*1.2;
             if(d>28) tryMove(e,Math.cos(e.angle)*espd,Math.sin(e.angle)*espd);
             if(d<30&&e.attackCD<=0){
                 var dmg=Math.max(1,e.atk-playerStats.def);
@@ -2109,9 +2211,43 @@ function renderExpedition(){
         }
         // Elite/Boss label with glow
         if(e.isElite){
-            ctx.save();ctx.shadowColor='#ff8800';ctx.shadowBlur=4;
-            ctx.fillStyle='#ff8800';ctx.font='bold 8px monospace';ctx.textAlign='center';
-            ctx.fillText('ELITE',e.x,e.y+e.radius+10);ctx.restore();
+            // Pulsing orange aura ring
+            ctx.save();
+            var eliteAuraA=0.12+Math.sin(frameCount*0.08)*0.06;
+            ctx.globalAlpha=eliteAuraA;
+            var eliteG=ctx.createRadialGradient(e.x,e.y,e.radius,e.x,e.y,e.radius*2.8);
+            eliteG.addColorStop(0,e.eliteEnraged?'#ff4400':'#ff8800');
+            eliteG.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle=eliteG;ctx.fillRect(e.x-30,e.y-30,60,60);ctx.restore();
+            // Rotating crown ring
+            ctx.save();ctx.globalAlpha=0.35+Math.sin(frameCount*0.1)*0.1;
+            ctx.strokeStyle=e.eliteEnraged?'#ff4400':'#ffaa00';ctx.lineWidth=1.5;
+            ctx.translate(e.x,e.y);ctx.rotate(frameCount*0.03);
+            ctx.beginPath();ctx.arc(0,0,e.radius+4,0,Math.PI*2);ctx.stroke();
+            // 4 corner sparks
+            for(var eci=0;eci<4;eci++){var eca=eci*Math.PI/2;ctx.fillStyle=e.eliteEnraged?'#ff4400':'#ffcc44';ctx.fillRect(Math.cos(eca)*(e.radius+3)-1.5,Math.sin(eca)*(e.radius+3)-1.5,3,3);}
+            ctx.restore();
+            // Charge trail
+            if(e.eliteCharging){
+                ctx.save();
+                for(var eci2=1;eci2<=5;eci2++){
+                    var ecx3=e.x-Math.cos(e.eliteChargeAngle)*eci2*8, ecy3=e.y-Math.sin(e.eliteChargeAngle)*eci2*8;
+                    ctx.globalAlpha=0.28-eci2*0.05;
+                    ctx.fillStyle=e.eliteEnraged?'#ff4400':'#ff8844';
+                    ctx.beginPath();ctx.arc(ecx3,ecy3,e.radius-eci2,0,Math.PI*2);ctx.fill();
+                }
+                ctx.restore();
+            }
+            // Enrage fire aura
+            if(e.eliteEnraged){
+                ctx.save();ctx.globalAlpha=0.1+Math.sin(frameCount*0.15)*0.05;
+                var enrEG=ctx.createRadialGradient(e.x,e.y,e.radius,e.x,e.y,e.radius*3.5);
+                enrEG.addColorStop(0,'#ff4400');enrEG.addColorStop(1,'rgba(0,0,0,0)');
+                ctx.fillStyle=enrEG;ctx.fillRect(e.x-35,e.y-35,70,70);ctx.restore();
+            }
+            ctx.save();ctx.shadowColor=e.eliteEnraged?'#ff4400':'#ff8800';ctx.shadowBlur=6;
+            ctx.fillStyle=e.eliteEnraged?'#ff4400':'#ff8800';ctx.font='bold 8px monospace';ctx.textAlign='center';
+            ctx.fillText(e.eliteEnraged?'★ELITE★':'ELITE',e.x,e.y+e.radius+10);ctx.restore();
         }
         if(e.isBoss){
             ctx.save();ctx.shadowColor=bossPhase===1?'#ff4400':'#ff4444';ctx.shadowBlur=8;
@@ -5928,5 +6064,5 @@ document.addEventListener('visibilitychange',function(){
         mobileAimStick.active=false;mobileAimStick.id=-1;
     }
 });
-var GAME_VERSION = 'v1.0.60';
+var GAME_VERSION = 'v1.0.61';
 (async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();await loadBestiarySprites();await loadRelicSprites();await loadGameIcons();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
