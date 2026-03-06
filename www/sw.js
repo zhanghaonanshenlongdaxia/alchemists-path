@@ -46,10 +46,13 @@ self.addEventListener('activate', function(e) {
 self.addEventListener('fetch', function(e) {
   e.respondWith(
     fetch(e.request).then(function(res) {
-      var clone = res.clone();
-      caches.open(CACHE_NAME).then(function(cache) {
-        cache.put(e.request, clone);
-      });
+      // Only cache full responses (not 206 partial content)
+      if(res.status === 200 && res.type === 'basic') {
+        var clone = res.clone();
+        caches.open(CACHE_NAME).then(function(cache) {
+          cache.put(e.request, clone);
+        });
+      }
       return res;
     }).catch(function() {
       return caches.match(e.request);
