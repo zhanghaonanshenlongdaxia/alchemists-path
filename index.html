@@ -13,47 +13,90 @@
     <script src="audio.js"></script>
     <script src="gamedata.js"></script>
     <script src="icons_embedded.js"></script>
-    <script src="game.js"></script>
     <script>
-    // ========== APK HOT UPDATE SYSTEM ==========
-    // Checks remote version 5s after start, downloads & caches new game.js via Cache API
+    // ========== APK HOT UPDATE SYSTEM (IndexedDB-based, no SW required) ==========
     var REMOTE_BASE = 'https://zhanghaonanshenlongdaxia.github.io/alchemists-path/';
-    var _HU_CACHE_NAME = 'alchemist-hot-update-v1';
+    var _HU_DB_NAME = 'AlchemistHotUpdate';
+    var _HU_STORE = 'gamejs';
     var _HU_VER_KEY = 'alchemist_hu_ver';
 
+    function _huOpenDB(cb){
+        var req = indexedDB.open(_HU_DB_NAME, 1);
+        req.onupgradeneeded = function(e){ e.target.result.createObjectStore(_HU_STORE); };
+        req.onsuccess = function(e){ cb(null, e.target.result); };
+        req.onerror = function(e){ cb(e); };
+    }
+
+    function _huSave(code, ver, cb){
+        _huOpenDB(function(err, db){
+            if(err){ cb && cb(err); return; }
+            var tx = db.transaction(_HU_STORE, 'readwrite');
+            tx.objectStore(_HU_STORE).put(code, 'code');
+            tx.objectStore(_HU_STORE).put(ver, 'ver');
+            tx.oncomplete = function(){ cb && cb(null); };
+        });
+    }
+
+    function _huLoad(cb){
+        _huOpenDB(function(err, db){
+            if(err){ cb(null, null, null); return; }
+            var tx = db.transaction(_HU_STORE, 'readonly');
+            var store = tx.objectStore(_HU_STORE);
+            var code, ver;
+            store.get('code').onsuccess = function(e){ code = e.target.result; };
+            store.get('ver').onsuccess = function(e){ ver = e.target.result; };
+            tx.oncomplete = function(){ cb(null, code, ver); };
+        });
+    }
+
     function _huExtractVer(src){
-        var m=src.match(/var GAME_VERSION\s*=\s*'([^']+)'/);
-        return m?m[1]:null;
+        var m = src.match(/var GAME_VERSION\s*=\s*'([^']+)'/);
+        return m ? m[1] : null;
+    }
+
+    function _huExecCode(code){
+        var s = document.createElement('script');
+        s.textContent = code;
+        document.head.appendChild(s);
     }
 
     function _huShowToast(ver){
-        var toast=document.createElement('div');
-        toast.style.cssText='position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:2px solid #44dd88;color:#fff;padding:12px 20px;border-radius:8px;z-index:999997;font-family:monospace;font-size:13px;text-align:center;min-width:240px;box-shadow:0 4px 20px rgba(0,0,0,0.6);';
-        toast.innerHTML='<div style="color:#44dd88;font-weight:bold;margin-bottom:8px;">\uD83D\uDD04 \u53d1\u73b0\u65b0\u7248\u672c '+ver+'</div>'
-            +'<div style="color:#aaa;font-size:11px;margin-bottom:10px;">\u5df2\u4e0b\u8f7d\uff0c\u91cd\u542f\u540e\u751f\u6548</div>'
-            +'<button onclick="window.location.reload()" style="background:#44dd88;color:#000;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-weight:bold;font-family:monospace;font-size:13px;">\u7acb\u5373\u91cd\u542f</button>'
-            +'<button onclick="this.parentElement.remove()" style="background:#444;color:#aaa;border:none;padding:8px 12px;border-radius:4px;cursor:pointer;font-family:monospace;font-size:12px;margin-left:6px;">\u7a0d\u540e</button>';
+        var toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:2px solid #44dd88;color:#fff;padding:12px 20px;border-radius:8px;z-index:999997;font-family:monospace;font-size:13px;text-align:center;min-width:240px;box-shadow:0 4px 20px rgba(0,0,0,0.6);';
+        toast.innerHTML = '<div style="color:#44dd88;font-weight:bold;margin-bottom:8px;">\uD83D\uDD04 \u53d1\u73b0\u65b0\u7248\u672c ' + ver + '</div>'
+            + '<div style="color:#aaa;font-size:11px;margin-bottom:10px;">\u5df2\u4e0b\u8f7d\uff0c\u91cd\u542f\u540e\u751f\u6548</div>'
+            + '<button onclick="window.location.reload()" style="background:#44dd88;color:#000;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-weight:bold;font-family:monospace;font-size:13px;">\u7acb\u5373\u91cd\u542f</button>'
+            + '<button onclick="this.parentElement.remove()" style="background:#444;color:#aaa;border:none;padding:8px 12px;border-radius:4px;cursor:pointer;font-family:monospace;font-size:12px;margin-left:6px;">\u7a0d\u540e</button>';
         document.body.appendChild(toast);
     }
 
     function _huCheckRemote(){
-        var curVer = localStorage.getItem(_HU_VER_KEY) || (typeof GAME_VERSION!=='undefined'?GAME_VERSION:'');
-        fetch(REMOTE_BASE+'game.js?_='+Date.now(), {cache:'no-store'})
+        var curVer = localStorage.getItem(_HU_VER_KEY) || (typeof GAME_VERSION !== 'undefined' ? GAME_VERSION : '');
+        fetch(REMOTE_BASE + 'game.js?_=' + Date.now(), {cache: 'no-store'})
             .then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
             .then(function(code){
                 var remoteVer = _huExtractVer(code);
                 if(remoteVer && remoteVer !== curVer){
-                    // Send to SW to store in hot cache (SW will serve it on next reload)
-                    if(navigator.serviceWorker && navigator.serviceWorker.controller){
-                        navigator.serviceWorker.controller.postMessage({action:'hotUpdate', code:code});
-                    }
-                    localStorage.setItem(_HU_VER_KEY, remoteVer);
-                    _huShowToast(remoteVer);
+                    _huSave(code, remoteVer, function(){
+                        localStorage.setItem(_HU_VER_KEY, remoteVer);
+                        _huShowToast(remoteVer);
+                    });
                 }
             }).catch(function(){});
     }
 
-    setTimeout(_huCheckRemote, 5000);
+    // On startup: load from IndexedDB if available, else use local game.js
+    _huLoad(function(err, cachedCode, cachedVer){
+        if(!err && cachedCode && cachedVer){
+            _huExecCode(cachedCode);
+        } else {
+            var s = document.createElement('script');
+            s.src = 'game.js';
+            document.head.appendChild(s);
+        }
+        // Check remote after 5s
+        setTimeout(_huCheckRemote, 5000);
+    });
     </script>
     <div id="updateModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99999;justify-content:center;align-items:center;">
         <div style="background:#1a1a2e;padding:30px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:320px;text-align:center;border:2px solid #44dd88;">
