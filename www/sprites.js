@@ -1,4 +1,5 @@
 // ============ SPRITE SYSTEM for Alchemist's Path ============
+var SPRITES_VERSION = 'sp-1.0.0';
 const TILE_SIZE = 16, SHEET_COLS = 20;
 let tilesheet = null;
 const SPR = {};

@@ -5,20 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Alchemist's Path</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚗️</text></svg>">
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <script src="sprites.js"></script>
-    <script src="audio.js"></script>
-    <script src="icons_embedded.js"></script>
     <script>
-    // ========== APK HOT UPDATE SYSTEM v2 (gamedata.js + game.js) ==========
+    // ========== APK HOT UPDATE SYSTEM v3 (all JS files + style.css) ==========
     var REMOTE_BASE = 'https://zhanghaonanshenlongdaxia.github.io/alchemists-path/';
     var _HU_DB_NAME = 'AlchemistHotUpdate';
-    var _HU_DB_VER = 2;
+    var _HU_DB_VER = 3;
     var _HU_STORE = 'files';
 
+    // IndexedDB helpers
     function _huOpenDB(cb){
         var req = indexedDB.open(_HU_DB_NAME, _HU_DB_VER);
         req.onupgradeneeded = function(e){
@@ -28,7 +25,6 @@
         req.onsuccess = function(e){ cb(null, e.target.result); };
         req.onerror = function(){ cb(new Error('idb')); };
     }
-
     function _huGet(key, cb){
         _huOpenDB(function(err, db){
             if(err){ cb(null); return; }
@@ -37,7 +33,6 @@
             req.onerror = function(){ cb(null); };
         });
     }
-
     function _huPut(key, val, cb){
         _huOpenDB(function(err, db){
             if(err){ cb&&cb(); return; }
@@ -47,80 +42,116 @@
         });
     }
 
-    function _huExec(code){
-        var s = document.createElement('script');
-        s.textContent = code;
-        document.head.appendChild(s);
-    }
-
-    function _huLoadScript(src, cb){
-        var s = document.createElement('script');
-        s.src = src;
-        s.onload = cb;
-        s.onerror = cb;
-        document.head.appendChild(s);
-    }
+    // Execute JS code or load from src
+    function _huExecJs(code){ var s=document.createElement('script'); s.textContent=code; document.head.appendChild(s); }
+    function _huLoadSrc(src, cb){ var s=document.createElement('script'); s.src=src; s.onload=cb; s.onerror=cb; document.head.appendChild(s); }
+    function _huApplyCss(css){ var s=document.createElement('style'); s.textContent=css; document.head.appendChild(s); }
+    function _huLoadCssLink(href){ var l=document.createElement('link'); l.rel='stylesheet'; l.href=href; document.head.appendChild(l); }
 
     function _huExtractVer(code, varName){
-        var m = code.match(new RegExp('var\\s+'+varName+'\\s*=\\s*\'([^\']+)\''));
-        return m ? m[1] : null;
+        var m=code.match(new RegExp('var\\s+'+varName+'\\s*=\\s*\'([^\']+)\''));
+        return m?m[1]:null;
     }
 
     function _huShowToast(ver){
-        var t = document.createElement('div');
-        t.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:2px solid #44dd88;color:#fff;padding:12px 20px;border-radius:8px;z-index:999997;font-family:monospace;font-size:13px;text-align:center;min-width:240px;box-shadow:0 4px 20px rgba(0,0,0,0.6);';
-        t.innerHTML = '<div style="color:#44dd88;font-weight:bold;margin-bottom:8px;">\uD83D\uDD04 \u53d1\u73b0\u65b0\u7248\u672c ' + ver + '</div>'
-            + '<div style="color:#aaa;font-size:11px;margin-bottom:10px;">\u5df2\u4e0b\u8f7d\uff0c\u91cd\u542f\u540e\u751f\u6548</div>'
-            + '<button onclick="window.location.reload()" style="background:#44dd88;color:#000;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-weight:bold;font-family:monospace;font-size:13px;">\u7acb\u5373\u91cd\u542f</button>'
-            + '<button onclick="this.parentElement.remove()" style="background:#444;color:#aaa;border:none;padding:8px 12px;border-radius:4px;cursor:pointer;font-family:monospace;font-size:12px;margin-left:6px;">\u7a0d\u540e</button>';
+        var t=document.createElement('div');
+        t.style.cssText='position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:2px solid #44dd88;color:#fff;padding:12px 20px;border-radius:8px;z-index:999997;font-family:monospace;font-size:13px;text-align:center;min-width:240px;box-shadow:0 4px 20px rgba(0,0,0,0.6);';
+        t.innerHTML='<div style="color:#44dd88;font-weight:bold;margin-bottom:8px;">\uD83D\uDD04 \u53d1\u73b0\u65b0\u7248\u672c '+ver+'</div>'
+            +'<div style="color:#aaa;font-size:11px;margin-bottom:10px;">\u5df2\u4e0b\u8f7d\uff0c\u91cd\u542f\u540e\u751f\u6548</div>'
+            +'<button onclick="window.location.reload()" style="background:#44dd88;color:#000;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-weight:bold;font-family:monospace;font-size:13px;">\u7acb\u5373\u91cd\u542f</button>'
+            +'<button onclick="this.parentElement.remove()" style="background:#444;color:#aaa;border:none;padding:8px 12px;border-radius:4px;cursor:pointer;font-family:monospace;font-size:12px;margin-left:6px;">\u7a0d\u540e</button>';
         document.body.appendChild(t);
     }
 
-    function _huCheckAndDownload(filename, verVar, curVer, cbSaved){
-        fetch(REMOTE_BASE + filename + '?_=' + Date.now(), {cache:'no-store'})
-            .then(function(r){ if(!r.ok) throw 0; return r.text(); })
+    // File manifest: [filename, verVar] - load order matters
+    var _HU_FILES = [
+        ['sprites.js',        'SPRITES_VERSION'],
+        ['audio.js',          'AUDIO_VERSION'],
+        ['icons_embedded.js', 'ICONS_VERSION'],
+        ['gamedata.js',       'GAMEDATA_VERSION'],
+        ['game.js',           'GAME_VERSION']
+    ];
+
+    // Load one file from IDB or fallback to local, then call cb
+    function _huLoadFile(filename, isCss, cb){
+        _huGet(filename+'_code', function(cached){
+            if(cached){
+                if(isCss) _huApplyCss(cached); else _huExecJs(cached);
+                cb();
+            } else {
+                if(isCss) { _huLoadCssLink(filename); cb(); }
+                else _huLoadSrc(filename, cb);
+            }
+        });
+    }
+
+    // Load all files serially
+    function _huLoadAll(files, idx, cb){
+        if(idx>=files.length){ cb(); return; }
+        var f=files[idx];
+        _huLoadFile(f[0], f[0].slice(-3)==='css', function(){
+            _huLoadAll(files, idx+1, cb);
+        });
+    }
+
+    // Background update check
+    function _huCheckAndSave(filename, verVar, curVer, cbDone){
+        fetch(REMOTE_BASE+filename+'?_='+Date.now(),{cache:'no-store'})
+            .then(function(r){if(!r.ok)throw 0;return r.text();})
             .then(function(code){
-                var remoteVer = _huExtractVer(code, verVar);
-                if(remoteVer && remoteVer !== curVer){
-                    _huPut(filename + '_code', code, function(){
-                        _huPut(filename + '_ver', remoteVer, function(){
-                            cbSaved(remoteVer);
-                        });
+                var remoteVer=_huExtractVer(code,verVar);
+                if(remoteVer&&remoteVer!==curVer){
+                    _huPut(filename+'_code',code,function(){
+                        _huPut(filename+'_ver',remoteVer,function(){ cbDone&&cbDone(remoteVer); });
                     });
-                }
-            }).catch(function(){});
+                } else { cbDone&&cbDone(null); }
+            }).catch(function(){ cbDone&&cbDone(null); });
     }
 
     function _huCheckRemote(){
-        var gdVer = (typeof GAMEDATA_VERSION !== 'undefined') ? GAMEDATA_VERSION : '';
-        var gjVer = (typeof GAME_VERSION !== 'undefined') ? GAME_VERSION : '';
-        var updated = false;
-        var latestVer = gjVer;
+        var verMap={
+            'sprites.js':        (typeof SPRITES_VERSION!=='undefined'?SPRITES_VERSION:''),
+            'audio.js':          (typeof AUDIO_VERSION!=='undefined'?AUDIO_VERSION:''),
+            'icons_embedded.js': (typeof ICONS_VERSION!=='undefined'?ICONS_VERSION:''),
+            'gamedata.js':       (typeof GAMEDATA_VERSION!=='undefined'?GAMEDATA_VERSION:''),
+            'game.js':           (typeof GAME_VERSION!=='undefined'?GAME_VERSION:''),
+            'style.css':         localStorage.getItem('alchemist_css_ver')||'css-1.0.0'
+        };
+        var anyUpdate=false, latestVer='';
+        var pending=0;
+        function oneDone(ver){ pending--; if(ver){anyUpdate=true;latestVer=ver;} if(pending===0&&anyUpdate) _huShowToast(latestVer); }
 
-        _huCheckAndDownload('gamedata.js', 'GAMEDATA_VERSION', gdVer, function(v){ updated=true; latestVer=v; });
-        _huCheckAndDownload('game.js', 'GAME_VERSION', gjVer, function(v){ updated=true; latestVer=v;
-            setTimeout(function(){ if(updated) _huShowToast(latestVer); }, 500);
+        // Check JS files
+        _HU_FILES.forEach(function(f){
+            pending++;
+            _huCheckAndSave(f[0],f[1],verMap[f[0]],oneDone);
         });
+        // Check style.css
+        pending++;
+        fetch(REMOTE_BASE+'style.css?_='+Date.now(),{cache:'no-store'})
+            .then(function(r){if(!r.ok)throw 0;return r.text();})
+            .then(function(css){
+                var curCss=verMap['style.css'];
+                // Use content hash comparison for CSS (no version var)
+                var hash=css.length+'_'+css.slice(0,32);
+                var storedHash=localStorage.getItem('alchemist_css_hash')||'';
+                if(hash!==storedHash){
+                    _huPut('style.css_code',css,function(){
+                        localStorage.setItem('alchemist_css_hash',hash);
+                        oneDone('css-updated');
+                    });
+                } else { oneDone(null); }
+            }).catch(function(){ oneDone(null); });
     }
 
-    // Startup: load gamedata.js then game.js serially from IDB cache if available
-    function _huLoadGameJs(){
-        _huGet('game.js_code', function(gjCode){
-            function afterGame(){ setTimeout(_huCheckRemote, 5000); }
-            if(gjCode){ _huExec(gjCode); afterGame(); }
-            else { _huLoadScript('game.js', afterGame); }
+    // Boot: load all files serially, then start remote check
+    var _huLoadList=[['style.css','']].concat(_HU_FILES);
+    // CSS first (separate handling)
+    _huGet('style.css_code',function(css){
+        if(css) _huApplyCss(css); else _huLoadCssLink('style.css');
+        _huLoadAll(_HU_FILES, 0, function(){
+            setTimeout(_huCheckRemote, 5000);
         });
-    }
-
-    _huGet('gamedata.js_code', function(gdCode){
-        if(gdCode){
-            _huExec(gdCode);
-            _huLoadGameJs();
-        } else {
-            _huLoadScript('gamedata.js', function(){
-                _huLoadGameJs();
-            });
-        }
     });
     </script>
     <div id="updateModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99999;justify-content:center;align-items:center;">

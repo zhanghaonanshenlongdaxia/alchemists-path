@@ -1,4 +1,5 @@
 // ============ AUDIO SYSTEM ============
+var AUDIO_VERSION = 'au-1.0.0';
 let audioCtx = null;
 function initAudio() {
     try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { audioCtx = null; }
