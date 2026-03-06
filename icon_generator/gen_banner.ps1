@@ -182,8 +182,7 @@ DrawStar2 $g 180 800 16 $starC
 # ============ RIGHT SIDE: TITLE 炼金之路 (centered vertically) ============
 $titleStr = [string][char]0x70BC + [char]0x91D1 + [char]0x4E4B + [char]0x8DEF  # 炼金之路
 
-# Right half: x=960..1920, center at x=1440, vertically centered at y=540
-$rightCX = 1440
+# Right half: x=960..1920, vertically centered
 $titleY   = 380  # top of title text area
 
 $bigFont = New-Object System.Drawing.Font("Microsoft YaHei", 110, [System.Drawing.FontStyle]::Bold)
