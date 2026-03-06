@@ -1,6 +1,7 @@
 // ============ gamedata.js ============
 // 所有游戏数据配置表，修改此文件来新增/修改游戏内容
 // 修改后需重新同步到 www/ 并构建APK
+var GAMEDATA_VERSION = 'gd-1.0.0';
 
 // ============ LANGUAGE STRINGS ============
 const LANG = {

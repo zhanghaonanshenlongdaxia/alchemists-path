@@ -11,92 +11,116 @@
     <canvas id="gameCanvas"></canvas>
     <script src="sprites.js"></script>
     <script src="audio.js"></script>
-    <script src="gamedata.js"></script>
     <script src="icons_embedded.js"></script>
     <script>
-    // ========== APK HOT UPDATE SYSTEM (IndexedDB-based, no SW required) ==========
+    // ========== APK HOT UPDATE SYSTEM v2 (gamedata.js + game.js) ==========
     var REMOTE_BASE = 'https://zhanghaonanshenlongdaxia.github.io/alchemists-path/';
     var _HU_DB_NAME = 'AlchemistHotUpdate';
-    var _HU_STORE = 'gamejs';
-    var _HU_VER_KEY = 'alchemist_hu_ver';
+    var _HU_DB_VER = 2;
+    var _HU_STORE = 'files';
 
     function _huOpenDB(cb){
-        var req = indexedDB.open(_HU_DB_NAME, 1);
-        req.onupgradeneeded = function(e){ e.target.result.createObjectStore(_HU_STORE); };
+        var req = indexedDB.open(_HU_DB_NAME, _HU_DB_VER);
+        req.onupgradeneeded = function(e){
+            var db = e.target.result;
+            if(!db.objectStoreNames.contains(_HU_STORE)) db.createObjectStore(_HU_STORE);
+        };
         req.onsuccess = function(e){ cb(null, e.target.result); };
-        req.onerror = function(e){ cb(e); };
+        req.onerror = function(){ cb(new Error('idb')); };
     }
 
-    function _huSave(code, ver, cb){
+    function _huGet(key, cb){
         _huOpenDB(function(err, db){
-            if(err){ cb && cb(err); return; }
-            var tx = db.transaction(_HU_STORE, 'readwrite');
-            tx.objectStore(_HU_STORE).put(code, 'code');
-            tx.objectStore(_HU_STORE).put(ver, 'ver');
-            tx.oncomplete = function(){ cb && cb(null); };
+            if(err){ cb(null); return; }
+            var req = db.transaction(_HU_STORE,'readonly').objectStore(_HU_STORE).get(key);
+            req.onsuccess = function(e){ cb(e.target.result||null); };
+            req.onerror = function(){ cb(null); };
         });
     }
 
-    function _huLoad(cb){
+    function _huPut(key, val, cb){
         _huOpenDB(function(err, db){
-            if(err){ cb(null, null, null); return; }
-            var tx = db.transaction(_HU_STORE, 'readonly');
-            var store = tx.objectStore(_HU_STORE);
-            var code, ver;
-            store.get('code').onsuccess = function(e){ code = e.target.result; };
-            store.get('ver').onsuccess = function(e){ ver = e.target.result; };
-            tx.oncomplete = function(){ cb(null, code, ver); };
+            if(err){ cb&&cb(); return; }
+            var tx = db.transaction(_HU_STORE,'readwrite');
+            tx.objectStore(_HU_STORE).put(val, key);
+            tx.oncomplete = function(){ cb&&cb(); };
         });
     }
 
-    function _huExtractVer(src){
-        var m = src.match(/var GAME_VERSION\s*=\s*'([^']+)'/);
-        return m ? m[1] : null;
-    }
-
-    function _huExecCode(code){
+    function _huExec(code){
         var s = document.createElement('script');
         s.textContent = code;
         document.head.appendChild(s);
     }
 
+    function _huLoadScript(src, cb){
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = cb;
+        s.onerror = cb;
+        document.head.appendChild(s);
+    }
+
+    function _huExtractVer(code, varName){
+        var m = code.match(new RegExp('var\\s+'+varName+'\\s*=\\s*\'([^\']+)\''));
+        return m ? m[1] : null;
+    }
+
     function _huShowToast(ver){
-        var toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:2px solid #44dd88;color:#fff;padding:12px 20px;border-radius:8px;z-index:999997;font-family:monospace;font-size:13px;text-align:center;min-width:240px;box-shadow:0 4px 20px rgba(0,0,0,0.6);';
-        toast.innerHTML = '<div style="color:#44dd88;font-weight:bold;margin-bottom:8px;">\uD83D\uDD04 \u53d1\u73b0\u65b0\u7248\u672c ' + ver + '</div>'
+        var t = document.createElement('div');
+        t.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:2px solid #44dd88;color:#fff;padding:12px 20px;border-radius:8px;z-index:999997;font-family:monospace;font-size:13px;text-align:center;min-width:240px;box-shadow:0 4px 20px rgba(0,0,0,0.6);';
+        t.innerHTML = '<div style="color:#44dd88;font-weight:bold;margin-bottom:8px;">\uD83D\uDD04 \u53d1\u73b0\u65b0\u7248\u672c ' + ver + '</div>'
             + '<div style="color:#aaa;font-size:11px;margin-bottom:10px;">\u5df2\u4e0b\u8f7d\uff0c\u91cd\u542f\u540e\u751f\u6548</div>'
             + '<button onclick="window.location.reload()" style="background:#44dd88;color:#000;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-weight:bold;font-family:monospace;font-size:13px;">\u7acb\u5373\u91cd\u542f</button>'
             + '<button onclick="this.parentElement.remove()" style="background:#444;color:#aaa;border:none;padding:8px 12px;border-radius:4px;cursor:pointer;font-family:monospace;font-size:12px;margin-left:6px;">\u7a0d\u540e</button>';
-        document.body.appendChild(toast);
+        document.body.appendChild(t);
     }
 
-    function _huCheckRemote(){
-        // GAME_VERSION is the currently running version (local or hot-updated)
-        var curVer = (typeof GAME_VERSION !== 'undefined') ? GAME_VERSION : '';
-        fetch(REMOTE_BASE + 'game.js?_=' + Date.now(), {cache: 'no-store'})
-            .then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+    function _huCheckAndDownload(filename, verVar, curVer, cbSaved){
+        fetch(REMOTE_BASE + filename + '?_=' + Date.now(), {cache:'no-store'})
+            .then(function(r){ if(!r.ok) throw 0; return r.text(); })
             .then(function(code){
-                var remoteVer = _huExtractVer(code);
+                var remoteVer = _huExtractVer(code, verVar);
                 if(remoteVer && remoteVer !== curVer){
-                    _huSave(code, remoteVer, function(){
-                        localStorage.setItem(_HU_VER_KEY, remoteVer);
-                        _huShowToast(remoteVer);
+                    _huPut(filename + '_code', code, function(){
+                        _huPut(filename + '_ver', remoteVer, function(){
+                            cbSaved(remoteVer);
+                        });
                     });
                 }
             }).catch(function(){});
     }
 
-    // On startup: load from IndexedDB if available, else use local game.js
-    _huLoad(function(err, cachedCode, cachedVer){
-        if(!err && cachedCode && cachedVer){
-            _huExecCode(cachedCode);
+    function _huCheckRemote(){
+        var gdVer = (typeof GAMEDATA_VERSION !== 'undefined') ? GAMEDATA_VERSION : '';
+        var gjVer = (typeof GAME_VERSION !== 'undefined') ? GAME_VERSION : '';
+        var updated = false;
+        var latestVer = gjVer;
+
+        _huCheckAndDownload('gamedata.js', 'GAMEDATA_VERSION', gdVer, function(v){ updated=true; latestVer=v; });
+        _huCheckAndDownload('game.js', 'GAME_VERSION', gjVer, function(v){ updated=true; latestVer=v;
+            setTimeout(function(){ if(updated) _huShowToast(latestVer); }, 500);
+        });
+    }
+
+    // Startup: load gamedata.js then game.js serially from IDB cache if available
+    function _huLoadGameJs(){
+        _huGet('game.js_code', function(gjCode){
+            function afterGame(){ setTimeout(_huCheckRemote, 5000); }
+            if(gjCode){ _huExec(gjCode); afterGame(); }
+            else { _huLoadScript('game.js', afterGame); }
+        });
+    }
+
+    _huGet('gamedata.js_code', function(gdCode){
+        if(gdCode){
+            _huExec(gdCode);
+            _huLoadGameJs();
         } else {
-            var s = document.createElement('script');
-            s.src = 'game.js';
-            document.head.appendChild(s);
+            _huLoadScript('gamedata.js', function(){
+                _huLoadGameJs();
+            });
         }
-        // Check remote after 5s
-        setTimeout(_huCheckRemote, 5000);
     });
     </script>
     <div id="updateModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99999;justify-content:center;align-items:center;">
