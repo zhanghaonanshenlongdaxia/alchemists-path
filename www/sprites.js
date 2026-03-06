@@ -32,10 +32,31 @@ function tintTileGradient(idx, color1, color2) {
 }
 function loadTilesheet() {
     return new Promise(function(resolve) {
-        tilesheet = new Image();
-        tilesheet.onload = function() { resolve(true); };
-        tilesheet.onerror = function() { tilesheet = null; resolve(false); };
-        tilesheet.src = 'tilesheet.png';
+        function loadFromSrc(src) {
+            tilesheet = new Image();
+            tilesheet.onload = function() { resolve(true); };
+            tilesheet.onerror = function() { tilesheet = null; resolve(false); };
+            tilesheet.src = src;
+        }
+        try {
+            var dbReq = indexedDB.open('AlchemistHotUpdate', 4);
+            dbReq.onsuccess = function(ev) {
+                var db = ev.target.result;
+                if (!db.objectStoreNames.contains('files')) { loadFromSrc('tilesheet.png'); return; }
+                var req = db.transaction('files','readonly').objectStore('files').get('tilesheet.png');
+                req.onsuccess = function(e2) {
+                    var buf = e2.target.result;
+                    if (buf && buf instanceof ArrayBuffer && buf.byteLength > 0) {
+                        var blob = new Blob([buf], {type:'image/png'});
+                        loadFromSrc(URL.createObjectURL(blob));
+                    } else {
+                        loadFromSrc('tilesheet.png');
+                    }
+                };
+                req.onerror = function() { loadFromSrc('tilesheet.png'); };
+            };
+            dbReq.onerror = function() { loadFromSrc('tilesheet.png'); };
+        } catch(e) { loadFromSrc('tilesheet.png'); }
     });
 }
 function initSprites() {

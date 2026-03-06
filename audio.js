@@ -42,21 +42,42 @@ function playBGM(trackKey) {
 }
 
 function _startBGM(src, trackKey) {
-    bgmAudio = new Audio(src);
-    bgmAudio.loop = true;
-    bgmAudio.volume = 0;
-    bgmCurrent = trackKey;
-    var playPromise = bgmAudio.play();
-    if (playPromise) {
-        playPromise.then(function() {
-            // Fade in
-            var fadeIn = setInterval(function() {
-                if (!bgmAudio) { clearInterval(fadeIn); return; }
-                bgmAudio.volume = Math.min(bgmVolume, bgmAudio.volume + 0.02);
-                if (bgmAudio.volume >= bgmVolume - 0.01) { bgmAudio.volume = bgmVolume; clearInterval(fadeIn); }
-            }, 30);
-        }).catch(function() {});
+    function doPlay(audioSrc) {
+        bgmAudio = new Audio(audioSrc);
+        bgmAudio.loop = true;
+        bgmAudio.volume = 0;
+        bgmCurrent = trackKey;
+        var playPromise = bgmAudio.play();
+        if (playPromise) {
+            playPromise.then(function() {
+                var fadeIn = setInterval(function() {
+                    if (!bgmAudio) { clearInterval(fadeIn); return; }
+                    bgmAudio.volume = Math.min(bgmVolume, bgmAudio.volume + 0.02);
+                    if (bgmAudio.volume >= bgmVolume - 0.01) { bgmAudio.volume = bgmVolume; clearInterval(fadeIn); }
+                }, 30);
+            }).catch(function() {});
+        }
     }
+    // Try IDB cache first
+    try {
+        var dbReq = indexedDB.open('AlchemistHotUpdate', 4);
+        dbReq.onsuccess = function(ev) {
+            var db = ev.target.result;
+            if (!db.objectStoreNames.contains('files')) { doPlay(src); return; }
+            var req = db.transaction('files','readonly').objectStore('files').get(src);
+            req.onsuccess = function(e2) {
+                var buf = e2.target.result;
+                if (buf && buf instanceof ArrayBuffer && buf.byteLength > 0) {
+                    var blob = new Blob([buf], {type:'audio/mpeg'});
+                    doPlay(URL.createObjectURL(blob));
+                } else {
+                    doPlay(src);
+                }
+            };
+            req.onerror = function() { doPlay(src); };
+        };
+        dbReq.onerror = function() { doPlay(src); };
+    } catch(e) { doPlay(src); }
 }
 
 function stopBGM() {

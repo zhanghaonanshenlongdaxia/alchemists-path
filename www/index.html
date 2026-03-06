@@ -7,12 +7,27 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚗️</text></svg>">
 </head>
 <body>
+    <!-- Full-screen update overlay -->
+    <div id="_huOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0a1a;z-index:999999;flex-direction:column;justify-content:center;align-items:center;font-family:monospace;">
+        <div style="color:#44dd88;font-size:32px;margin-bottom:12px;">⚗️</div>
+        <div style="color:#fff;font-size:18px;font-weight:bold;margin-bottom:6px;">\u83f8\u91d1\u672f\u4e4b\u9053</div>
+        <div id="_huTitle" style="color:#44dd88;font-size:14px;margin-bottom:20px;">\u68c0\u6d4b\u66f4\u65b0\u4e2d...</div>
+        <div style="width:280px;background:#1a1a2e;border:1px solid #333;border-radius:12px;overflow:hidden;margin-bottom:10px;">
+            <div id="_huBar" style="height:22px;width:0%;background:linear-gradient(90deg,#44dd88,#4488ee);transition:width 0.25s;border-radius:12px;"></div>
+        </div>
+        <div id="_huPct" style="color:#fff;font-size:20px;font-weight:bold;margin-bottom:6px;">0%</div>
+        <div id="_huSpeed" style="color:#888;font-size:12px;margin-bottom:4px;"></div>
+        <div id="_huFile" style="color:#666;font-size:11px;margin-bottom:20px;max-width:280px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;"></div>
+        <div id="_huDoneBtn" style="display:none;">
+            <div style="color:#44dd88;font-size:14px;margin-bottom:10px;">\u66f4\u65b0\u5b8c\u6210\uff01\u6b63\u5728\u91cd\u542f...</div>
+        </div>
+    </div>
     <canvas id="gameCanvas"></canvas>
     <script>
-    // ========== APK HOT UPDATE SYSTEM v3 (all JS files + style.css) ==========
+    // ========== APK HOT UPDATE SYSTEM v4 (JS + CSS + MP3 + PNG) ==========
     var REMOTE_BASE = 'https://zhanghaonanshenlongdaxia.github.io/alchemists-path/';
     var _HU_DB_NAME = 'AlchemistHotUpdate';
-    var _HU_DB_VER = 3;
+    var _HU_DB_VER = 4;
     var _HU_STORE = 'files';
 
     // IndexedDB helpers
@@ -42,199 +57,271 @@
         });
     }
 
-    // Execute JS code or load from src
+    // Helpers
     function _huExecJs(code){ var s=document.createElement('script'); s.textContent=code; document.head.appendChild(s); }
     function _huLoadSrc(src, cb){ var s=document.createElement('script'); s.src=src; s.onload=cb; s.onerror=cb; document.head.appendChild(s); }
     function _huApplyCss(css){ var s=document.createElement('style'); s.textContent=css; document.head.appendChild(s); }
     function _huLoadCssLink(href){ var l=document.createElement('link'); l.rel='stylesheet'; l.href=href; document.head.appendChild(l); }
+    function _huExtractVer(code, varName){ var m=code.match(new RegExp('var\\s+'+varName+'\\s*=\\s*\'([^\']+)\'')); return m?m[1]:null; }
+    function _huFmtSpeed(bps){ if(bps>1048576) return (bps/1048576).toFixed(1)+' MB/s'; if(bps>1024) return (bps/1024).toFixed(0)+' KB/s'; return bps+' B/s'; }
+    function _huFmtSize(b){ if(b>1048576) return (b/1048576).toFixed(1)+'MB'; if(b>1024) return (b/1024).toFixed(0)+'KB'; return b+'B'; }
 
-    function _huExtractVer(code, varName){
-        var m=code.match(new RegExp('var\\s+'+varName+'\\s*=\\s*\'([^\']+)\''));
-        return m?m[1]:null;
+    // Overlay UI
+    var _huOverlay = document.getElementById('_huOverlay');
+    var _huBar     = document.getElementById('_huBar');
+    var _huPct     = document.getElementById('_huPct');
+    var _huSpeed   = document.getElementById('_huSpeed');
+    var _huFile    = document.getElementById('_huFile');
+    var _huTitle   = document.getElementById('_huTitle');
+    var _huDoneBtn = document.getElementById('_huDoneBtn');
+
+    function _huShowOverlay(title){
+        _huTitle.textContent = title||'\u66f4\u65b0\u4e2d...';
+        _huOverlay.style.display = 'flex';
+    }
+    function _huUpdateProgress(pct, filename, speed){
+        _huBar.style.width = pct+'%';
+        _huPct.textContent = Math.round(pct)+'%';
+        if(filename) _huFile.textContent = filename;
+        if(speed!=null) _huSpeed.textContent = speed>0?_huFmtSpeed(speed):'';
     }
 
-    function _huShowToast(ver){
-        var t=document.createElement('div');
-        t.style.cssText='position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:2px solid #44dd88;color:#fff;padding:12px 20px;border-radius:8px;z-index:999997;font-family:monospace;font-size:13px;text-align:center;min-width:240px;box-shadow:0 4px 20px rgba(0,0,0,0.6);';
-        t.innerHTML='<div style="color:#44dd88;font-weight:bold;margin-bottom:8px;">\uD83D\uDD04 \u53d1\u73b0\u65b0\u7248\u672c '+ver+'</div>'
-            +'<div style="color:#aaa;font-size:11px;margin-bottom:10px;">\u5df2\u4e0b\u8f7d\uff0c\u91cd\u542f\u540e\u751f\u6548</div>'
-            +'<button onclick="window.location.reload()" style="background:#44dd88;color:#000;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-weight:bold;font-family:monospace;font-size:13px;">\u7acb\u5373\u91cd\u542f</button>'
-            +'<button onclick="this.parentElement.remove()" style="background:#444;color:#aaa;border:none;padding:8px 12px;border-radius:4px;cursor:pointer;font-family:monospace;font-size:12px;margin-left:6px;">\u7a0d\u540e</button>';
-        document.body.appendChild(t);
-    }
-
-    // File manifest: [filename, verVar] - load order matters
-    var _HU_FILES = [
-        ['sprites.js',        'SPRITES_VERSION'],
-        ['audio.js',          'AUDIO_VERSION'],
-        ['icons_embedded.js', 'ICONS_VERSION'],
-        ['gamedata.js',       'GAMEDATA_VERSION'],
-        ['game.js',           'GAME_VERSION']
+    // File manifest
+    // [filename, verKey, type]  type: 'js'|'css'|'binary'
+    var _HU_MANIFEST = [
+        ['sprites.js',        'SPRITES_VERSION', 'js'],
+        ['audio.js',          'AUDIO_VERSION',   'js'],
+        ['icons_embedded.js', 'ICONS_VERSION',   'js'],
+        ['gamedata.js',       'GAMEDATA_VERSION','js'],
+        ['game.js',           'GAME_VERSION',    'js'],
+        ['style.css',         null,              'css'],
+        ['tilesheet.png',     null,              'binary'],
+        ['bgm_lab.mp3',       null,              'binary'],
+        ['bgm_forest.mp3',    null,              'binary'],
+        ['bgm_cave.mp3',      null,              'binary'],
+        ['bgm_swamp.mp3',     null,              'binary'],
+        ['bgm_boss.mp3',      null,              'binary']
     ];
 
-    // Load one file from IDB or fallback to local, then call cb
-    function _huLoadFile(filename, isCss, cb){
-        _huGet(filename+'_code', function(cached){
-            if(cached){
-                if(isCss) _huApplyCss(cached); else _huExecJs(cached);
-                cb();
-            } else {
-                if(isCss) { _huLoadCssLink(filename); cb(); }
-                else _huLoadSrc(filename, cb);
-            }
-        });
-    }
-
-    // Load all files serially
-    function _huLoadAll(files, idx, cb){
+    // JS load files serially from IDB or local
+    function _huLoadJsFromIDB(files, idx, cb){
         if(idx>=files.length){ cb(); return; }
         var f=files[idx];
-        _huLoadFile(f[0], f[0].slice(-3)==='css', function(){
-            _huLoadAll(files, idx+1, cb);
+        if(f[2]==='binary'||f[2]==='css'){ _huLoadJsFromIDB(files,idx+1,cb); return; }
+        _huGet(f[0]+'_data', function(cached){
+            if(cached){ _huExecJs(cached); }
+            else { /* will load via script tag after overlay */ }
+            _huLoadJsFromIDB(files, idx+1, cb);
         });
     }
 
-    // Background update check
-    function _huCheckAndSave(filename, verVar, curVer, cbDone){
-        fetch(REMOTE_BASE+filename+'?_='+Date.now(),{cache:'no-store'})
-            .then(function(r){if(!r.ok)throw 0;return r.text();})
-            .then(function(code){
-                var remoteVer=_huExtractVer(code,verVar);
-                if(remoteVer&&remoteVer!==curVer){
-                    _huPut(filename+'_code',code,function(){
-                        _huPut(filename+'_ver',remoteVer,function(){ cbDone&&cbDone(remoteVer); });
-                    });
-                } else { cbDone&&cbDone(null); }
-            }).catch(function(){ cbDone&&cbDone(null); });
+    // Fetch with real-time progress tracking
+    function _huFetchWithProgress(url, isBinary, onProgress, cb){
+        var startT = Date.now(), lastT = startT, lastLoaded = 0;
+        fetch(url, {cache:'no-store'})
+            .then(function(r){
+                if(!r.ok) throw new Error('HTTP '+r.status);
+                var total = parseInt(r.headers.get('content-length')||'0',10);
+                var reader = r.body ? r.body.getReader() : null;
+                if(!reader){
+                    // No streaming support: fallback
+                    if(isBinary) return r.arrayBuffer().then(function(buf){ cb(null,buf,total); });
+                    return r.text().then(function(t){ cb(null,t,total); });
+                }
+                var chunks=[], loaded=0;
+                function read(){
+                    reader.read().then(function(res){
+                        if(res.done){
+                            var now=Date.now();
+                            var elapsed=(now-startT)/1000||0.001;
+                            var speed=loaded/elapsed;
+                            onProgress(100, speed);
+                            if(isBinary){
+                                var buf=new Uint8Array(loaded);
+                                var off=0;
+                                chunks.forEach(function(c){buf.set(c,off);off+=c.length;});
+                                cb(null, buf.buffer, loaded);
+                            } else {
+                                var text=new TextDecoder().decode(
+                                    (function(){var b=new Uint8Array(loaded),o=0;chunks.forEach(function(c){b.set(c,o);o+=c.length;});return b;})()
+                                );
+                                cb(null, text, loaded);
+                            }
+                            return;
+                        }
+                        chunks.push(res.value);
+                        loaded += res.value.length;
+                        var now=Date.now();
+                        var dt=(now-lastT)/1000||0.001;
+                        var speed=(loaded-lastLoaded)/dt;
+                        lastT=now; lastLoaded=loaded;
+                        var pct=total>0?(loaded/total*100):0;
+                        onProgress(pct, speed);
+                        read();
+                    }).catch(function(err){ cb(err); });
+                }
+                read();
+            })
+            .catch(function(err){ cb(err); });
     }
 
-    function _huCheckRemote(){
-        var verMap={
-            'sprites.js':        (typeof SPRITES_VERSION!=='undefined'?SPRITES_VERSION:''),
-            'audio.js':          (typeof AUDIO_VERSION!=='undefined'?AUDIO_VERSION:''),
-            'icons_embedded.js': (typeof ICONS_VERSION!=='undefined'?ICONS_VERSION:''),
-            'gamedata.js':       (typeof GAMEDATA_VERSION!=='undefined'?GAMEDATA_VERSION:''),
-            'game.js':           (typeof GAME_VERSION!=='undefined'?GAME_VERSION:''),
-            'style.css':         localStorage.getItem('alchemist_css_ver')||'css-1.0.0'
-        };
-        var anyUpdate=false, latestVer='';
-        var pending=0;
-        function oneDone(ver){ pending--; if(ver){anyUpdate=true;latestVer=ver;} if(pending===0&&anyUpdate) _huShowToast(latestVer); }
+    // Check if a binary file needs update (by stored Content-Length)
+    function _huCheckBinaryNeedsUpdate(filename, cb){
+        fetch(REMOTE_BASE+filename+'?_='+Date.now(), {method:'HEAD', cache:'no-store'})
+            .then(function(r){
+                if(!r.ok){ cb(false); return; }
+                var remoteLen = r.headers.get('content-length')||'';
+                var storedLen = localStorage.getItem('_hu_len_'+filename)||'';
+                cb(remoteLen && remoteLen !== storedLen, remoteLen);
+            })
+            .catch(function(){ cb(false); });
+    }
 
-        // Check JS files
-        _HU_FILES.forEach(function(f){
-            pending++;
-            _huCheckAndSave(f[0],f[1],verMap[f[0]],oneDone);
+    // Check if JS/CSS needs update (by version var or content hash)
+    function _huCheckTextNeedsUpdate(filename, verVar, cb){
+        _huGet(filename+'_data', function(cached){
+            if(!cached){ cb(true, ''); return; } // not cached yet, needs download
+            fetch(REMOTE_BASE+filename+'?_='+Date.now(),{cache:'no-store'})
+                .then(function(r){if(!r.ok)throw 0;return r.text();})
+                .then(function(code){
+                    if(verVar){
+                        var remoteVer=_huExtractVer(code,verVar);
+                        var storedVer=localStorage.getItem('_hu_ver_'+filename)||'';
+                        cb(remoteVer&&remoteVer!==storedVer, code);
+                    } else {
+                        var hash=code.length+'|'+code.slice(0,64);
+                        var storedHash=localStorage.getItem('_hu_hash_'+filename)||'';
+                        cb(hash!==storedHash, code);
+                    }
+                }).catch(function(){ cb(false,''); });
         });
-        // Check style.css
-        pending++;
-        fetch(REMOTE_BASE+'style.css?_='+Date.now(),{cache:'no-store'})
-            .then(function(r){if(!r.ok)throw 0;return r.text();})
-            .then(function(css){
-                var curCss=verMap['style.css'];
-                // Use content hash comparison for CSS (no version var)
-                var hash=css.length+'_'+css.slice(0,32);
-                var storedHash=localStorage.getItem('alchemist_css_hash')||'';
-                if(hash!==storedHash){
-                    _huPut('style.css_code',css,function(){
-                        localStorage.setItem('alchemist_css_hash',hash);
-                        oneDone('css-updated');
-                    });
-                } else { oneDone(null); }
-            }).catch(function(){ oneDone(null); });
     }
 
-    // Boot: load all files serially, then start remote check
-    var _huLoadList=[['style.css','']].concat(_HU_FILES);
-    // CSS first (separate handling)
-    _huGet('style.css_code',function(css){
+    // ===== MAIN UPDATE FLOW =====
+    function _huCheckAllAndUpdate(onDone){
+        // Step1: HEAD-check binary files, text-check JS/CSS
+        var toUpdate = []; // [{f, type, remoteData}]
+        var totalBytes = 0;
+        var pending = _HU_MANIFEST.length;
+        function onChecked(){ pending--; if(pending===0) doUpdate(); }
+
+        _HU_MANIFEST.forEach(function(f){
+            var fname=f[0], verVar=f[1], ftype=f[2];
+            if(ftype==='binary'){
+                _huCheckBinaryNeedsUpdate(fname, function(needs, remoteLen){
+                    if(needs){ toUpdate.push({f:fname,type:ftype,size:parseInt(remoteLen||'0',10)}); totalBytes+=parseInt(remoteLen||'0',10); }
+                    onChecked();
+                });
+            } else {
+                _huCheckTextNeedsUpdate(fname, verVar, function(needs, code){
+                    if(needs){ toUpdate.push({f:fname,type:ftype,code:code}); totalBytes+=code?code.length:0; }
+                    onChecked();
+                });
+            }
+        });
+
+        function doUpdate(){
+            if(toUpdate.length===0){ onDone(false); return; }
+            // Show overlay
+            _huShowOverlay('\u53d1\u73b0' + toUpdate.length + '\u4e2a\u6587\u4ef6\u9700\u8981\u66f4\u65b0');
+            var totalDown=0, grandTotal=toUpdate.reduce(function(s,u){return s+(u.size||u.code&&u.code.length||0);},0);
+            var fileIdx=0;
+
+            function downloadNext(){
+                if(fileIdx>=toUpdate.length){
+                    // All done
+                    _huUpdateProgress(100,'','');
+                    _huTitle.textContent = '\u66f4\u65b0\u5b8c\u6210\uff01';
+                    _huDoneBtn.style.display='block';
+                    setTimeout(function(){ window.location.reload(); }, 1200);
+                    return;
+                }
+                var item=toUpdate[fileIdx++];
+                _huFile.textContent = item.f;
+                if(item.type==='binary'){
+                    // Download with streaming progress
+                    var fileStart=totalDown;
+                    _huFetchWithProgress(REMOTE_BASE+item.f+'?_='+Date.now(), true,
+                        function(filePct, speed){
+                            var fileBytes=item.size*filePct/100;
+                            var globalPct=grandTotal>0?(totalDown+fileBytes)/grandTotal*100:filePct;
+                            _huUpdateProgress(globalPct, item.f, speed);
+                        },
+                        function(err, buf, size){
+                            if(err){ totalDown+=(item.size||0); downloadNext(); return; }
+                            _huPut(item.f+'_data', buf, function(){
+                                localStorage.setItem('_hu_len_'+item.f, size+'');
+                                totalDown+=size;
+                                downloadNext();
+                            });
+                        }
+                    );
+                } else {
+                    // JS/CSS: may already have code from check, or download now
+                    function saveTextItem(code){
+                        var fileSize=code.length;
+                        _huPut(item.f+'_data', code, function(){
+                            if(item.type==='js'&&_huExtractVer(code,null)){
+                                // save version
+                            }
+                            // detect ver
+                            var verMatch=code.match(/var\s+\w+_VERSION\s*=\s*'([^']+)'/);
+                            if(verMatch) localStorage.setItem('_hu_ver_'+item.f, verMatch[1]);
+                            else { var hash2=code.length+'|'+code.slice(0,64); localStorage.setItem('_hu_hash_'+item.f, hash2); }
+                            totalDown+=fileSize;
+                            _huUpdateProgress(grandTotal>0?totalDown/grandTotal*100:100, item.f, 0);
+                            downloadNext();
+                        });
+                    }
+                    if(item.code){
+                        saveTextItem(item.code);
+                    } else {
+                        _huFetchWithProgress(REMOTE_BASE+item.f+'?_='+Date.now(), false,
+                            function(filePct, speed){
+                                var globalPct=grandTotal>0?(totalDown)/grandTotal*100:filePct;
+                                _huUpdateProgress(globalPct, item.f, speed);
+                            },
+                            function(err, text){
+                                if(err){ downloadNext(); return; }
+                                saveTextItem(text);
+                            }
+                        );
+                    }
+                }
+            }
+            downloadNext();
+        }
+    }
+
+    // ===== STARTUP BOOT SEQUENCE =====
+    // 1. Load CSS (from IDB or local)
+    // 2. Load JS files serially (from IDB or local)
+    // 3. Check for updates in background (5s delay)
+
+    function _huBootLoadJs(files, idx, cb){
+        if(idx>=files.length){ cb(); return; }
+        var f=files[idx];
+        if(f[2]==='css'||f[2]==='binary'){ _huBootLoadJs(files,idx+1,cb); return; }
+        _huGet(f[0]+'_data', function(cached){
+            function next(){ _huBootLoadJs(files,idx+1,cb); }
+            if(cached){ _huExecJs(cached); next(); }
+            else { _huLoadSrc(f[0], next); }
+        });
+    }
+
+    // Load CSS first
+    _huGet('style.css_data', function(css){
         if(css) _huApplyCss(css); else _huLoadCssLink('style.css');
-        _huLoadAll(_HU_FILES, 0, function(){
-            setTimeout(_huCheckRemote, 5000);
+        // Load all JS serially
+        _huBootLoadJs(_HU_MANIFEST, 0, function(){
+            // After game loaded, check for updates
+            setTimeout(function(){
+                _huCheckAllAndUpdate(function(hadUpdate){
+                    // hadUpdate handled inside (overlay shown)
+                });
+            }, 5000);
         });
     });
-    </script>
-    <div id="updateModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99999;justify-content:center;align-items:center;">
-        <div style="background:#1a1a2e;padding:30px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:320px;text-align:center;border:2px solid #44dd88;">
-            <div style="color:#44dd88;font-size:24px;margin-bottom:10px;">🔄</div>
-            <h3 style="color:#fff;margin:10px 0;font-family:monospace;">发现新版本</h3>
-            <p style="color:#aaa;font-size:14px;margin:15px 0;font-family:monospace;">检测到游戏更新，是否立即更新？</p>
-            <div id="updateProgress" style="display:none;margin:15px 0;">
-                <div style="background:#333;height:20px;border-radius:10px;overflow:hidden;margin:10px 0;">
-                    <div id="progressBar" style="background:linear-gradient(90deg,#44dd88,#4488ee);height:100%;width:0%;transition:width 0.3s;"></div>
-                </div>
-                <p id="progressText" style="color:#888;font-size:12px;font-family:monospace;">准备更新...</p>
-            </div>
-            <div id="updateButtons">
-                <button onclick="startUpdate()" style="background:#44dd88;color:#000;border:none;padding:12px 30px;border-radius:6px;font-size:16px;font-weight:bold;cursor:pointer;margin:5px;font-family:monospace;">立即更新</button>
-                <button onclick="closeUpdateModal()" style="background:#555;color:#fff;border:none;padding:12px 30px;border-radius:6px;font-size:16px;cursor:pointer;margin:5px;font-family:monospace;">稍后提醒</button>
-            </div>
-        </div>
-    </div>
-    <script>
-    var pendingUpdate = null;
-    var updateModal = document.getElementById('updateModal');
-    var updateProgress = document.getElementById('updateProgress');
-    var updateButtons = document.getElementById('updateButtons');
-    var progressBar = document.getElementById('progressBar');
-    var progressText = document.getElementById('progressText');
-    
-    function showUpdateModal(){
-        updateModal.style.display = 'flex';
-    }
-    
-    function closeUpdateModal(){
-        updateModal.style.display = 'none';
-        // Remind again in 5 minutes if not updated
-        setTimeout(function(){ if(pendingUpdate) showUpdateModal(); }, 300000);
-    }
-    
-    function startUpdate(){
-        updateButtons.style.display = 'none';
-        updateProgress.style.display = 'block';
-        var progress = 0;
-        var interval = setInterval(function(){
-            progress += Math.random() * 15 + 5;
-            if(progress >= 100) progress = 100;
-            progressBar.style.width = progress + '%';
-            if(progress < 30) progressText.textContent = '正在下载更新...';
-            else if(progress < 70) progressText.textContent = '正在安装更新...';
-            else if(progress < 100) progressText.textContent = '即将完成...';
-            else {
-                progressText.textContent = '更新完成！正在重启...';
-                clearInterval(interval);
-                setTimeout(function(){
-                    if(pendingUpdate) pendingUpdate.postMessage({action:'skipWaiting'});
-                    window.location.reload();
-                }, 500);
-            }
-        }, 200);
-    }
-    
-    if('serviceWorker' in navigator){
-        navigator.serviceWorker.register('./sw.js').then(function(reg){
-            // Check for updates every 30 seconds
-            setInterval(function(){ reg.update(); }, 30000);
-            reg.addEventListener('updatefound', function(){
-                var nw = reg.installing;
-                pendingUpdate = nw;
-                nw.addEventListener('statechange', function(){
-                    if(nw.state === 'installed' && navigator.serviceWorker.controller){
-                        // New version available, show modal
-                        showUpdateModal();
-                    }
-                });
-            });
-        });
-        // Handle controller change
-        var refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', function(){
-            if(!refreshing){
-                refreshing = true;
-                window.location.reload();
-            }
-        });
-    }
     </script>
     <div id="_verLabel" style="position:fixed;bottom:4px;right:6px;color:rgba(255,255,255,0.3);font-family:monospace;font-size:10px;pointer-events:none;z-index:9999;"></div>
     <script>
