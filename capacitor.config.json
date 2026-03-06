@@ -2,6 +2,13 @@
   "appId": "com.alchemistspath.game",
   "appName": "Alchemist's Path",
   "webDir": "www",
+  "server": {
+    "url": "https://zhanghaonanshenlongdaxia.github.io/alchemists-path/",
+    "cleartext": false,
+    "allowNavigation": [
+      "zhanghaonanshenlongdaxia.github.io"
+    ]
+  },
   "android": {
     "allowMixedContent": false,
     "backgroundColor": "#000000"
