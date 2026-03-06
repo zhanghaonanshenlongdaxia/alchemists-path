@@ -137,26 +137,18 @@
         });
     }
     </script>
-    <div id="_dbgBox" style="display:none;position:fixed;bottom:0;left:0;right:0;max-height:160px;overflow-y:auto;background:rgba(0,0,0,0.92);z-index:999999;padding:6px;font-family:monospace;font-size:11px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <span style="color:#ff4444;font-weight:bold;">ERROR LOG</span>
-            <button onclick="document.getElementById('_dbgBox').style.display='none'" style="background:#555;color:#fff;border:none;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:11px;">✕ 关闭</button>
-        </div>
-        <div id="_dbgLog"></div>
-    </div>
+    <div id="_verLabel" style="position:fixed;bottom:4px;right:6px;color:rgba(255,255,255,0.3);font-family:monospace;font-size:10px;pointer-events:none;z-index:9999;"></div>
     <script>
-    var _dbgBox=document.getElementById('_dbgBox');
-    var _dbgLog=document.getElementById('_dbgLog');
-    function _dbgAppend(msg,color){
-        _dbgBox.style.display='block';
-        var d=document.createElement('div');
-        d.style.cssText='color:'+(color||'#ff8888')+';border-bottom:1px solid #333;padding:2px 0;word-break:break-all;';
-        d.textContent=msg;
-        _dbgLog.appendChild(d);
-        _dbgBox.scrollTop=_dbgBox.scrollHeight;
-    }
-    window.addEventListener('error',function(e){_dbgAppend('[ERR] '+(e.message||e)+(e.filename?' @'+e.filename.split('/').pop()+':'+(e.lineno||''):''));});
-    window.addEventListener('unhandledrejection',function(e){_dbgAppend('[PROMISE] '+(e.reason&&e.reason.message?e.reason.message:String(e.reason)));});
+    // Show version in bottom-right corner after game loads
+    window.addEventListener('load', function(){
+        setTimeout(function(){
+            var ver = (typeof GAME_VERSION !== 'undefined') ? GAME_VERSION : '';
+            var cached = localStorage.getItem('alchemist_hu_ver');
+            if(cached) ver = cached + ' (hot)';
+            var el = document.getElementById('_verLabel');
+            if(el && ver) el.textContent = ver;
+        }, 1000);
+    });
     </script>
 </body>
 </html>
