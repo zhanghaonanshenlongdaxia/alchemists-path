@@ -71,7 +71,8 @@
     }
 
     function _huCheckRemote(){
-        var curVer = localStorage.getItem(_HU_VER_KEY) || (typeof GAME_VERSION !== 'undefined' ? GAME_VERSION : '');
+        // GAME_VERSION is the currently running version (local or hot-updated)
+        var curVer = (typeof GAME_VERSION !== 'undefined') ? GAME_VERSION : '';
         fetch(REMOTE_BASE + 'game.js?_=' + Date.now(), {cache: 'no-store'})
             .then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
             .then(function(code){
