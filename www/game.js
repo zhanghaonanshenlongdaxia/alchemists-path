@@ -4939,7 +4939,7 @@ function drawSettings(){
     var W=canvas.width,H=canvas.height;
     var compact=H<550;
     var lh=compact?28:42, titleH=compact?22:30, padY=compact?12:20;
-    var ph=Math.min(H-padY*2,compact?280:380);
+    var ph=Math.min(H-padY*2,compact?340:450);
     ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
     var pw=Math.min(W-30,340),px=(W-pw)/2,py=(H-ph)/2;
     ctx.fillStyle='rgba(14,14,26,0.97)';ctx.fillRect(px,py,pw,ph);
@@ -4982,6 +4982,13 @@ function drawSettings(){
         ctx.fillText(qLabels[i],qx+qBtnW/2,qy+qBtnH/2+4);
     }
     cy+=lh+(compact?6:10);
+    // God Mode toggle
+    var gmBtnW=pw-24,gmBtnH=compact?24:28,gmBtnX=px+12,gmBtnY=cy;
+    ctx.fillStyle=godMode?'#ffd700':'#333';ctx.fillRect(gmBtnX,gmBtnY,gmBtnW,gmBtnH);
+    ctx.strokeStyle=godMode?'#ffee88':'#555';ctx.lineWidth=1;ctx.strokeRect(gmBtnX,gmBtnY,gmBtnW,gmBtnH);
+    ctx.fillStyle=godMode?'#000':'#888';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
+    ctx.fillText('无敌模式: '+(godMode?'开':'关'),gmBtnX+gmBtnW/2,gmBtnY+gmBtnH/2+4);
+    cy+=compact?30:36;
     // Save & Load buttons
     var sbW=Math.floor((pw-40)/2),sbH=compact?24:28;
     var saveX=px+12,loadX=px+20+sbW,sbY=cy;
@@ -4998,14 +5005,7 @@ function drawSettings(){
     ctx.strokeStyle='#ffaa66';ctx.lineWidth=1;ctx.strokeRect(menuBtnX,menuBtnY,menuBtnW,menuBtnH);
     ctx.fillStyle='#000';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
     ctx.fillText('返回主菜单',menuBtnX+menuBtnW/2,menuBtnY+menuBtnH/2+4);
-    cy+=lh;
-    // God Mode toggle
-    var gmBtnW=pw-24,gmBtnH=compact?24:28,gmBtnX=px+12,gmBtnY=cy;
-    ctx.fillStyle=godMode?'#ffd700':'#333';ctx.fillRect(gmBtnX,gmBtnY,gmBtnW,gmBtnH);
-    ctx.strokeStyle=godMode?'#ffee88':'#555';ctx.lineWidth=1;ctx.strokeRect(gmBtnX,gmBtnY,gmBtnW,gmBtnH);
-    ctx.fillStyle=godMode?'#000':'#888';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
-    ctx.fillText('无敌模式: '+(godMode?'开':'关'),gmBtnX+gmBtnW/2,gmBtnY+gmBtnH/2+4);
-    cy+=lh;
+    cy+=compact?30:36;
     // Close button
     var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cy;
     ctx.fillStyle='#44dd88';ctx.fillRect(cbX,cbY,cbW,cbH);
@@ -5016,7 +5016,7 @@ function handleSettingsClick(cx,cy){
     var W=canvas.width,H=canvas.height;
     var compact=H<550;
     var lh=compact?28:42, titleH=compact?22:30, padY=compact?12:20;
-    var ph=Math.min(H-padY*2,compact?280:380);
+    var ph=Math.min(H-padY*2,compact?340:450);
     var pw=Math.min(W-30,340),px=(W-pw)/2,py=(H-ph)/2;
     var cyy=py+titleH+20, sliderW=pw-100, sliderX=px+85;
     // BGM slider
@@ -5042,6 +5042,10 @@ function handleSettingsClick(cx,cy){
         }
     }
     cyy+=lh+(compact?6:10);
+    // God Mode toggle button
+    var gmBtnW2=pw-24,gmBtnH2=compact?24:28,gmBtnX2=px+12,gmBtnY2=cyy;
+    if(cx>=gmBtnX2&&cx<=gmBtnX2+gmBtnW2&&cy>=gmBtnY2&&cy<=gmBtnY2+gmBtnH2){godMode=!godMode;playSound('click');return;}
+    cyy+=compact?30:36;
     // Save & Load buttons
     var sbW2=Math.floor((pw-40)/2),sbH2=compact?24:28;
     var saveX2=px+12,loadX2=px+20+sbW2,sbY2=cyy;
@@ -5066,11 +5070,7 @@ function handleSettingsClick(cx,cy){
         playBGM('menu');
         return;
     }
-    cyy+=lh;
-    // God Mode toggle button
-    var gmBtnW2=pw-24,gmBtnH2=compact?24:28,gmBtnX2=px+12,gmBtnY2=cyy;
-    if(cx>=gmBtnX2&&cx<=gmBtnX2+gmBtnW2&&cy>=gmBtnY2&&cy<=gmBtnY2+gmBtnH2){godMode=!godMode;playSound('click');return;}
-    cyy+=lh;
+    cyy+=compact?30:36;
     // Close button
     var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cyy;
     if(cx>=cbX&&cx<=cbX+cbW&&cy>=cbY&&cy<=cbY+cbH){showSettings=false;saveSettings();playSound('click');return;}
