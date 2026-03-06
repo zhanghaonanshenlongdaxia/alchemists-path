@@ -5928,4 +5928,20 @@ document.addEventListener('visibilitychange',function(){
         mobileAimStick.active=false;mobileAimStick.id=-1;
     }
 });
-(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();await loadBestiarySprites();await loadRelicSprites();await loadGameIcons();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
+var GAME_VERSION = 'v1.0.55';
+var _versionModalShown = false;
+function showVersionModal(){
+    if(_versionModalShown) return;
+    _versionModalShown=true;
+    var modal=document.createElement('div');
+    modal.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:99998;display:flex;justify-content:center;align-items:center;';
+    modal.innerHTML='<div style="background:#1a1a2e;padding:28px 24px;border-radius:12px;border:2px solid #44dd88;max-width:300px;text-align:center;font-family:monospace;">'
+        +'<div style="color:#44dd88;font-size:28px;margin-bottom:8px;">⚗️</div>'
+        +'<h3 style="color:#fff;margin:8px 0 4px;">炼金师之路</h3>'
+        +'<p style="color:#44dd88;font-size:13px;margin:4px 0 16px;">'+GAME_VERSION+'</p>'
+        +'<button id="_vmBtn" style="background:#44dd88;color:#000;border:none;padding:12px 36px;border-radius:6px;font-size:15px;font-weight:bold;cursor:pointer;font-family:monospace;">进入游戏</button>'
+        +'</div>';
+    document.body.appendChild(modal);
+    document.getElementById('_vmBtn').onclick=function(){document.body.removeChild(modal);};
+}
+(async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();await loadBestiarySprites();await loadRelicSprites();await loadGameIcons();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();showVersionModal();})();
