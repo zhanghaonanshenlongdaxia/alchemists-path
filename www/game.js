@@ -5928,5 +5928,5 @@ document.addEventListener('visibilitychange',function(){
         mobileAimStick.active=false;mobileAimStick.id=-1;
     }
 });
-var GAME_VERSION = 'v1.0.56';
+var GAME_VERSION = 'v1.0.57';
 (async function(){await loadTilesheet();initSprites();await loadCustomEnemySprites();await loadWeaponSprites();await loadBestiarySprites();await loadRelicSprites();await loadGameIcons();initResearch();loadSettings();loadTutorialState();loadGame();refreshLabShop();gameLoop();})();
