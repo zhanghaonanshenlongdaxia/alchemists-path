@@ -7,6 +7,7 @@ var qualityLevel = 2; // 0=low, 1=medium, 2=high
 var sfxVolume = 1.0;
 var godMode = false;
 var showSettings = false;
+var _settingsRects = {};
 function applyQuality(){
     if(qualityLevel===0) pixelRatio=1;
     else if(qualityLevel===1) pixelRatio=Math.min(window.devicePixelRatio||1, 2);
@@ -106,6 +107,11 @@ let nearMerchantRef = null; // merchant NPC player is near
 let bossRef = null; // reference to boss enemy for special AI
 let bossSummonTimer = 0; // timer for boss summoning minions
 let bossPhase = 0; // 0=normal, 1=enraged
+let bossFlashColor = '#ff0000';
+let bossFlash = 0; // full-screen flash intensity 0~1
+let bossShockwave = null; // {x,y,r,maxR,life}
+let bossVolleyCD = 0; // projectile volley cooldown
+let bossProjectiles = []; // boss scatter projectiles
 let researchLevels = {}; // {hp:0, atk:0, ...}
 function initResearch(){ for(var r of RESEARCH) if(!researchLevels[r.id]) researchLevels[r.id]=0; }
 function getResearchCost(r){ return Math.floor(r.baseCost*Math.pow(r.costMul, researchLevels[r.id]||0)); }
@@ -531,6 +537,7 @@ function setupFloor(biomeIdx, floor){
     lockedDoors=[]; collectibleDrops=[];
     stairsZone=null; exitZone=null;
     bossRef=null; bossSummonTimer=0; bossPhase=0;
+    bossProjectiles=[]; bossFlash=0; bossShockwave=null; bossVolleyCD=0;
     ambientParts=[];
     secondWindUsed=false; // reset per floor
     // Init explored map
@@ -1139,8 +1146,14 @@ function update(){
             if(bossPhase===0&&e.hp<e.maxHp*0.4){
                 bossPhase=1;
                 spawnFloat(e.x,e.y-30,'狂暴！','#ff0000');
-                spawnParticles(e.x,e.y,'#ff0000',15);
-                screenShake=8;playSound('levelUp');
+                spawnParticles(e.x,e.y,'#ff0000',30);
+                screenShake=20; bossFlash=1.0; bossFlashColor='#ff0000';
+                bossShockwave={x:e.x,y:e.y,r:10,maxR:180,life:30};
+                playSound('levelUp');
+                // Instantly summon 4 minions on enrage
+                var baseHPe=2+Math.floor(expeditionNum*0.5)+currentFloor*2;
+                var baseATKe=1+Math.floor(expeditionNum*0.3)+currentFloor;
+                for(var ei=0;ei<4;ei++){var ea=Math.PI*2*ei/4,er=70;var ex2=e.x+Math.cos(ea)*er,ey2=e.y+Math.sin(ea)*er;if(!isSolid(ex2,ey2)){enemies.push({x:ex2,y:ey2,angle:Math.random()*Math.PI*2,hp:Math.ceil(baseHPe),maxHp:Math.ceil(baseHPe),radius:6,alert:true,alertTimer:180,patrolAngle:Math.random()*Math.PI*2,patrolTimer:60,animFrame:0,attackCD:0,atk:Math.ceil(baseATKe),isElite:false,isBoss:false});spawnParticles(ex2,ey2,'#ff0000',8);}}
             }
             var spdMul=bossPhase===1?1.3:1.0;
             // Charge attack
@@ -1153,8 +1166,10 @@ function update(){
                     var dmg=Math.max(1,Math.ceil(e.atk*1.5)-playerStats.def);
                     var actualDmg=applyDamageToPlayer(dmg);
                     if(actualDmg!==false){spawnFloat(player.x,player.y-10,'-'+actualDmg,'#ff4444');
-                    spawnParticles(player.x,player.y,'#ff4444',8);
-                    screenShake=6;playSound('hit');}
+                    spawnParticles(player.x,player.y,'#ff4444',12);
+                    screenShake=14; bossFlash=0.6; bossFlashColor='#ff2200';
+                    bossShockwave={x:player.x,y:player.y,r:5,maxR:80,life:15};
+                    playSound('hit');}
                     e.charging=false;e.chargeCD=180;e.attackCD=30;
                     if(playerStats.hp<=0){
                         if(playerStats.revive){playerStats.revive=false;playerStats.hp=Math.floor(playerStats.maxHp/2);spawnFloat(player.x,player.y-20,T('revived'),'#ffaa00');spawnParticles(player.x,player.y,'#ffaa00',12);activeBuffs=activeBuffs.filter(function(b){return b.effect!=='revive';});}
@@ -1189,36 +1204,52 @@ function update(){
                 // Ground slam (AoE) when close
                 if(e.slamCD<=0&&d<60){
                     e.slamCD=bossPhase===1?150:240;
-                    // Damage all nearby
                     var slamDmg=Math.max(1,Math.ceil(e.atk*0.8)-playerStats.def);
                     if(d<50){
                         var actualSlam=applyDamageToPlayer(slamDmg);
                         if(actualSlam!==false){spawnFloat(player.x,player.y-10,'-'+actualSlam,'#ff6644');
-                        screenShake=6;playSound('hit');}
+                        screenShake=12; bossFlash=0.5; bossFlashColor='#ff6600';
+                        bossShockwave={x:e.x,y:e.y,r:10,maxR:120,life:20};
+                        playSound('hit');}
                         if(playerStats.hp<=0){
                             if(playerStats.revive){playerStats.revive=false;playerStats.hp=Math.floor(playerStats.maxHp/2);spawnFloat(player.x,player.y-20,T('revived'),'#ffaa00');spawnParticles(player.x,player.y,'#ffaa00',12);activeBuffs=activeBuffs.filter(function(b){return b.effect!=='revive';});}
                             else{state='gameover';return;}
                         }
                     }
-                    // Visual slam ring
-                    for(var si=0;si<20;si++){var sa=Math.PI*2*si/20;particles.push({x:e.x+Math.cos(sa)*40,y:e.y+Math.sin(sa)*40,vx:Math.cos(sa)*2,vy:Math.sin(sa)*2,life:20,maxLife:20,size:3,color:bossPhase===1?'#ff4400':'#ff8844'});}
+                    // Visual slam ring (more particles)
+                    for(var si=0;si<32;si++){var sa=Math.PI*2*si/32,sr2=40+Math.random()*20;particles.push({x:e.x+Math.cos(sa)*sr2,y:e.y+Math.sin(sa)*sr2,vx:Math.cos(sa)*3,vy:Math.sin(sa)*3,life:25,maxLife:25,size:4,color:bossPhase===1?'#ff4400':'#ff8844'});}
                     spawnFloat(e.x,e.y-20,'震地！','#ff6644');
+                }
+                // Projectile volley attack (enraged phase)
+                if(bossPhase===1&&bossVolleyCD<=0&&d<250&&d>50){
+                    bossVolleyCD=90;
+                    var vCount=8;
+                    bossFlash=0.35; bossFlashColor='#aa00ff';
+                    for(var vi=0;vi<vCount;vi++){
+                        var va=e.angle+(vi-(vCount-1)/2)*0.28;
+                        if(typeof bossProjectiles==='undefined') break;
+                        bossProjectiles.push({x:e.x,y:e.y,vx:Math.cos(va)*4.5,vy:Math.sin(va)*4.5,life:60,atk:Math.ceil(e.atk*0.6)});
+                    }
+                    spawnFloat(e.x,e.y-20,'散弹！','#aa44ff');
                 }
             }
             if(e.chargeCD>0) e.chargeCD--;
             if(e.slamCD>0) e.slamCD--;
             // Summon minions periodically
             bossSummonTimer++;
-            var summonInterval=bossPhase===1?360:540; // faster in enrage
-            var maxMinions=bossPhase===1?5:3;
+            var summonInterval=bossPhase===1?240:420; // faster in enrage
+            var maxMinions=bossPhase===1?10:6;
             var minionCount=enemies.filter(function(en){return !en.isBoss&&!en.isElite;}).length;
             if(bossSummonTimer>=summonInterval&&minionCount<maxMinions){
                 bossSummonTimer=0;
-                var summonCount=bossPhase===1?3:2;
+                var summonCount=bossPhase===1?5:3;
                 var baseHP2=2+Math.floor(expeditionNum*0.5)+currentFloor*2;
                 var baseATK2=1+Math.floor(expeditionNum*0.3)+currentFloor;
+                // Full-screen summon flash
+                bossFlash=0.45; bossFlashColor='#6600cc';
+                screenShake=8;
                 for(var si=0;si<summonCount;si++){
-                    var sa=Math.random()*Math.PI*2, sr=60+Math.random()*40;
+                    var sa=Math.random()*Math.PI*2, sr=50+Math.random()*80;
                     var sx2=e.x+Math.cos(sa)*sr, sy2=e.y+Math.sin(sa)*sr;
                     if(!isSolid(sx2,sy2)){
                         enemies.push({
@@ -1229,12 +1260,13 @@ function update(){
                             animFrame:0,attackCD:0,atk:Math.ceil(baseATK2*0.7),
                             isElite:false,isBoss:false
                         });
-                        spawnParticles(sx2,sy2,'#aa44dd',6);
+                        spawnParticles(sx2,sy2,'#aa44dd',10);
                     }
                 }
-                spawnFloat(e.x,e.y-25,'召唤！','#aa44dd');
+                spawnFloat(e.x,e.y-25,'召唤随从！','#aa44dd');
                 playSound('craft');
             }
+            if(bossVolleyCD>0) bossVolleyCD--;
             if(e.attackCD>0) e.attackCD--;
             if(frameCount%6===0) e.animFrame=(e.animFrame+1)%3;
             continue; // skip normal AI for boss
@@ -1458,6 +1490,27 @@ function update(){
         if(ap.life<=0) ambientParts.splice(i,1);
     }
     if(screenShake>0) screenShake*=0.85;
+    if(bossFlash>0) bossFlash*=0.80;
+    if(bossShockwave){
+        bossShockwave.r+=bossShockwave.maxR/bossShockwave.life*1.5;
+        bossShockwave.life--;
+        if(bossShockwave.life<=0||bossShockwave.r>=bossShockwave.maxR) bossShockwave=null;
+    }
+    for(var bpi=bossProjectiles.length-1;bpi>=0;bpi--){
+        var bp=bossProjectiles[bpi];
+        bp.x+=bp.vx; bp.y+=bp.vy; bp.life--;
+        var bpd=dist({x:bp.x,y:bp.y},player);
+        if(bpd<16){
+            var bpDmg=Math.max(1,bp.atk-playerStats.def);
+            var bpActual=applyDamageToPlayer(bpDmg);
+            if(bpActual!==false){spawnFloat(player.x,player.y-10,'-'+bpActual,'#aa44ff');screenShake=5;}
+            if(playerStats.hp<=0){if(playerStats.revive){playerStats.revive=false;playerStats.hp=Math.floor(playerStats.maxHp/2);spawnFloat(player.x,player.y-20,T('revived'),'#ffaa00');}else{state='gameover';}}
+            bossProjectiles.splice(bpi,1);
+        } else if(bp.life<=0||isSolid(bp.x,bp.y)){
+            spawnParticles(bp.x,bp.y,'#aa44ff',3);
+            bossProjectiles.splice(bpi,1);
+        }
+    }
 }
 
 function endExpedition(){
@@ -2184,6 +2237,33 @@ function renderExpedition(){
         ctx.fillText(f.text,f.x,f.y);ctx.shadowBlur=0;ctx.restore();
     }
     ctx.restore();
+
+    // Boss full-screen flash
+    if(bossFlash>0.02){
+        ctx.save();ctx.globalAlpha=bossFlash*0.55;
+        ctx.fillStyle=bossFlashColor;ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.restore();
+    }
+    // Boss shockwave ring (screen-space, centered on world pos)
+    if(bossShockwave){
+        var bsWX=bossShockwave.x-camera.x, bsWY=bossShockwave.y-camera.y;
+        var bsAlpha=Math.max(0,(bossShockwave.life/(bossShockwave.maxR/3))*0.7);
+        ctx.save();ctx.globalAlpha=bsAlpha;
+        ctx.strokeStyle=bossFlashColor;ctx.lineWidth=4;
+        ctx.beginPath();ctx.arc(bsWX,bsWY,bossShockwave.r,0,Math.PI*2);ctx.stroke();
+        ctx.lineWidth=2;ctx.globalAlpha=bsAlpha*0.5;
+        ctx.beginPath();ctx.arc(bsWX,bsWY,bossShockwave.r*0.7,0,Math.PI*2);ctx.stroke();
+        ctx.restore();
+    }
+    // Boss projectiles (screen-space)
+    for(var bpri=0;bpri<bossProjectiles.length;bpri++){
+        var bpr=bossProjectiles[bpri];
+        var bprX=bpr.x-camera.x, bprY=bpr.y-camera.y;
+        ctx.save();ctx.shadowColor='#aa44ff';ctx.shadowBlur=8;
+        ctx.fillStyle='#cc88ff';
+        ctx.beginPath();ctx.arc(bprX,bprY,5,0,Math.PI*2);ctx.fill();
+        ctx.restore();
+    }
 
     // Vignette overlay — biome-tinted atmosphere
     var vigW=canvas.width,vigH=canvas.height;
@@ -4984,6 +5064,7 @@ function drawSettings(){
     cy+=lh+(compact?6:10);
     // God Mode toggle
     var gmBtnW=pw-24,gmBtnH=compact?24:28,gmBtnX=px+12,gmBtnY=cy;
+    _settingsRects.godMode={x:gmBtnX,y:gmBtnY,w:gmBtnW,h:gmBtnH};
     ctx.fillStyle=godMode?'#ffd700':'#333';ctx.fillRect(gmBtnX,gmBtnY,gmBtnW,gmBtnH);
     ctx.strokeStyle=godMode?'#ffee88':'#555';ctx.lineWidth=1;ctx.strokeRect(gmBtnX,gmBtnY,gmBtnW,gmBtnH);
     ctx.fillStyle=godMode?'#000':'#888';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
@@ -4992,6 +5073,8 @@ function drawSettings(){
     // Save & Load buttons
     var sbW=Math.floor((pw-40)/2),sbH=compact?24:28;
     var saveX=px+12,loadX=px+20+sbW,sbY=cy;
+    _settingsRects.save={x:saveX,y:sbY,w:sbW,h:sbH};
+    _settingsRects.load={x:loadX,y:sbY,w:sbW,h:sbH};
     ctx.fillStyle='#44dd88';ctx.fillRect(saveX,sbY,sbW,sbH);
     ctx.fillStyle='#000';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
     ctx.fillText(T('saveBtn'),saveX+sbW/2,sbY+sbH/2+4);
@@ -5001,6 +5084,7 @@ function drawSettings(){
     cy+=sbH+(compact?6:10);
     // Return to Menu button
     var menuBtnW=pw-24,menuBtnH=compact?24:28,menuBtnX=px+12,menuBtnY=cy;
+    _settingsRects.menu={x:menuBtnX,y:menuBtnY,w:menuBtnW,h:menuBtnH};
     ctx.fillStyle='#dd8844';ctx.fillRect(menuBtnX,menuBtnY,menuBtnW,menuBtnH);
     ctx.strokeStyle='#ffaa66';ctx.lineWidth=1;ctx.strokeRect(menuBtnX,menuBtnY,menuBtnW,menuBtnH);
     ctx.fillStyle='#000';ctx.font='bold '+(compact?10:11)+'px monospace';ctx.textAlign='center';
@@ -5008,18 +5092,31 @@ function drawSettings(){
     cy+=compact?30:36;
     // Close button
     var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cy;
+    _settingsRects.close={x:cbX,y:cbY,w:cbW,h:cbH};
+    _settingsRects.panel={x:px,y:py,w:pw,h:ph};
     ctx.fillStyle='#44dd88';ctx.fillRect(cbX,cbY,cbW,cbH);
     ctx.fillStyle='#000';ctx.font='bold '+(compact?12:14)+'px monospace';ctx.textAlign='center';
     ctx.fillText(T('settingsClose'),W/2,cbY+cbH/2+5);
 }
 function handleSettingsClick(cx,cy){
+    var r=_settingsRects;
+    // Use recorded rects from drawSettings for accurate hit detection
+    if(r.godMode&&cx>=r.godMode.x&&cx<=r.godMode.x+r.godMode.w&&cy>=r.godMode.y&&cy<=r.godMode.y+r.godMode.h){godMode=!godMode;playSound('click');return;}
+    if(r.save&&cx>=r.save.x&&cx<=r.save.x+r.save.w&&cy>=r.save.y&&cy<=r.save.y+r.save.h){saveGame();playSound('click');return;}
+    if(r.load&&cx>=r.load.x&&cx<=r.load.x+r.load.w&&cy>=r.load.y&&cy<=r.load.y+r.load.h){loadGame();playSound('click');return;}
+    if(r.menu&&cx>=r.menu.x&&cx<=r.menu.x+r.menu.w&&cy>=r.menu.y&&cy<=r.menu.y+r.menu.h){
+        saveGame();state='menu';showSettings=false;labTab=null;activeBuffs=[];carriedPotions=[];
+        weaponPopup=null;merchantPopup=null;buffPopup=null;buffTooltipIndex=null;
+        playSound('click');playBGM('menu');return;
+    }
+    if(r.close&&cx>=r.close.x&&cx<=r.close.x+r.close.w&&cy>=r.close.y&&cy<=r.close.y+r.close.h){showSettings=false;saveSettings();playSound('click');return;}
+    // Sliders (BGM/SFX) and quality buttons still use computed coords
     var W=canvas.width,H=canvas.height;
     var compact=H<550;
     var lh=compact?28:42, titleH=compact?22:30, padY=compact?12:20;
     var ph=Math.min(H-padY*2,compact?340:450);
     var pw=Math.min(W-30,340),px=(W-pw)/2,py=(H-ph)/2;
     var cyy=py+titleH+20, sliderW=pw-100, sliderX=px+85;
-    // BGM slider
     var trackH=compact?8:10;
     if(cy>=cyy-12&&cy<=cyy+12&&cx>=sliderX&&cx<=sliderX+sliderW){
         bgmVolume=Math.max(0,Math.min(1,(cx-sliderX)/sliderW));
@@ -5027,55 +5124,18 @@ function handleSettingsClick(cx,cy){
         return;
     }
     cyy+=lh;
-    // SFX slider
     if(cy>=cyy-12&&cy<=cyy+12&&cx>=sliderX&&cx<=sliderX+sliderW){
         sfxVolume=Math.max(0,Math.min(1,(cx-sliderX)/sliderW));
         return;
     }
     cyy+=lh;
-    // Quality buttons
     var qBtnW=Math.floor((sliderW-8)/3),qBtnH=compact?22:26;
     for(var i=0;i<3;i++){
         var qx=sliderX+i*(qBtnW+4),qy=cyy-(compact?8:10);
-        if(cx>=qx&&cx<=qx+qBtnW&&cy>=qy&&cy<=qy+qBtnH){
-            qualityLevel=i;applyQuality();playSound('click');return;
-        }
+        if(cx>=qx&&cx<=qx+qBtnW&&cy>=qy&&cy<=qy+qBtnH){qualityLevel=i;applyQuality();playSound('click');return;}
     }
-    cyy+=lh+(compact?6:10);
-    // God Mode toggle button
-    var gmBtnW2=pw-24,gmBtnH2=compact?24:28,gmBtnX2=px+12,gmBtnY2=cyy;
-    if(cx>=gmBtnX2&&cx<=gmBtnX2+gmBtnW2&&cy>=gmBtnY2&&cy<=gmBtnY2+gmBtnH2){godMode=!godMode;playSound('click');return;}
-    cyy+=compact?30:36;
-    // Save & Load buttons
-    var sbW2=Math.floor((pw-40)/2),sbH2=compact?24:28;
-    var saveX2=px+12,loadX2=px+20+sbW2,sbY2=cyy;
-    if(cx>=saveX2&&cx<=saveX2+sbW2&&cy>=sbY2&&cy<=sbY2+sbH2){saveGame();playSound('click');return;}
-    if(cx>=loadX2&&cx<=loadX2+sbW2&&cy>=sbY2&&cy<=sbY2+sbH2){loadGame();playSound('click');return;}
-    cyy+=sbH2+(compact?6:10);
-    // Return to Menu button
-    var menuBtnW2=pw-24,menuBtnH2=compact?24:28,menuBtnX2=px+12,menuBtnY2=cyy;
-    if(cx>=menuBtnX2&&cx<=menuBtnX2+menuBtnW2&&cy>=menuBtnY2&&cy<=menuBtnY2+menuBtnH2){
-        // Return to main menu
-        saveGame();
-        state='menu';
-        showSettings=false;
-        labTab=null;
-        activeBuffs=[];
-        carriedPotions=[];
-        weaponPopup=null;
-        merchantPopup=null;
-        buffPopup=null;
-        buffTooltipIndex=null;
-        playSound('click');
-        playBGM('menu');
-        return;
-    }
-    cyy+=compact?30:36;
-    // Close button
-    var cbW=compact?100:120,cbH=compact?28:34,cbX=W/2-cbW/2,cbY=cyy;
-    if(cx>=cbX&&cx<=cbX+cbW&&cy>=cbY&&cy<=cbY+cbH){showSettings=false;saveSettings();playSound('click');return;}
     // Click outside panel to close
-    if(cx<px||cx>px+pw||cy<py||cy>py+ph){showSettings=false;saveSettings();playSound('click');return;}
+    if(r.panel&&(cx<r.panel.x||cx>r.panel.x+r.panel.w||cy<r.panel.y||cy>r.panel.y+r.panel.h)){showSettings=false;saveSettings();playSound('click');return;}
 }
 function saveSettings(){
     try{localStorage.setItem('alchemist_settings',JSON.stringify({lang:lang,bgmVolume:bgmVolume,sfxVolume:sfxVolume,qualityLevel:qualityLevel}));}catch(e){}
